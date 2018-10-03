@@ -25,7 +25,6 @@ def parse_json(input_string):
     object_index = 0
     start_index = 0
     results = []
-    # in_string = False
     try:
         for i in range(len(input_string)):
             if input_string[i] in start_delimiters:
@@ -34,14 +33,11 @@ def parse_json(input_string):
                 if not match_delimiters(stack.pop(), input_string[i]):
                     print("Malformed JSON object at index {}.".format(object_index))
                     sys.exit(1)
-                if not stack:  # check if stack is empty
+                if not stack:
                     results.append({"index": object_index,
                                     "value": json.loads(input_string[start_index:i+1])})
                     start_index = i + 1
                     object_index += 1
-            # elif input_string[i] == '"':
-            #     if in_string:
-
         if stack:
             print("Malformed JSON object at index {}.".format(object_index))
             sys.exit(1)
