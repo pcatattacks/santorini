@@ -14,8 +14,7 @@ def take_input():
 
 def match_delimiters(opening, closing):
     return (opening == "{" and closing == "}") or \
-           (opening == "[" and closing == "]") or \
-           (opening == '"' and closing == '"')
+           (opening == "[" and closing == "]")
 
 
 def parse_json(input_string):
