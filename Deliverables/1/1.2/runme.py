@@ -23,7 +23,7 @@ def parse_json(input_string):
     stack = []
     start_delimiters = ["[", "{"]
     end_delimiters = ["]", "}"]
-    object_index = 0
+    object_index = 1
     start_index = 0
     results = []
     try:
