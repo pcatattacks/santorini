@@ -1,5 +1,14 @@
+{"greeting": [
+                "hello",
+                "world"
+                ]
+       }
+[1, 2,
+ 3]
+{"key":
+"value"}
 "word1"
-[1, 2, 3]
-{"key": "value"}
 "word2"
-{"greeting": ["hello", "world"] }
+" blah blah
+hello
+"

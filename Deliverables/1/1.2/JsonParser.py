@@ -1,33 +1,60 @@
 import json
+import sys
 
 
 def take_input():
-    inputs = []
+    input_string = ""
     while True:
         try:
-            line = input()
-            inputs.append(line)
+            input_string += input()
         except EOFError:
             break
-    return inputs
+    return input_string
 
 
-def parse_json(input_line, index):
+def match_delimiters(opening, closing):
+    return (opening == "{" and closing == "}") or \
+           (opening == "[" and closing == "]") or \
+           (opening == '"' and closing == '"')
+
+
+def parse_json(input_string):
+    stack = []
+    start_delimiters = ["[", "{"]
+    end_delimiters = ["]", "}"]
+    object_index = 0
+    start_index = 0
+    results = []
+    # in_string = False
     try:
-        val = json.loads(input_line)
-        return json.dumps({"index": index, "value": val})
+        for i in range(len(input_string)):
+            if input_string[i] in start_delimiters:
+                stack.append(input_string[i])
+            elif input_string[i] in end_delimiters:
+                if not match_delimiters(stack.pop(), input_string[i]):
+                    print("Malformed JSON object at index {}.".format(object_index))
+                    sys.exit(1)
+                if not stack:  # check if stack is empty
+                    results.append({"index": object_index,
+                                    "value": json.loads(input_string[start_index:i+1])})
+                    start_index = i + 1
+                    object_index += 1
+            # elif input_string[i] == '"':
+            #     if in_string:
+
+        if stack:
+            print("Malformed JSON object at index {}.".format(object_index))
+            sys.exit(1)
     except ValueError:
-        return "Bad JSON object detected."
+        print("Malformed JSON object at index {}.".format(object_index))
+        sys.exit(1)
+    return results
 
 
 def main():
-    inputs = take_input()
-    results = []
-    for i in range(len(inputs)):
-        results.append(parse_json(inputs[i], i))
-
+    results = parse_json(take_input())
     for i in range(len(results)-1, -1, -1):
-        print(results[i])
+        print(json.dumps(results[i]))
 
 
 if __name__ == "__main__":
