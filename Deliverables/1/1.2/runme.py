@@ -26,32 +26,48 @@ def parse_json(input_string):
     object_index = 1
     start_index = 0
     results = []
+    in_value = False
     try:
-        for i in range(len(input_string)):
-            if input_string[i] in start_delimiters:
-                stack.append(input_string[i])
-            elif input_string[i] in end_delimiters:
-                if not match_delimiters(stack.pop(), input_string[i]):
-                    print("Malformed JSON object at index {}.".format(object_index))
-                    sys.exit(1)
-                if not stack:
+        for i, char in enumerate(input_string):
+            if in_value:
+                # if char.startswith('\"'):
+                #     continue
+                if char == '"':
+                    in_value = False
                     results.append({"index": object_index,
-                                    "value": json.loads(input_string[start_index:i+1])})
-                    start_index = i + 1
+                                    "value": input_string[start_index:i]})
                     object_index += 1
+            else:
+                if not stack:  # starting a new value
+                    if char == '"':
+                        in_value = True
+                        start_index = i+1
+
+                if char in start_delimiters:
+                    stack.append(char)
+                elif char in end_delimiters:
+                    if not match_delimiters(stack.pop(), char):
+                        print("Malformed JSON value at index {}.".format(object_index))
+                        sys.exit(1)
+                    if not stack:
+                        results.append({"index": object_index,
+                                        "value": json.loads(input_string[start_index:i+1])})
+                        start_index = i + 1
+                        object_index += 1
         if stack:
-            print("Malformed JSON object at index {}.".format(object_index))
+            print("Malformed JSON value at index {}.".format(object_index))
             sys.exit(1)
     except ValueError:
-        print("Malformed JSON object at index {}.".format(object_index))
+        print(input_string[start_index:i+1])
+        print("Malformed JSON value at index {}.".format(object_index))
         sys.exit(1)
     return results
 
 
 def main():
     results = parse_json(take_input())
-    for i in range(len(results)-1, -1, -1):
-        print(json.dumps(results[i]))
+    for val in reversed(results):
+        print(json.dumps(val))
 
 
 if __name__ == "__main__":

@@ -1,3 +1,8 @@
+"hello world"
+"hello
+world on new line"
+"hello \"
+with escaped quote"
 {"greeting": [
                 "hello",
                 "world"
