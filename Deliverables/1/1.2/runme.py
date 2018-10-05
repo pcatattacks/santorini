@@ -8,7 +8,7 @@ def take_input():
     input_string = ""
     while True:
         try:
-            input_string += input()
+            input_string += input() + "\n"
         except EOFError:
             break
     return input_string
@@ -30,20 +30,19 @@ def parse_json(input_string):
     try:
         for i, char in enumerate(input_string):
             if in_value:
-                # if char.startswith('\"'):
-                #     continue
-                if char == '"':
-                    in_value = False
-                    results.append({"index": object_index,
-                                    "value": input_string[start_index:i]})
-                    object_index += 1
+                if char == '\n':
+                    try:
+                        val = "[" + input_string[start_index:i] + "]"
+                        results.append({"index": object_index,
+                                        "value": json.loads(val)[0]})
+                        in_value = False
+                        object_index += 1
+                    except ValueError:
+                        continue
             else:
-                if not stack:  # starting a new value
-                    if char == '"':
-                        in_value = True
-                        start_index = i+1
-
                 if char in start_delimiters:
+                    if not stack:
+                        start_index = i
                     stack.append(char)
                 elif char in end_delimiters:
                     if not match_delimiters(stack.pop(), char):
@@ -51,15 +50,17 @@ def parse_json(input_string):
                         sys.exit(1)
                     if not stack:
                         results.append({"index": object_index,
-                                        "value": json.loads(input_string[start_index:i+1])})
+                                        "value": json.loads(input_string[start_index:i + 1])})
                         start_index = i + 1
                         object_index += 1
+                elif not stack:  # starting a new value
+                    in_value = True
+                    start_index = i
         if stack:
             print("Malformed JSON value at index {}.".format(object_index))
             sys.exit(1)
-    except ValueError:
-        print(input_string[start_index:i+1])
-        print("Malformed JSON value at index {}.".format(object_index))
+    except ValueError as e:
+        print("Malformed JSON value at index {}.".format(object_index), e)
         sys.exit(1)
     return results
 
