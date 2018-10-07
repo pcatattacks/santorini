@@ -62,6 +62,9 @@ def parse_json(input_string):
     except ValueError as e:
         print("Malformed JSON value at index {}.".format(object_index), e)
         sys.exit(1)
+    except IndexError as e:
+        print("Malformed JSON value at index {}.".format(object_index-1), e)
+        sys.exit(1)
     return results
 
 
