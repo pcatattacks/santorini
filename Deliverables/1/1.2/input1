@@ -6,8 +6,7 @@
 [1, 2,
  3]
 {"key":
-"value"}
-[ { "hello":
+"value"}[ { "hello":
              "world",
              "hi": "prashanth"
              },
