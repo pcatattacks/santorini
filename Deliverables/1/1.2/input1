@@ -1,3 +1,6 @@
+"\n\n \n\n"
+"hello world"
+"hello \" with escaped quote"
 {"greeting": [
                 "hello",
                 "world"
@@ -13,3 +16,15 @@
              {"this": "is pranav",
              "doing": 1000}
              ]
+true
+21312
+["test"]
+23
+false
+32
+null
+{"test": null,
+        "another test": true
+        }
+121412
+123
