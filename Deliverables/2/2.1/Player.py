@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-
 class Player(object):
 
     @staticmethod
@@ -35,10 +32,3 @@ class Player(object):
             print("You, the player, have won!")
         else:
             print("Sorry, you have lost. Better luck next time!")
-
-
-if __name__ == "__main__":
-    # only for initial testing.
-    Player.start_game()
-    Player.keep_number()
-    Player.end_game(True)
