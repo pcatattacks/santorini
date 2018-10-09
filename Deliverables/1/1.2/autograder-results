@@ -1,0 +1,99 @@
+Team 1 tests:
+	passed: 0
+	failed: 3
+	failed tests:
+		tests/1/1.2/1/valid/input1
+		tests/1/1.2/1/valid/input2
+		tests/1/1.2/1/valid/input5
+Team 2 tests:
+	passed: 0
+	failed: 5
+	failed tests:
+		tests/1/1.2/2/valid/input1
+		tests/1/1.2/2/valid/input2
+		tests/1/1.2/2/valid/input3
+		tests/1/1.2/2/valid/input4
+		tests/1/1.2/2/valid/input5
+Team 3 tests:
+	passed: 0
+	failed: 5
+	failed tests:
+		tests/1/1.2/3/valid/input1
+		tests/1/1.2/3/valid/input2
+		tests/1/1.2/3/valid/input3
+		tests/1/1.2/3/valid/input4
+		tests/1/1.2/3/valid/input5
+Team 4 tests:
+	passed: 4
+	failed: 1
+	failed tests:
+		tests/1/1.2/4/valid/input3
+Team 5 tests:
+	passed: 0
+	failed: 3
+	failed tests:
+		tests/1/1.2/5/valid/input2
+		tests/1/1.2/5/valid/input3
+		tests/1/1.2/5/valid/input4
+Team 6 tests:
+	passed: 0
+	failed: 5
+	failed tests:
+		tests/1/1.2/6/valid/input1
+		tests/1/1.2/6/valid/input2
+		tests/1/1.2/6/valid/input3
+		tests/1/1.2/6/valid/input4
+		tests/1/1.2/6/valid/input5
+Team 7 tests:
+	passed: 1
+	failed: 4
+	failed tests:
+		tests/1/1.2/7/valid/input1
+		tests/1/1.2/7/valid/input2
+		tests/1/1.2/7/valid/input4
+		tests/1/1.2/7/valid/input5
+Team 8 tests:
+	passed: 1
+	failed: 3
+	failed tests:
+		tests/1/1.2/8/valid/input2
+		tests/1/1.2/8/valid/input4
+		tests/1/1.2/8/valid/input5
+Team 11 tests:
+	passed: 0
+	failed: 5
+	failed tests:
+		tests/1/1.2/11/valid/input1
+		tests/1/1.2/11/valid/input2
+		tests/1/1.2/11/valid/input3
+		tests/1/1.2/11/valid/input4
+		tests/1/1.2/11/valid/input5
+Team 12 tests:
+	passed: 5
+	failed: 0
+	failed tests:
+Team 13 tests:
+	passed: 0
+	failed: 0
+	failed tests:
+Team 14 tests:
+	passed: 1
+	failed: 2
+	failed tests:
+		tests/1/1.2/14/valid/input2
+		tests/1/1.2/14/valid/input4
+Team 15 tests:
+	passed: 2
+	failed: 3
+	failed tests:
+		tests/1/1.2/15/valid/input1
+		tests/1/1.2/15/valid/input3
+		tests/1/1.2/15/valid/input5
+Team 16 tests:
+	passed: 0
+	failed: 1
+	failed tests:
+		tests/1/1.2/16/valid/input1
+
+
+Overall Score: 14/54
