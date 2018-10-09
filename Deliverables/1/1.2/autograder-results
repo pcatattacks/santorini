@@ -7,11 +7,8 @@ Team 1 tests:
 		tests/1/1.2/1/valid/input5
 Team 2 tests:
 	passed: 0
-	failed: 5
+	failed: 2
 	failed tests:
-		tests/1/1.2/2/valid/input1
-		tests/1/1.2/2/valid/input2
-		tests/1/1.2/2/valid/input3
 		tests/1/1.2/2/valid/input4
 		tests/1/1.2/2/valid/input5
 Team 3 tests:
@@ -46,11 +43,10 @@ Team 6 tests:
 		tests/1/1.2/6/valid/input5
 Team 7 tests:
 	passed: 1
-	failed: 4
+	failed: 3
 	failed tests:
 		tests/1/1.2/7/valid/input1
 		tests/1/1.2/7/valid/input2
-		tests/1/1.2/7/valid/input4
 		tests/1/1.2/7/valid/input5
 Team 8 tests:
 	passed: 1
@@ -61,13 +57,8 @@ Team 8 tests:
 		tests/1/1.2/8/valid/input5
 Team 11 tests:
 	passed: 0
-	failed: 5
+	failed: 0
 	failed tests:
-		tests/1/1.2/11/valid/input1
-		tests/1/1.2/11/valid/input2
-		tests/1/1.2/11/valid/input3
-		tests/1/1.2/11/valid/input4
-		tests/1/1.2/11/valid/input5
 Team 12 tests:
 	passed: 5
 	failed: 0
@@ -96,4 +87,7 @@ Team 16 tests:
 		tests/1/1.2/16/valid/input1
 
 
-Overall Score: 14/54
+Overall Passed: 14/45
+Test Submission Grade (out of 5): 5
+Test Run Grade (out of 5): 2
+Assignment Score (out of 10): 7
