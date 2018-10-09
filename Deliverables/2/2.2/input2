@@ -1,0 +1,9 @@
+{
+        "operation-name": "start_game",
+        "operation-argument1": -1
+    }
+{
+    "operation-name": "start_game",
+    "operation-argument1": 9
+}
+{"operation-name": "start_game", "operation-argument1": 4}

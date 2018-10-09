@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import random
-from runme import take_input, parse_json
+from JsonParser import take_input, parse_json
 
 MIN_POSSIBLE_VALUE = 1
 MAX_POSSIBLE_VALUE = 10
