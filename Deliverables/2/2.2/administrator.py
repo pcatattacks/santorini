@@ -1,82 +1,58 @@
 #!/usr/bin/python3
 import random
-
+from runme import take_input, parse_json
 
 MIN_POSSIBLE_VALUE = 1
 MAX_POSSIBLE_VALUE = 10
 
 
 class GameWorld:
-
-    new_game = True
-    system_option = -1
+    admin_option = -1
     player_option = -1
     swap_option = -1
 
 
-def start_game(game_world):
-
-    if game_world.new_game is True:
-        game_world.new_game = False
-    else:
-        print("Game already in Progress. Cannot start new game")
-    return game_world
-
-
-def admin_option_picker(game_world):
-
-    if game_world.new_game is True:
-
-        face_down_cards = list(range(MIN_POSSIBLE_VALUE, MAX_POSSIBLE_VALUE + 1))
-        random.shuffle(face_down_cards)
-
-        game_world.system_option = face_down_cards.pop()
-        game_world.swap_option = face_down_cards.pop()
-    else:
-        print("Cannot modify in-between game!!")
-    return game_world
-
-
-# Set User Option by calling player_option_picker() which would return the player's option.
-def set_user_option(game_world):
-    # TODO:  Should be replaced with PlayerModule.player_option_picker() - If boolean then use admin.swap_option
-    if game_world.new_game is False:
-        # TODO: Remove this line of code after player module is implemented.
-        game_world.player_option = game_world.swap_option
-        ''' 
-            player_option = player_module.player_option_picker()
-            if type(player_option) is boolean:
-                game_world.player_option = game_world.swap_option
-            else:
-                game_world.player_option = player_option
-    
-        '''
-    else:
-        print("Cannot Modify in-between game")
-    return game_world
-
-
-def admin_win_checker(game_world):
-    if game_world.new_game is False:
-
-        if game_world.player_option > game_world.system_option:
-            return True
-        else:
-            return False
-
-
-def admin_game_driver():
+def start_game(player_option):
     game_world = GameWorld()
-
     game_world = admin_option_picker(game_world)
-    game_world = start_game(game_world)
-    game_world = set_user_option(game_world)
+    game_world = set_user_option(game_world, player_option)
 
     return admin_win_checker(game_world)
 
 
+def admin_option_picker(game_world):
+    face_down_cards = list(range(MIN_POSSIBLE_VALUE, MAX_POSSIBLE_VALUE + 1))
+    random.shuffle(face_down_cards)
+    game_world.admin_option = face_down_cards.pop()
+    game_world.swap_option = face_down_cards.pop()
+
+    # TESTING:  Setting values for testing purposes - Random values works as expected.
+    game_world.admin_option = 8
+    game_world.swap_option = 6
+
+    return game_world
+
+
+def set_user_option(game_world, user_option):
+    if user_option is -1:
+        game_world.player_option = game_world.swap_option
+    else:
+        game_world.player_option = user_option
+    return game_world
+
+
+def admin_win_checker(game_world):
+    if game_world.player_option > game_world.admin_option:
+        return "Player Won"
+    else:
+        return "Player Lost"
+
+
 def main():
-    admin_game_driver()
+    command_list = parse_json(take_input())
+    for command_obj in command_list:
+        if command_obj['value']['operation-name'] == "start_game":
+            print(start_game(int(command_obj['value']['operation-argument1'])))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 Change in the Player Module:
 
 1) In player_option_picker():
-    -> Should return the number if user wants to keep declared number
-    -> Should return a boolean if user wants to choose the card given by the administrator
+    -> Should return the declared number if user wants to keep the declared number
+    -> Should return -1 if user wants to choose the card given by the administrator
 
 
