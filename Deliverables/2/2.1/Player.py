@@ -1,29 +1,15 @@
+import random
+
+
 class Player(object):
 
     @staticmethod
     def start_game():
-        while True:
-            try:
-                number = int(input("Please choose an integer between 1 and 10 inclusive:"))
-                assert 0 <= number <= 10
-                break
-            except (ValueError, AssertionError):
-                print("Invalid value.")
-        return number
+        return random.randint(0, 11)
 
     @staticmethod
     def keep_number():
-        pick = 'pick'
-        keep = 'keep'
-        while True:
-            try:
-                decision = input("""Would you like to keep your number or pick one from the pile?
-                Please enter {option1} or {option2}:""".format(option1=pick, option2=keep))
-                assert decision.lower() == pick or decision.lower() == keep
-                break
-            except AssertionError:
-                print("Please choose and type either 'pick' or 'keep':")
-        return True if decision == keep else False
+        return random.choice((True, False))
 
     @staticmethod
     def end_game(won):
