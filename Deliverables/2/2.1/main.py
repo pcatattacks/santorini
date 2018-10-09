@@ -1,5 +1,5 @@
-from .Player import Player
-from .JsonParser import take_input, parse_json
+from Player import Player
+from JsonParser import take_input, parse_json
 
 
 def main():

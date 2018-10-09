@@ -14,7 +14,4 @@ class Player(object):
     @staticmethod
     def end_game(won):
         assert type(won) is bool
-        if won:
-            print("You, the player, have won!")
-        else:
-            print("Sorry, you have lost. Better luck next time!")
+
