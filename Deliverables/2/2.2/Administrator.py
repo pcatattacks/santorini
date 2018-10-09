@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import random
 from JsonParser import take_input, parse_json
+import json
 
 MIN_POSSIBLE_VALUE = 1
 MAX_POSSIBLE_VALUE = 10
@@ -52,7 +53,11 @@ def main():
     command_list = parse_json(take_input())
     for command_obj in command_list:
         if command_obj['value']['operation-name'] == "start_game":
-            print(start_game(int(command_obj['value']['operation-argument1'])))
+            val = int(command_obj['value']['operation-argument1'])
+            result = start_game(val)
+            json_result = {"operation-name": "start_game",
+                           "operation-argument1": result}
+            print(json.dumps(json_result))
 
 
 if __name__ == "__main__":
