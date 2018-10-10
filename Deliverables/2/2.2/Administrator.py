@@ -1,64 +1,57 @@
-#!/usr/bin/python3
 import random
-from JsonParser import take_input, parse_json
 import json
 
 MIN_POSSIBLE_VALUE = 1
 MAX_POSSIBLE_VALUE = 10
 
 
-class GameWorld:
-    admin_option = -1
-    player_option = -1
-    swap_option = -1
+class ContractError(Exception):
+    """Custom exception for violating contracts."""
+    pass
 
 
-def start_game(player_option):
-    game_world = GameWorld()
-    game_world = admin_option_picker(game_world)
-    game_world = set_user_option(game_world, player_option)
+class Administrator(object):
 
-    return admin_win_checker(game_world)
+    def __init__(self):
+        self.admin_option = -1
+        self.player_option = -1
+        self.face_down_cards = random.shuffle(list(range(MIN_POSSIBLE_VALUE, MAX_POSSIBLE_VALUE + 1)))
 
+    def start_game(self):
+        self.pick_card()
+        self.send_player_message("pick_number_or_card")
+        self.set_player_option(int(input()))  # handles players choice
+        self.send_player_message("notify_of_verdict", self.admin_win())
+        self.end_game()
 
-def admin_option_picker(game_world):
-    face_down_cards = list(range(MIN_POSSIBLE_VALUE, MAX_POSSIBLE_VALUE + 1))
-    random.shuffle(face_down_cards)
-    game_world.admin_option = face_down_cards.pop()
-    game_world.swap_option = face_down_cards.pop()
+    def pick_card(self):
+        # self.admin_option = face_down_cards.pop()
+        self.admin_option = 8  # TESTING:  Setting values for testing purposes - Random value works as expected.
 
-    # TESTING:  Setting values for testing purposes - Random values works as expected.
-    game_world.admin_option = 8
-    game_world.swap_option = 6
+    def admin_win(self):
+        return self.admin_option >= self.player_option
 
-    return game_world
+    def set_player_option(self, value):
+        if type(value) is not int:
+            raise TypeError("Administrator.set_player_option() only excepts one integer argument.")
+        elif value > MAX_POSSIBLE_VALUE or value < MIN_POSSIBLE_VALUE:
+            raise ValueError("Administrator.set_player_option() value argument \
+                                must be between {min} and {max} inclusive."
+                             .format(min=MIN_POSSIBLE_VALUE, max=MAX_POSSIBLE_VALUE))
+        if value == -1:
+            self.player_option = self.face_down_cards.pop()
+        else:
+            self.player_option = value
 
+    @staticmethod
+    def send_player_message(operation_name, *args):
+        message = {"operation-name": operation_name}
+        for i, arg in enumerate(args):
+            message["operation-argument{}".format(i)] = arg
+        print(json.dumps(message))
 
-def set_user_option(game_world, user_option):
-    if user_option is -1:
-        game_world.player_option = game_world.swap_option
-    else:
-        game_world.player_option = user_option
-    return game_world
-
-
-def admin_win_checker(game_world):
-    if game_world.player_option > game_world.admin_option:
-        return "Player Won"
-    else:
-        return "Player Lost"
-
-
-def main():
-    command_list = parse_json(take_input())
-    for command_obj in command_list:
-        if command_obj['value']['operation-name'] == "start_game":
-            val = int(command_obj['value']['operation-argument1'])
-            result = start_game(val)
-            json_result = {"operation-name": "start_game",
-                           "operation-argument1": result}
-            print(json.dumps(json_result))
-
-
-if __name__ == "__main__":
-    main()
+    def end_game(self):
+        """Resets the game state so it can be played again."""
+        self.admin_option = -1
+        self.player_option = -1
+        self.face_down_cards = random.shuffle(list(range(MIN_POSSIBLE_VALUE, MAX_POSSIBLE_VALUE + 1)))

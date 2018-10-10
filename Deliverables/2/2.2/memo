@@ -1,7 +1,15 @@
 Change in the Player Module:
 
-1) In player_option_picker():
+1) We no longer need the player_number_generator() function.
+
+2) For player_option_picker():
+    -> rename function to pick_number_or_card()
     -> Should return the declared number if user wants to keep the declared number
     -> Should return -1 if user wants to choose the card given by the administrator
+    CONTRACT: function can only be called once before notify_of_verdict() is called.
 
-
+3) We need a new function, notify_of_verdict() that takes:
+    -> win: a boolean that is True if the player has won, False otherwise
+    -> prints a message to notify the player that they won or lost.
+    -> returns nothing. The admin does not expect anything from this function.
+    CONTRACT: notify_of_verdict() can only be called once before player_option_picker() is called.
