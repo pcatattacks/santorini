@@ -1,1 +1,2 @@
-AssertionError: Can't call player.start_game() more than once until player.end_game() is called.
+Player.ContractError: Can't call player.start_game() more than once until player.end_game() is called.
+

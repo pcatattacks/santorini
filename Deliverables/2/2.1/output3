@@ -1,1 +1,1 @@
-AssertionError: Can't call player.end_game() until player.start_game() is called.
+Player.ContractError: Can't call player.end_game() until player.start_game() is called.
