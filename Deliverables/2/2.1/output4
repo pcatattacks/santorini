@@ -1,0 +1,1 @@
+AssertionError: Can't call player.keep_number() until player.start_game() is called.

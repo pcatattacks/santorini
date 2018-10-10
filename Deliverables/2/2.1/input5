@@ -1,0 +1,8 @@
+{
+    "operation-name": "start_game"
+}
+{
+    "operation-name" : "end_game",
+    "operation-argument1": false
+}
+{"operation-name": "keep_number"}
