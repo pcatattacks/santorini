@@ -1,4 +1,7 @@
-Change in the Player Module:
+To: Overlord Founder of our Precious Startup
+From: Team 12 (Pranav Dhingra, Prashanth Thirupachur)
+
+Changes in the Player Module:
 
 1) We no longer need the player_number_generator() function.
 

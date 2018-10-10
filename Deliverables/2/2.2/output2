@@ -1,3 +1,2 @@
-{"operation-name": "start_game", "operation-argument1": "Player Lost"}
-{"operation-name": "start_game", "operation-argument1": "Player Won"}
-{"operation-name": "start_game", "operation-argument1": "Player Lost"}
+{"operation-name": "pick_number_or_card"}
+{"operation-name": "notify_of_verdict", "operation-argument1": true}
