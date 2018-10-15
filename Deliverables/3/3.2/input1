@@ -4,5 +4,5 @@
       [3, 2, 1, 0, 4],
       [0, [2, "blue2"], 1, 2, 3]],
 
-      ["neighboring-cell-exists?", "blue1", "N"]
+      ["neighboring-cell-exists?", "blue1", "S"]
   ]

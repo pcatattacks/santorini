@@ -1,7 +1,6 @@
-from JsonParser import take_input, parse_json
+from enum import Enum
 
-# from enum import Enum
-#
+
 # class Direction(Enum):
 #     N = "N"
 #     NE = "NE"
@@ -11,8 +10,8 @@ from JsonParser import take_input, parse_json
 #     SW = "SW"
 #     W = "W"
 #     NW = "NW"
-#
-#
+
+
 # class Worker(Enum):
 #     blue1 = "blue1"
 #     blue2 = "blue2"
@@ -41,15 +40,6 @@ class Board:
     def __init__(self):
         self.board = None
 
-    # TODO: may not be necessary
-    def parse_board(self, json_board):
-        """
-        Parses a JSON representation of a board, converts it to a Python object and assigns to member variable.
-        :param json_board:
-        :return: Void
-        """
-        pass
-
     def set_board(self, board_obj):
         """
         Sets board member variable to the passed in board object.
@@ -61,16 +51,18 @@ class Board:
     def neighboring_cell_exists(self, worker, direction):
         """
 
-        :param worker:
-        :param direction:
-        :return: Boolean stating whether cell is occupied or not
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2"
+        :param direction: a string which is either "N", "NE"...
+        :return: Boolean stating whether cell adjacent in the specified direction exists or not.
         """
-        pass
+        worker_row, worker_col, worker_height = self._get_worker_position(worker)
+        adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
+        return 0 <= adj_cell_row <= len(self.board) and 0 <= adj_cell_col <= len(self.board[0])
 
     def get_height(self, worker, direction):
         """
 
-        :param worker:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2"
         :param direction:
         :return: positive integer, [0, 4]
         """
@@ -105,11 +97,42 @@ class Board:
 
     def _get_worker_position(self, worker):
         """
-
-        :param worker:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
         :return: returns tuple of (row, col, height) where row, col are elem of [0,5] and height is elem [0,4].
         """
-        pass
+        # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
+        for r, row in enumerate(self.board):
+            for c, cell in enumerate(row):
+                if type(cell) == list and cell[1] == worker:
+                    return r, c, cell[0]
+
+    @staticmethod
+    def _get_adj_cell(worker_row, worker_col, direction_string):
+        """
+
+        :param worker_row: int specifying worker's x position
+        :param worker_col: int specifying worker's y position
+        :param direction_string: a string which is either "N", "NW", ...
+        :return:
+        """
+        if direction_string == "N":
+            return worker_row + 1, worker_col
+        elif direction_string == "E":
+            return worker_row, worker_col + 1
+        elif direction_string == "S":
+            return worker_row - 1, worker_col
+        elif direction_string == "W":
+            return worker_row, worker_col - 1
+        elif direction_string == "NE":
+            return worker_row + 1, worker_col + 1
+        elif direction_string == "SE":
+            return worker_row - 1, worker_col + 1
+        elif direction_string == "NW":
+            return worker_row + 1, worker_col - 1
+        elif direction_string == "SW":
+            return worker_row - 1, worker_col - 1
+        else:
+            raise ValueError("Invalid direction string!")
 
     def _is_valid_move(self, worker, direction):
         """
