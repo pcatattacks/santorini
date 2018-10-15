@@ -73,9 +73,13 @@ class Board:
 
         :param worker:
         :param direction:
-        :return: Boolean that tells us whether a cell is occupied or not
+        :return: True if the adjacent cell in the given direction exists and is occupied, false, if cell is unoccupied.
         """
-        pass
+        worker_row, worker_col, cell_height = self._get_worker_position(worker)
+        if not self.neighboring_cell_exists(worker, direction):
+            return  # Behaviour unspecified if cell doesn't exist - look at spec.
+        adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+        return type(self.board[adj_cell_row][adj_cell_col]) == list
 
     def build(self, worker, direction):
         """
@@ -113,7 +117,7 @@ class Board:
         :param worker_row: int specifying worker's x position
         :param worker_col: int specifying worker's y position
         :param direction_string: a string which is either "N", "NW", ...
-        :return:
+        :return: Tuple of (row, col) of the adjacent cell in the specified direction.
         """
         if direction_string == "N":
             return worker_row + 1, worker_col
