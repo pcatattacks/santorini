@@ -61,13 +61,21 @@ class Board:
 
     def get_height(self, worker, direction):
         """
-
         :param worker: a string which is either "blue1", "blue2", "white1", "white2"
         :param direction:
-        :return: positive integer, [0, 4]
+        :return: positive integer, [0, 4] - The Height of the cell on the Board adjacent to the Worker in this Direction
+                if a such a cell exists
         """
-        pass
 
+        if self.neighboring_cell_exists(worker, direction):
+            worker_row, worker_col, worker_height = self._get_worker_position(worker)
+            adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
+            cell = self.board[adj_cell_row][adj_cell_col]
+            if type(cell) == list:
+                print(cell[0])
+            else:
+                print(cell)
+                
     def is_occupied(self, worker, direction):
         """
 
