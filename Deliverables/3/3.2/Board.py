@@ -1,3 +1,5 @@
+from JsonParser import take_input, parse_json
+
 # from enum import Enum
 #
 # class Direction(Enum):
@@ -36,6 +38,10 @@
 
 class Board:
 
+    def __init__(self):
+        self.board = None
+
+    # TODO: may not be necessary
     def parse_board(self, json_board):
         """
         Parses a JSON representation of a board, converts it to a Python object and assigns to member variable.
@@ -44,7 +50,15 @@ class Board:
         """
         pass
 
-    def neighbouring_cell_exists(self, worker, direction):
+    def set_board(self, board_obj):
+        """
+        Sets board member variable to the passed in board object.
+        :param board_obj:
+        :return: Void.
+        """
+        self.board = board_obj
+
+    def neighboring_cell_exists(self, worker, direction):
         """
 
         :param worker:
