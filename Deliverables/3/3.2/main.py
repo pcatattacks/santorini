@@ -1,3 +1,4 @@
+import json
 from JsonParser import take_input, parse_json
 from Board import Board
 
@@ -10,15 +11,20 @@ def main():
         board.set_board(given_board)
         command, worker, direction = statement
         if command == "move":
-            board.move(worker, direction)
+            print(json.dumps(
+                board.move(worker, direction)))
         elif command == "build":
-            board.build(worker, direction)
+            print(json.dumps(
+                board.build(worker, direction)))
         elif command == "get-height":
-            board.get_height(worker, direction)
+            print(json.dumps(
+                board.get_height(worker, direction)))
         elif command == "occupied?":
-            board.is_occupied(worker, direction)
+            print(json.dumps(
+                board.is_occupied(worker, direction)))
         elif command == "neighboring-cell-exists?":
-            board.neighboring_cell_exists(worker, direction)
+            print(json.dumps(
+                board.neighboring_cell_exists(worker, direction)))
         else:
             raise ValueError("Command not supported: {}".format(statement[0]))
 

@@ -57,7 +57,7 @@ class Board:
         """
         worker_row, worker_col, worker_height = self._get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
-        return 0 <= adj_cell_row <= len(self.board) and 0 <= adj_cell_col <= len(self.board[0])
+        return 0 <= adj_cell_row < len(self.board) and 0 <= adj_cell_col < len(self.board[0])
 
     def get_height(self, worker, direction):
         """
@@ -72,9 +72,10 @@ class Board:
             adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
             cell = self.board[adj_cell_row][adj_cell_col]
             if type(cell) == list:
-                print(cell[0])
+                return cell[0]
             else:
-                print(cell)
+                return cell
+        # behaviour unspecified if cell doesn't exist
                 
     def is_occupied(self, worker, direction):
         """
@@ -83,29 +84,41 @@ class Board:
         :param direction:
         :return: True if the adjacent cell in the given direction exists and is occupied, false, if cell is unoccupied.
         """
-        worker_row, worker_col, cell_height = self._get_worker_position(worker)
-        if not self.neighboring_cell_exists(worker, direction):
-            return  # Behaviour unspecified if cell doesn't exist - look at spec.
-        adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
-        return type(self.board[adj_cell_row][adj_cell_col]) == list
+        if self.neighboring_cell_exists(worker, direction):
+            worker_row, worker_col, cell_height = self._get_worker_position(worker)
+            adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+            return type(self.board[adj_cell_row][adj_cell_col]) == list
+        # behaviour unspecified if cell doesn't exist
 
     def build(self, worker, direction):
         """
         TODO: add a contract after seeing Piazza reply - check whether valid build or not
         :param worker:
         :param direction:
-        :return: JSON representation of a Board
+        :return: Object representation of a Board
         """
-        pass
+        if self._is_valid_build(worker, direction):
+            worker_row, worker_col, worker_height = self._get_worker_position(worker)
+            adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+            self.board[adj_cell_row][adj_cell_col] += 1
+            return self.board
+        # behaviour unspecified if invalid build
 
     def move(self, worker, direction):
         """
         TODO: add a contract after seeing Piazza reply - check whether valid move or not
         :param worker:
         :param direction:
-        :return: JSON representation of a Board
+        :return: Object representation of a Board
         """
-        pass
+        if self._is_valid_move(worker, direction):
+            worker_row, worker_col, worker_height = self._get_worker_position(worker)
+            adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+            adj_cell_height = self.board[adj_cell_row][adj_cell_col]
+            self.board[adj_cell_row][adj_cell_col] = [adj_cell_height, worker]
+            self.board[worker_row][worker_col] = worker_height
+            return self.board
+        # behaviour unspecified if invalid build
 
     def _get_worker_position(self, worker):
         """
@@ -153,7 +166,12 @@ class Board:
         :param direction:
         :return: Boolean denoting if move is valid or not
         """
-        pass
+        worker_height = self._get_worker_position(worker)[2]
+        adj_cell_height = self.get_height(worker, direction)
+        return self.neighboring_cell_exists(worker, direction) \
+            and not self.is_occupied(worker, direction) \
+            and adj_cell_height != 4 \
+            and adj_cell_height - worker_height <= 1
 
     def _is_valid_build(self, worker, direction):
         """
@@ -162,5 +180,7 @@ class Board:
         :param direction:
         :return: Boolean denoting if build is valid or not
         """
-        pass
-
+        adj_cell_height = self.get_height(worker, direction)
+        return self.neighboring_cell_exists(worker, direction) \
+            and not self.is_occupied(worker, direction) \
+            and adj_cell_height != 4
