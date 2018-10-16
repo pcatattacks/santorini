@@ -1,43 +1,9 @@
-from enum import Enum
-
-
-# class Direction(Enum):
-#     N = "N"
-#     NE = "NE"
-#     E = "E"
-#     SE = "SE"
-#     S = "S"
-#     SW = "SW"
-#     W = "W"
-#     NW = "NW"
-
-
-# class Worker(Enum):
-#     blue1 = "blue1"
-#     blue2 = "blue2"
-#     white1 = "white1"
-#     white2 = "white2"
-
-
-# class Cell:  # TODO
-#
-#     def __init__(self):
-#         self.height = 0
-#         self.worker = False
-#
-#     def occupied(self):
-#         return self.worker
-#
-#     def update_worker(self, on_or_off):
-#         self.worker = on_or_off
-#
-#     def update_height(self):
-#         pass
-
-
 class Board:
 
     def __init__(self):
+        """
+        # TODO: define all terms and board class
+        """
         self.board = None
 
     def set_board(self, board_obj):
@@ -52,7 +18,7 @@ class Board:
         """
 
         :param worker: a string which is either "blue1", "blue2", "white1", "white2"
-        :param direction: a string which is either "N", "NE"...
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: Boolean stating whether cell adjacent in the specified direction exists or not.
         """
         worker_row, worker_col, worker_height = self._get_worker_position(worker)
@@ -62,7 +28,7 @@ class Board:
     def get_height(self, worker, direction):
         """
         :param worker: a string which is either "blue1", "blue2", "white1", "white2"
-        :param direction:
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: positive integer, [0, 4] - The Height of the cell on the Board adjacent to the Worker in this Direction
                 if a such a cell exists
         """
@@ -80,8 +46,8 @@ class Board:
     def is_occupied(self, worker, direction):
         """
 
-        :param worker:
-        :param direction:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: True if the adjacent cell in the given direction exists and is occupied, false, if cell is unoccupied.
         """
         if self.neighboring_cell_exists(worker, direction):
@@ -93,8 +59,8 @@ class Board:
     def build(self, worker, direction):
         """
         TODO: add a contract after seeing Piazza reply - check whether valid build or not
-        :param worker:
-        :param direction:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: Object representation of a Board
         """
         if self._is_valid_build(worker, direction):
@@ -107,8 +73,8 @@ class Board:
     def move(self, worker, direction):
         """
         TODO: add a contract after seeing Piazza reply - check whether valid move or not
-        :param worker:
-        :param direction:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: Object representation of a Board
         """
         if self._is_valid_move(worker, direction):
@@ -135,8 +101,8 @@ class Board:
     def _get_adj_cell(worker_row, worker_col, direction_string):
         """
 
-        :param worker_row: int specifying worker's x position
-        :param worker_col: int specifying worker's y position
+        :param worker_row: int specifying worker's x position.
+        :param worker_col: int specifying worker's y position.
         :param direction_string: a string which is either "N", "NW", ...
         :return: Tuple of (row, col) of the adjacent cell in the specified direction.
         """
@@ -162,8 +128,8 @@ class Board:
     def _is_valid_move(self, worker, direction):
         """
 
-        :param worker:
-        :param direction:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: Boolean denoting if move is valid or not
         """
         worker_height = self._get_worker_position(worker)[2]
@@ -176,8 +142,8 @@ class Board:
     def _is_valid_build(self, worker, direction):
         """
 
-        :param worker:
-        :param direction:
+        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param direction: a string which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
         :return: Boolean denoting if build is valid or not
         """
         adj_cell_height = self.get_height(worker, direction)
