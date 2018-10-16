@@ -37,7 +37,7 @@ class Board:
             worker_row, worker_col, worker_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
             cell = self.board[adj_cell_row][adj_cell_col]
-            if type(cell) == list:
+            if isinstance(cell, list):
                 return cell[0]
             else:
                 return cell
@@ -53,7 +53,7 @@ class Board:
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, cell_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
-            return type(self.board[adj_cell_row][adj_cell_col]) == list
+            return isinstance(self.board[adj_cell_row][adj_cell_col], list)
         # behaviour unspecified if cell doesn't exist
 
     def build(self, worker, direction):
@@ -94,7 +94,7 @@ class Board:
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
         for r, row in enumerate(self.board):
             for c, cell in enumerate(row):
-                if type(cell) == list and cell[1] == worker:
+                if isinstance(cell, list) and cell[1] == worker:
                     return r, c, cell[0]
 
     @staticmethod
