@@ -189,3 +189,21 @@ class Board:
         :rtype: bool
         """
         pass
+
+    @staticmethod
+    def _is_valid_worker(worker):
+        """
+        :param any worker: a worker (as specified above).
+        :return: `True` if worker is as specified above, else `False`
+        :rtype: bool
+        """
+        pass
+
+    @staticmethod
+    def _is_valid_direction(direction):
+        """
+        :param any direction:
+        :return: `True` if direction is as specified above, else `False`
+        :rtype: bool
+        """
+        pass
