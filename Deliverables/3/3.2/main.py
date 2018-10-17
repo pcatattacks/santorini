@@ -29,7 +29,7 @@ def main():
             else:
                 raise ValueError("Command not supported: {}".format(statement[0]))
         except Exception as e:
-            print(e)
+            print(json.dumps(str(e)))
 
 
 if __name__ == "__main__":
