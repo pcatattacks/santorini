@@ -73,6 +73,8 @@ class Board:
         :return: `True` if cell adjacent in the specified direction exists, else `False`.
         :rtype: bool
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         worker_row, worker_col, worker_height = self._get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
         return 0 <= adj_cell_row < len(self.board) and 0 <= adj_cell_col < len(self.board[0])
@@ -86,6 +88,8 @@ class Board:
         :return: the height of the cell adjacent to the worker's position in the specified direction.
         :rtype: int
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, worker_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
@@ -107,6 +111,8 @@ class Board:
         `False`, if cell is unoccupied. Behaviour unspecified if cell adjacent cell doesn't exist.
         :rtype: bool, void
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, cell_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
@@ -125,6 +131,8 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         if self._is_valid_build(worker, direction):
             worker_row, worker_col, worker_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
@@ -149,6 +157,8 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         if self._is_valid_move(worker, direction):
             worker_row, worker_col, worker_height = self._get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
@@ -167,6 +177,8 @@ class Board:
         the form `(row, col, height)`.
         :rtype: tuple of ints
         """
+        if not self._is_valid_worker(worker):
+            raise ValueError("Invalid value(s) provided to function.")
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
         for r, row in enumerate(self.board):
             for c, cell in enumerate(row):
@@ -216,6 +228,8 @@ class Board:
         :return: Boolean denoting if move is valid or not
         :rtype: bool
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         worker_height = self._get_worker_position(worker)[2]
         adj_cell_height = self.get_height(worker, direction)
         return self.neighboring_cell_exists(worker, direction) \
@@ -236,7 +250,27 @@ class Board:
         :return: `True` if build is valid, else `False`
         :rtype: bool
         """
+        if not self._is_valid_worker(worker) or not self._is_valid_direction(direction):
+            raise ValueError("Invalid value(s) provided to function.")
         adj_cell_height = self.get_height(worker, direction)
         return self.neighboring_cell_exists(worker, direction) \
             and not self.is_occupied(worker, direction) \
             and adj_cell_height != 4
+
+    @staticmethod
+    def _is_valid_worker(worker):
+        """
+        :param any worker: a worker (as specified above).
+        :return: `True` if worker is as specified above, else `False`
+        :rtype: bool
+        """
+        return worker in ("blue1", "blue2", "white1", "white2")
+
+    @staticmethod
+    def _is_valid_direction(direction):
+        """
+        :param any direction:
+        :return: `True` if direction is as specified above, else `False`
+        :rtype: bool
+        """
+        return direction in ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
