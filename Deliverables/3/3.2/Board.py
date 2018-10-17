@@ -88,7 +88,7 @@ class Board:
 
     def _get_worker_position(self, worker):
         """
-        :param worker: a string which is either "blue1", "blue2", "white1", "white2".
+        :param worker: `string` which is either "blue1", "blue2", "white1", "white2".
         :return: returns tuple of (row, col, height) where row, col are elem of [0,5] and height is elem [0,4].
         """
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
@@ -101,27 +101,27 @@ class Board:
     def _get_adj_cell(worker_row, worker_col, direction_string):
         """
 
-        :param worker_row: int specifying worker's x position.
-        :param worker_col: int specifying worker's y position.
-        :param direction_string: a string which is either "N", "NW", ...
+        :param worker_row: `int` specifying worker's x position.
+        :param worker_col: `int` specifying worker's y position.
+        :param direction_string: `string` which is either "N", "NW", ...
         :return: Tuple of (row, col) of the adjacent cell in the specified direction.
         """
         if direction_string == "N":
-            return worker_row + 1, worker_col
+            return worker_row - 1, worker_col
         elif direction_string == "E":
             return worker_row, worker_col + 1
         elif direction_string == "S":
-            return worker_row - 1, worker_col
+            return worker_row + 1, worker_col
         elif direction_string == "W":
             return worker_row, worker_col - 1
         elif direction_string == "NE":
-            return worker_row + 1, worker_col + 1
-        elif direction_string == "SE":
             return worker_row - 1, worker_col + 1
+        elif direction_string == "SE":
+            return worker_row + 1, worker_col + 1
         elif direction_string == "NW":
-            return worker_row + 1, worker_col - 1
-        elif direction_string == "SW":
             return worker_row - 1, worker_col - 1
+        elif direction_string == "SW":
+            return worker_row + 1, worker_col - 1
         else:
             raise ValueError("Invalid direction string!")
 
