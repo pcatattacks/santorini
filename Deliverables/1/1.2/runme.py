@@ -8,7 +8,10 @@ def take_input():
     input_string = ""
     while True:
         try:
-            input_string += input() + "\n"
+            line = input()
+            if line.strip() == "":
+                continue
+            input_string += line + "\n"
         except EOFError:
             break
     return input_string

@@ -3,28 +3,37 @@
 "hello \" with escaped quote"
 {"greeting": [
                 "hello",
+
                 "world"
                 ]
        }
+
 [1, 2,
  3]
 {"key":
+
 "value"}[ { "hello":
              "world",
              "hi": "prashanth"
+
              },
              {"this": "is pranav",
              "doing": 1000}
              ]
+
 true
 21312
 ["test"]
 23
+
 false
 32
+
 null
 {"test": null,
         "another test": true
         }
+
 121412
+
 123
