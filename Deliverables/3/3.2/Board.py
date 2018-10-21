@@ -27,7 +27,7 @@ class Board:
         `int` in range [0, 4].
 
     position
-        `tuple` of `int`. `(row, col)`. A position is valid if `row` and `col` are in range [0,5].
+        `tuple` of `int`. `(row, col)`. A position is valid if `row` and `col` are in range [0,4].
 
     direction
         `string` which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
