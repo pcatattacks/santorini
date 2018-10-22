@@ -73,7 +73,7 @@ class Board:
         :return: `True` if cell adjacent in the specified direction exists, else `False`.
         :rtype: bool
         """
-        worker_row, worker_col, worker_height = self._get_worker_position(worker)
+        worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
         return 0 <= adj_cell_row < len(self.board) and 0 <= adj_cell_col < len(self.board[0])
 
@@ -86,7 +86,7 @@ class Board:
         :return: the height of the cell adjacent to the worker's position in the specified direction.
         :rtype: int
         """
-        worker_row, worker_col, worker_height = self._get_worker_position(worker)
+        worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
         cell = self.board[adj_cell_row][adj_cell_col]
         if isinstance(cell, list):
@@ -106,7 +106,7 @@ class Board:
         `False`, if cell is unoccupied. Behaviour unspecified if cell adjacent cell doesn't exist.
         :rtype: bool, void
         """
-        worker_row, worker_col, cell_height = self._get_worker_position(worker)
+        worker_row, worker_col, cell_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         return isinstance(self.board[adj_cell_row][adj_cell_col], list)
 
@@ -123,7 +123,7 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
-        worker_row, worker_col, worker_height = self._get_worker_position(worker)
+        worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         self.board[adj_cell_row][adj_cell_col] += 1
         return self.board
@@ -146,14 +146,14 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
-        worker_row, worker_col, worker_height = self._get_worker_position(worker)
+        worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         adj_cell_height = self.board[adj_cell_row][adj_cell_col]
         self.board[adj_cell_row][adj_cell_col] = [adj_cell_height, worker]
         self.board[worker_row][worker_col] = worker_height
         return self.board
 
-    def _get_worker_position(self, worker):
+    def get_worker_position(self, worker):
         """
         Returns the position of the given worker and the height at that position as one tuple of
         the form `(row, col, height)` by iterating through the the cells in `self.board`.
