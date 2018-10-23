@@ -24,7 +24,7 @@ def main():
                     print(json.dumps("yes"))
                     continue
                 board.move(worker, move_dir)
-                if RuleChecker.is_valid_build(worker, build_dir):
+                if RuleChecker.is_valid_build(board, worker, build_dir):
                     print(json.dumps("yes"))
                 else:
                     print(json.dumps("no"))
