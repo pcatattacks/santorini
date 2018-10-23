@@ -20,7 +20,7 @@ def test_input_x(exe_name, input_num):
     actual_output = parse_json(actual_output)  # parsing json into python list of values
     with open("output{}".format(input_num), "r") as output_file:
         # reading + parsing output json into python list of values
-        data = output_file.read()
+        data = output_file.read() + '\n'  # adding newline for our parser
         expected_output = parse_json(data)
     # print(expected_output)
     # print(actual_output)

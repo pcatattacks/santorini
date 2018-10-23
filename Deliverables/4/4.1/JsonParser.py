@@ -47,7 +47,7 @@ def parse_json(input_string):
                     stack.append(char)
                 elif char in end_delimiters:
                     if not match_delimiters(stack.pop(), char):
-                        print("Malformed JSON value at index {}.".format(object_index))
+                        # print("Malformed JSON value at index {}.".format(object_index), file=sys.stderr)
                         sys.exit(1)
                     if not stack:
                         results.append({"index": object_index,
@@ -58,14 +58,17 @@ def parse_json(input_string):
                     in_value = True
                     start_index = i
         if stack:
-            print("Malformed JSON value at index {}.".format(object_index))
+            # print("Malformed JSON value at index {}.".format(object_index), file=sys.stderr)
             # sys.exit(1)
+            pass
     except ValueError as e:
-        print("Malformed JSON value at index {}.".format(object_index), e)
+        # print("Malformed JSON value at index {}.".format(object_index), e, file=sys.stderr)
         # sys.exit(1)
+        pass
     except IndexError as e:
-        print("Malformed JSON value at index {}.".format(object_index-1), e)
+        # print("Malformed JSON value at index {}.".format(object_index-1), e, file=sys.stderr)
         # sys.exit(1)
+        pass
     return results
 
 
