@@ -3,6 +3,8 @@ from JsonParser import take_input, parse_json
 from Board import Board
 from RuleChecker import RuleChecker
 
+# import traceback
+
 
 def main():
     board = Board()
@@ -23,6 +25,9 @@ def main():
                 if RuleChecker.is_winning_move(board, worker, move_dir) and build_dir is None:  # checking for win
                     print(json.dumps("yes"))
                     continue
+                elif build_dir is None:
+                    print(json.dumps("no"))
+                    continue
                 board.move(worker, move_dir)
                 if RuleChecker.is_valid_build(board, worker, build_dir):
                     print(json.dumps("yes"))
@@ -32,6 +37,7 @@ def main():
                 print(json.dumps("no"))
         except Exception as e:
             print(json.dumps(str(e)))
+            # print(json.dumps(traceback.format_exc()))
 
 
 if __name__ == "__main__":

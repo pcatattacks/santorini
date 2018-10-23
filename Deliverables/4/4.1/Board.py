@@ -86,13 +86,14 @@ class Board:
         :return: the height of the cell adjacent to the worker's position in the specified direction.
         :rtype: int
         """
-        worker_row, worker_col, worker_height = self.get_worker_position(worker)
-        adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
-        cell = self.board[adj_cell_row][adj_cell_col]
-        if isinstance(cell, list):
-            return cell[0]
-        else:
-            return cell
+        if self.neighboring_cell_exists(worker, direction):
+            worker_row, worker_col, worker_height = self.get_worker_position(worker)
+            adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
+            cell = self.board[adj_cell_row][adj_cell_col]
+            if isinstance(cell, list):
+                return cell[0]
+            else:
+                return cell
                 
     def is_occupied(self, worker, direction):
         """
@@ -106,9 +107,10 @@ class Board:
         `False`, if cell is unoccupied. Behaviour unspecified if cell adjacent cell doesn't exist.
         :rtype: bool, void
         """
-        worker_row, worker_col, cell_height = self.get_worker_position(worker)
-        adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
-        return isinstance(self.board[adj_cell_row][adj_cell_col], list)
+        if self.neighboring_cell_exists(worker, direction):
+            worker_row, worker_col, cell_height = self.get_worker_position(worker)
+            adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+            return isinstance(self.board[adj_cell_row][adj_cell_col], list)
 
     def build(self, worker, direction):
         """
