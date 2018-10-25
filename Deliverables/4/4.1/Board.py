@@ -1,3 +1,5 @@
+from RuleChecker import RuleChecker
+
 class Board:
     """
     A class to maintain the state of a Santorini board and perform commands to change, or query, the board state.
@@ -73,6 +75,8 @@ class Board:
         :return: `True` if cell adjacent in the specified direction exists, else `False`.
         :rtype: bool
         """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
         return 0 <= adj_cell_row < len(self.board) and 0 <= adj_cell_col < len(self.board[0])
@@ -86,6 +90,8 @@ class Board:
         :return: the height of the cell adjacent to the worker's position in the specified direction.
         :rtype: int
         """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, worker_height = self.get_worker_position(worker)
             adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
@@ -107,6 +113,8 @@ class Board:
         `False`, if cell is unoccupied. Behaviour unspecified if cell adjacent cell doesn't exist.
         :rtype: bool, void
         """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, cell_height = self.get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
@@ -125,6 +133,8 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         self.board[adj_cell_row][adj_cell_col] += 1
@@ -148,6 +158,8 @@ class Board:
         :return: a board (as specified above) edited to reflect the build. Nothing if move is invalid.
         :rtype: list, void
         """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         adj_cell_height = self.board[adj_cell_row][adj_cell_col]
@@ -165,6 +177,8 @@ class Board:
         the form `(row, col, height)`.
         :rtype: tuple of ints
         """
+        if not RuleChecker.is_valid_worker(worker):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
         for r, row in enumerate(self.board):
             for c, cell in enumerate(row):

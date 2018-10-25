@@ -9,13 +9,13 @@ class RuleChecker:
 
     @staticmethod
     def is_winning_move(board, worker, direction):
-        if not RuleChecker._is_valid_worker(worker) or not RuleChecker._is_valid_direction(direction):
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
             raise ValueError("Invalid (or no) worker / direction provided.")
         return board.get_height(worker, direction) == 3
 
     @staticmethod
     def is_valid_move(board, worker, direction):
-        if not RuleChecker._is_valid_worker(worker) or not RuleChecker._is_valid_direction(direction):
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
             raise ValueError("Invalid (or no) worker / direction provided.")
         worker_height = board.get_worker_position(worker)[2]
         adj_cell_height = board.get_height(worker, direction)
@@ -26,7 +26,7 @@ class RuleChecker:
 
     @staticmethod
     def is_valid_build(board, worker, direction):
-        if not RuleChecker._is_valid_worker(worker) or not RuleChecker._is_valid_direction(direction):
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
             raise ValueError("Invalid (or no) worker / direction provided.")
         adj_cell_height = board.get_height(worker, direction)
         return (board.neighboring_cell_exists(worker, direction)
@@ -34,9 +34,9 @@ class RuleChecker:
                 and adj_cell_height != 4)
 
     @staticmethod
-    def _is_valid_worker(worker):
+    def is_valid_worker(worker):
         return worker in RuleChecker.WORKERS
 
     @staticmethod
-    def _is_valid_direction(direction):
+    def is_valid_direction(direction):
         return direction in RuleChecker.DIRECTIONS
