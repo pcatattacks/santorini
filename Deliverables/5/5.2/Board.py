@@ -101,7 +101,7 @@ class Board:
                 return cell[0]
             else:
                 return cell
-                
+
     def is_occupied(self, worker, direction):
         """
         Checks if the cell adjacent to the worker's position in the specified direction is occupied.
@@ -179,7 +179,7 @@ class Board:
         :rtype: tuple of ints
         """
         if not RuleChecker.is_valid_worker(worker):
-            raise ValueError("Invalid (or no) worker provided.")
+            raise ValueError("Invalid worker provided: {}".format(worker))
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
         for r, row in enumerate(self.board):
             for c, cell in enumerate(row):
@@ -206,5 +206,3 @@ class Board:
         elif "W" in direction_string:
             worker_col -= 1
         return worker_row, worker_col
-
-
