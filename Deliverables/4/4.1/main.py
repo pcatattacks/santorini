@@ -22,8 +22,11 @@ def main():
 
             board.set_board(given_board)
             if RuleChecker.is_valid_move(board, worker, move_dir):
-                if RuleChecker.is_winning_move(board, worker, move_dir) and build_dir is None:  # checking for win
-                    print(json.dumps("yes"))
+                if RuleChecker.is_winning_move(board, worker, move_dir):
+                    if build_dir is None:  # checking for win
+                        print(json.dumps("yes"))
+                    else:
+                        print(json.dumps("no"))
                     continue
                 elif build_dir is None:
                     print(json.dumps("no"))
