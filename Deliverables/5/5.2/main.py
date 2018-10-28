@@ -24,15 +24,17 @@ def main():
             else:
                 raise MalformedCommand("Invalid number of arguments in JSON list.")
 
-            # TODO: add validity checks for board. Different checks for boards given for the 'place' and 'play' command.
             if command == "Place":
-                pass
+                player.register(color)
+                placements = player.place(given_board)
+                print(json.dumps(placements))
             elif command == "Play":
                 pass
             else:
                 raise MalformedCommand("Unrecognized command argument: {}".format(command))
 
-        except Exception as e:
+        except Exception as e:  # TODO: add a separate `except` statement for ContractViolation, so we do nothing for
+            #  violated contracts since behaviour is unspecified
             print(json.dumps(str(e)))
 
 

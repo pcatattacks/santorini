@@ -6,6 +6,7 @@ class RuleChecker:
 
     WORKERS = ("blue1", "blue2", "white1", "white2")
     DIRECTIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+    COLORS = ("blue", "white")
 
     @staticmethod
     def is_winning_move(board, worker, direction):
@@ -34,9 +35,23 @@ class RuleChecker:
                 and adj_cell_height != 4)
 
     @staticmethod
+    def is_legal_initial_board(board, color):
+        # TODO
+        pass
+
+    @staticmethod
+    def is_legal_board(board):
+        # TODO
+        pass
+
+    @staticmethod
     def is_valid_worker(worker):
         return worker in RuleChecker.WORKERS
 
     @staticmethod
     def is_valid_direction(direction):
         return direction in RuleChecker.DIRECTIONS
+
+    @staticmethod
+    def is_valid_color(color):
+        return color in RuleChecker.COLORS

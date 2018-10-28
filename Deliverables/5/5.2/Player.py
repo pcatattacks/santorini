@@ -51,15 +51,44 @@ class Player:
         :return:
         :rtype: void
         """
-        pass
+        if not RuleChecker.is_valid_color(color):
+            raise ValueError("Invalid color provided: {}".format(color))
+        if self.color:
+            raise ContractViolation("Cannot call Player.register() again until game ends!")
+        self.color = color
 
-    def send_play(self):
+    def place(self, board):
+        """
+        Returns the worker placements for the player.
+
+        CONTRACT:
+         - Can only be called after Player.register() has been called.
+         - Must be called before Player.play().
+         - Cannot be called more than once.
+         - `board` must be a valid initial board (a board where all cell's heights are 0, and no workers of `self.color`
+         are present any cell.
+
+        :param Board board: an instance of Board (refer to documentation of Board class).
+        :return: `list` of [position1, position2] denoting the position of the player's 1st and 2nd worker respectively.
+        See `position`, `worker` in documentation of Board.py.
+        :rtype: list
+        """
+        if not self.color:
+            raise ContractViolation("Function must be called after player.register()!")
+        if not RuleChecker.is_valid_initial_board(board, self.color):
+            raise ContractViolation("Invalid initial board provided: {board}".format(board))
+        self.board.set_board(board)
+        # TODO: potential contract needed to ensure set_board is called at start of every turn for player
+        return Strategy.get_placements(self.board, self.color)
+
+    def play(self, board):
         """
         Returns the strategized play a player wants to execute on a given turn.
 
         :return: a play (as defined above)
-        :rtype: `list`
+        :rtype: list
         """
+        self.board.set_board(board)
         pass
 
     def receive_notification(self, board, has_won, end_game):
@@ -108,28 +137,60 @@ class Strategy:
     # for each God power. if so, we'll have to always find which GodPowerStrategy class to find and use, rather than
     # just finding it once and storing it. Not sure.
 
-    def __init__(self):
-        pass
+    # TODO: Discuss
+    # by making Strategy a public class with static member functions, we aren't enabling any cheating are we? or should
+    # strategy be a private class within player? that doesn't make sense to me. having some of Strategy's function's
+    # exposed doesn't allow any manipulation to variables that represent the game state, so it should be fine (I think).
 
     @staticmethod
     def get_placements(board, color):
         """
+        Returns worker placements of given color, by scheme of choosing the first two unoccupied corner cells, starting
+        from top left, in the clockwise direction.
 
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param string color: color (as defined above)
         :return: `list` of [position1, position2] where position1 and position2 are positions of the first and second
         worker respectively. See `worker` and `position` in Board.py documentation.
-        :rtype: `list`
+        :rtype: list
         """
+        if not RuleChecker.is_valid_initial_board(board, color):
+            raise ContractViolation("Invalid initial board provided to Strategy class: {board}".format(board))
+        corners = ([0, 0], [0, len(board[0])-1], [len(board)-1, len(board[0])-1], [len(board)-1, 0])
+        placements = []
+        for corner in corners:
+            if not board.has_worker(*corner):
+                placements.append(corner)
+            if len(placements) == 2:
+                break
+        assert len(placements) == 2  # shouldn't needed since we're checking that the board is valid at the start, but
+        # may as well
+        return placements
 
     @staticmethod
-    def next_play(board, color):
+    def get_play(board, color):
         """
         Returns the optimal play for a given board and a color that identifies the player.
 
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param string color: color (as defined above)
         :return: a play (as defined above)
-        :rtype: `list`
+        :rtype: list
         """
         pass
+
+    @staticmethod
+    def _get_legal_plays(board, color):
+        """
+        Returns a list of all possible legal plays for a player of the given color.
+
+        :param Board board: an instance of Board (refer to documentation of Board class).
+        :param string color: color (as defined above)
+        :return: a `list` of legal plays (as defined above)
+        :rtype: list
+        """
+        pass
+
+
+class ContractViolation(Exception):
+    pass

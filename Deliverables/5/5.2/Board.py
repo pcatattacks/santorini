@@ -63,6 +63,7 @@ class Board:
         :return: No value returned.
         :rtype: void.
         """
+        # TODO: add check for if the board object is valid
         self.board = board_obj
 
     def neighboring_cell_exists(self, worker, direction):
@@ -119,7 +120,7 @@ class Board:
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, cell_height = self.get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
-            return isinstance(self.board[adj_cell_row][adj_cell_col], list)
+            return self.has_worker(adj_cell_row, adj_cell_col)
 
     def build(self, worker, direction):
         """
@@ -186,6 +187,37 @@ class Board:
                 if isinstance(cell, list) and cell[1] == worker:
                     return r, c, cell[0]
 
+    def has_worker(self, row, col):
+        """
+        Returns whether a cell has a worker present in it or not.
+
+        :param int row: `row` in a position (as defined above).
+        :param int col: `col` in a position (as defined above).
+        :return: `True` if self.board[row][col] is instance of `list`, `False` otherwise.
+        :rtype: bool
+        """
+        return isinstance(self.board[row, col], list)
+
+    def place_worker(self, row, col, worker):
+        """
+        Places a worker at the cell at position (row, col)
+
+        :param int row: `row` in a position (as defined above).
+        :param int col: `col` in a position (as defined above).
+        :param string worker: a worker (as defined above).
+        :return:
+        """
+        if not RuleChecker.is_valid_worker(worker):
+            raise ValueError("Invalid worker provided: {}".format(worker))
+        # TODO: Discuss. Should we check if the cell has a worker here, or should we expect the RuleChecker to do that
+        # using the board's has_worker function?
+        # Pranav: I think we should let the RuleChecker do that. place_worker should only be responsible for putting
+        # a worker on a cell. Maybe there's god powers that allow you to replace your worker with another players? But
+        # lets check anyway. it's redundant but doesn't matter, doesn't cost anything either.
+        if self.has_worker(row, col):
+            raise IllegalMove("Cannot place worker in occupied cell!")
+        self.board[row][col] = [self.board[row][col], worker]
+
     @staticmethod
     def _get_adj_cell(worker_row, worker_col, direction_string):
         """
@@ -206,3 +238,7 @@ class Board:
         elif "W" in direction_string:
             worker_col -= 1
         return worker_row, worker_col
+
+
+class IllegalMove(Exception):
+    pass
