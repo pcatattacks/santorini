@@ -180,6 +180,30 @@ class Strategy:
         pass
 
     @staticmethod
+    def get_plays(board, color):
+        """
+        Returns a list of all possible legal plays that cannot not result in the opposing player winning with the next
+        move.
+
+        :param Board board: an instance of Board (refer to documentation of Board class).
+        :param string color: color (as defined above)
+        :return: a `list` of legal plays (as defined above)
+        :rtype: `list`
+        """
+        # algorithm - a basic DFS
+        #
+        # R <- []
+        # P <- get legal plays for current player
+        # for p in P:
+        #   simulate play - so edit the board
+        #   Q <- get legal plays for opposing player
+        #   for q in Q:
+        #       if q not is winning_play: # TODO - will have to write a function in RuleChecker for this
+        #           R.append(p)
+        #   undo play (if you're using the same board - don't need if we're deepcopy-ing the board for each play)
+        pass
+
+    @staticmethod
     def _get_legal_plays(board, color):
         """
         Returns a list of all possible legal plays for a player of the given color.
@@ -189,6 +213,7 @@ class Strategy:
         :return: a `list` of legal plays (as defined above)
         :rtype: list
         """
+        # TODO
         pass
 
 

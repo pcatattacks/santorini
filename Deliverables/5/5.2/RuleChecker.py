@@ -15,6 +15,16 @@ class RuleChecker:
         return board.get_height(worker, direction) == 3
 
     @staticmethod
+    def is_winning_build(board, worker, direction):
+        # TODO
+        pass
+
+    @staticmethod
+    def is_winning_play(board, worker, direction):
+        # TODO
+        pass
+
+    @staticmethod
     def is_valid_move(board, worker, direction):
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
             raise ValueError("Invalid (or no) worker / direction provided.")
