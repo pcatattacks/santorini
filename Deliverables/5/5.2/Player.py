@@ -75,7 +75,7 @@ class Player:
         """
         if not self.color:
             raise ContractViolation("Function must be called after player.register()!")
-        if not RuleChecker.is_valid_initial_board(board, self.color):
+        if not RuleChecker.is_legal_initial_board(board, self.color):
             raise ContractViolation("Invalid initial board provided: {board}".format(board))
         self.board.set_board(board)
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
