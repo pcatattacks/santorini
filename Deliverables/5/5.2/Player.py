@@ -202,7 +202,37 @@ class Strategy:
         #       if q not is winning_play: # TODO - will have to write a function in RuleChecker for this
         #           R.append(p)
         #   undo play (if you're using the same board - don't need if we're deepcopy-ing the board for each play)
-        pass
+
+        available_colors = list(RuleChecker.COLORS)
+        available_colors.remove(color)
+        support_player_color = color
+        opposition_player_color = available_colors[0]
+
+        temp = Board()
+        winning_moves = []
+
+        support_player_legal_moves = Strategy._get_legal_plays(board, support_player_color)
+        opposition_player_legal_moves = []
+
+        for play in support_player_legal_moves:
+            if len(play[1]) == 1:
+                winning_moves.append(play)
+            else:
+                opposition_win = False
+                temp.board = copy.deepcopy(board.board)
+                temp.board = temp.move(play[0], play[1][0])
+                temp.board = temp.build(play[0], play[1][1])
+
+                opposition_player_legal_moves = Strategy._get_legal_plays(temp, opposition_player_color)
+
+                for play_win_check in opposition_player_legal_moves:
+                    if len(play_win_check[1]) == 1:
+                        opposition_win = True
+
+                if not opposition_win:
+                    winning_moves.append(play)
+
+        return winning_moves
 
     @staticmethod
     def _get_legal_plays(board, color):
