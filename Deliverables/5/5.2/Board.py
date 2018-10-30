@@ -196,7 +196,7 @@ class Board:
         :return: `True` if self.board[row][col] is instance of `list`, `False` otherwise.
         :rtype: bool
         """
-        return isinstance(self.board[row, col], list)
+        return isinstance(self.board[row][col], list)
 
     def place_worker(self, row, col, worker):
         """

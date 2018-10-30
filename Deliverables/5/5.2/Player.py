@@ -1,5 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
+import copy
 
 
 class Player:
@@ -206,16 +207,45 @@ class Strategy:
     @staticmethod
     def _get_legal_plays(board, color):
         """
-        Returns a list of all possible legal plays for a player of the given color.
+        Returns a list of all possible legal plays for players of the given color.
 
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param string color: color (as defined above)
         :return: a `list` of legal plays (as defined above)
         :rtype: list
         """
-        # TODO
-        pass
+
+        temp = Board()
+
+        legal_plays = []
+        players = [str(color+"1"), str(color+"2")]
+        player_movable_directions = [[], []]
+
+    #   Valid Move directions
+        for direc in RuleChecker.DIRECTIONS:
+            for i, player in enumerate(players):
+                if RuleChecker.is_valid_move(board, player, direc):
+                    player_movable_directions[i].append(direc)
+
+    #   Constructing all possible legal plays.
+        for i, player in enumerate(players):
+            for move_dir in player_movable_directions[i]:
+                if RuleChecker.is_winning_move(board, player, move_dir):
+                    legal_plays.append([player, [move_dir]])
+
+                else:
+                    if [player, [move_dir]] not in legal_plays:
+                        temp.board = copy.deepcopy(board.board)
+                        temp.board = temp.move(players[i], move_dir)
+
+                        for build_dir in RuleChecker.DIRECTIONS:
+                            if temp.neighboring_cell_exists(player, build_dir):
+                                if RuleChecker.is_valid_build(temp, player, build_dir):
+                                    legal_plays.append([player, [move_dir, build_dir]])
+
+        return legal_plays
 
 
 class ContractViolation(Exception):
     pass
+
