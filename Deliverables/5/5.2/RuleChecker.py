@@ -16,11 +16,15 @@ class RuleChecker:
 
     @staticmethod
     def is_winning_build(board, worker, direction):
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         # TODO
         pass
 
     @staticmethod
     def is_winning_play(board, worker, direction):
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
         # TODO
         pass
 
@@ -46,6 +50,8 @@ class RuleChecker:
 
     @staticmethod
     def is_legal_initial_board(board, color):
+        if not RuleChecker.is_valid_color(color):
+            raise ValueError("Invalid color given: {}".format(color))
         # TODO
         pass
 

@@ -1,6 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
-import copy
+from copy import deepcopy
 
 
 class Player:
@@ -191,6 +191,11 @@ class Strategy:
         :return: a `list` of legal plays (as defined above)
         :rtype: `list`
         """
+        if not RuleChecker.is_valid_color(color):
+            raise ContractViolation("Invalid color given: {}".format(color))
+        if not RuleChecker.is_legal_board(board):
+            raise ContractViolation("Invalid board given: {}".format(board))
+
         # algorithm - a basic DFS
         #
         # R <- []
@@ -205,34 +210,39 @@ class Strategy:
 
         available_colors = list(RuleChecker.COLORS)
         available_colors.remove(color)
-        support_player_color = color
         opposition_player_color = available_colors[0]
 
-        temp = Board()
-        winning_moves = []
+        result_plays = []
 
-        support_player_legal_moves = Strategy._get_legal_plays(board, support_player_color)
-        opposition_player_legal_moves = []
+        player_legal_plays = Strategy._get_legal_plays(board, color)
 
-        for play in support_player_legal_moves:
-            if len(play[1]) == 1:
-                winning_moves.append(play)
+        for play in player_legal_plays:
+            if len(play[1]) == 1:  # TODO: replace with RuleChecker.is_winning_play
+                result_plays.append(play)
             else:
                 opposition_win = False
-                temp.board = copy.deepcopy(board.board)
-                temp.board = temp.move(play[0], play[1][0])
-                temp.board = temp.build(play[0], play[1][1])
+                worker = play[0]
+                move_dir, build_dir = play[1]
+                temp_board = deepcopy(board)
 
-                opposition_player_legal_moves = Strategy._get_legal_plays(temp, opposition_player_color)
+                temp_board.move(worker, move_dir)
+                temp_board.build(worker, build_dir)
 
-                for play_win_check in opposition_player_legal_moves:
-                    if len(play_win_check[1]) == 1:
+                opposition_player_legal_plays = Strategy._get_legal_plays(temp_board, opposition_player_color)
+
+                if not opposition_player_legal_plays:
+                    result_plays.append(play)
+                    continue
+
+                for opp_play in opposition_player_legal_plays:
+                    if len(opp_play[1]) == 1:  # TODO: replace with RuleChecker.is_winning_play
                         opposition_win = True
+                        break
 
                 if not opposition_win:
-                    winning_moves.append(play)
+                    result_plays.append(play)
 
-        return winning_moves
+        return result_plays
 
     @staticmethod
     def _get_legal_plays(board, color):
@@ -244,8 +254,12 @@ class Strategy:
         :return: a `list` of legal plays (as defined above)
         :rtype: list
         """
+        if not RuleChecker.is_valid_color(color):
+            raise ContractViolation("Invalid color given: {}".format(color))
+        if not RuleChecker.is_legal_board(board):
+            raise ContractViolation("Invalid board given: {}".format(board))
 
-        temp = Board()
+        temp_board = deepcopy(board)
 
         legal_plays = []
         players = [str(color+"1"), str(color+"2")]
@@ -264,14 +278,12 @@ class Strategy:
                     legal_plays.append([player, [move_dir]])
 
                 else:
-                    if [player, [move_dir]] not in legal_plays:
-                        temp.board = copy.deepcopy(board.board)
-                        temp.board = temp.move(players[i], move_dir)
-
-                        for build_dir in RuleChecker.DIRECTIONS:
-                            if temp.neighboring_cell_exists(player, build_dir):
-                                if RuleChecker.is_valid_build(temp, player, build_dir):
-                                    legal_plays.append([player, [move_dir, build_dir]])
+                    temp_board.move(player, move_dir)
+                    for build_dir in RuleChecker.DIRECTIONS:
+                        if RuleChecker.is_valid_build(temp_board, player, build_dir):
+                            legal_plays.append([player, [move_dir, build_dir]])
+                    opp_dir = Board.get_opposite_direction(move_dir)
+                    temp_board.move(player, opp_dir)  # undoing the move
 
         return legal_plays
 

@@ -239,6 +239,28 @@ class Board:
             worker_col -= 1
         return worker_row, worker_col
 
+    @staticmethod
+    def get_opposite_direction(direction_string):
+        """
+        Gets the opposite direction to the direction string.
+
+        :param string direction_string: `a direction (as defined above).
+        :return:
+        """
+        if not RuleChecker.is_valid_direction(direction_string):
+            raise ValueError("Invalid Direction string provided: {}".format(direction_string))
+        opp_dir = ""
+        if "N" in direction_string:
+            opp_dir += "S"
+        elif "S" in direction_string:
+            opp_dir += "N"
+        if "E" in direction_string:
+            opp_dir += "W"
+        elif "W" in direction_string:
+            opp_dir += "E"
+        return opp_dir
+
+
 
 class IllegalMove(Exception):
     pass
