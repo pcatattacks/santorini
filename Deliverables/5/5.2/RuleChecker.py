@@ -60,7 +60,7 @@ class RuleChecker:
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color given: {}".format(color))
         # TODO
-        pass
+        return True
 
     @staticmethod
     def is_legal_board(board):
@@ -70,7 +70,7 @@ class RuleChecker:
         :return:
         """
         # TODO
-        pass
+        return True
 
     @staticmethod
     def is_valid_worker(worker):

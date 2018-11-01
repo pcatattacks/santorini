@@ -1,14 +1,16 @@
 import json
+import traceback
 
 from Player import Player
 from JsonParser import take_input, parse_json
-from CustomExceptions import MalformedCommand
+from CustomExceptions import MalformedCommand, ContractViolation
 
 
 def main():
     player = Player()
     json_values = parse_json(take_input())
-    for val in json_values:
+    for json_val in json_values:
+        val = json_val["value"]
         try:
             if not isinstance(val, list):
                 raise MalformedCommand("Incorrect JSON value. Expected JSON list, given {}".format(type(val)))
@@ -28,10 +30,11 @@ def main():
                 print(json.dumps(plays))
             else:
                 raise MalformedCommand("Unrecognized command argument: {}".format(command))
-
-        except Exception as e:  # TODO: add a separate `except` statement for ContractViolation, so we do nothing for
-            #  violated contracts since behaviour is unspecified
-            print(json.dumps(str(e)))
+        except ContractViolation:  # unspecified behaviour for invalid input
+            pass
+        # except Exception as e:
+        #     # print(json.dumps(str(e)))
+        #     # print(json.dumps(traceback.format_exc()))
 
 
 if __name__ == "__main__":

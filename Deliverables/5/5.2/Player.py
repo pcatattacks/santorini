@@ -78,7 +78,7 @@ class Player:
         if not self.color:
             raise ContractViolation("Function must be called after player.register()!")
         if not RuleChecker.is_legal_initial_board(board, self.color):
-            raise ContractViolation("Invalid initial board provided: {board}".format(board))
+            raise ContractViolation("Invalid initial board provided: {}".format(board))
         self.board.set_board(board)
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
         return Strategy.get_placements(self.board, self.color)
@@ -92,10 +92,10 @@ class Player:
         """
         if not self.color:
             raise ContractViolation("Function must be called after player.register()!")
-        if not RuleChecker.is_legal_board(board, self.color):
-            raise ContractViolation("Invalid board provided: {board}".format(board))
+        if not RuleChecker.is_legal_board(board):
+            raise ContractViolation("Invalid board provided: {}".format(board))
         self.board.set_board(board)
-        return Strategy.get_plays(board, self.color)
+        return Strategy.get_plays(self.board, self.color)
 
     def receive_notification(self, board, has_won, end_game):
         """
@@ -160,9 +160,10 @@ class Strategy:
         worker respectively. See `worker` and `position` in Board.py documentation.
         :rtype: list
         """
-        if not RuleChecker.is_valid_initial_board(board, color):
-            raise ContractViolation("Invalid initial board provided to Strategy class: {board}".format(board))
-        corners = ([0, 0], [0, len(board[0])-1], [len(board)-1, len(board[0])-1], [len(board)-1, 0])
+        if not RuleChecker.is_legal_initial_board(board, color):
+            raise ContractViolation("Invalid initial board provided to Strategy class: {}".format(board))
+        num_rows, num_cols = board.get_dimensions()
+        corners = ([0, 0], [0, num_cols-1], [num_rows-1, num_cols-1], [num_rows-1, 0])
         placements = []
         for corner in corners:
             if not board.has_worker(*corner):

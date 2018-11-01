@@ -1,4 +1,5 @@
 from RuleChecker import RuleChecker
+from CustomExceptions import ContractViolation
 
 
 class Board:
@@ -54,6 +55,18 @@ class Board:
         `board` member variable simply stores the board for other functions to easily access.
         """
         self.board = None
+
+    def get_dimensions(self):
+        """
+        CONTRACT:
+         - cannot be called before set_board() has been called.
+
+        :return: The dimensions of the board member variable in format (num_rows, num_cols)
+        :rtype: tuple
+        """
+        if not self.board:
+            raise ContractViolation("Cannot get dimensions if Board.board member variable has not been set!")
+        return len(self.board), len(self.board[0])
 
     def set_board(self, board_obj):
         """
