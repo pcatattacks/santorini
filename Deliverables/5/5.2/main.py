@@ -1,13 +1,8 @@
 import json
 
-from Board import Board
-from RuleChecker import RuleChecker
 from Player import Player
 from JsonParser import take_input, parse_json
-
-
-class MalformedCommand(Exception):
-    pass
+from CustomExceptions import MalformedCommand
 
 
 def main():
@@ -29,7 +24,8 @@ def main():
                 placements = player.place(given_board)
                 print(json.dumps(placements))
             elif command == "Play":
-                pass
+                plays = player.play(given_board)
+                print(json.dumps(plays))
             else:
                 raise MalformedCommand("Unrecognized command argument: {}".format(command))
 

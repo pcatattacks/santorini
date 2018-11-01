@@ -1,5 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
+from CustomExceptions import ContractViolation
 from copy import deepcopy
 
 
@@ -89,8 +90,12 @@ class Player:
         :return: a play (as defined above)
         :rtype: list
         """
+        if not self.color:
+            raise ContractViolation("Function must be called after player.register()!")
+        if not RuleChecker.is_legal_board(board, self.color):
+            raise ContractViolation("Invalid board provided: {board}".format(board))
         self.board.set_board(board)
-        pass
+        return Strategy.get_plays(board, self.color)
 
     def receive_notification(self, board, has_won, end_game):
         """
@@ -230,7 +235,7 @@ class Strategy:
 
                 opposition_player_legal_plays = Strategy._get_legal_plays(temp_board, opposition_player_color)
 
-                if not opposition_player_legal_plays:
+                if not opposition_player_legal_plays:  # if no legal options left for opposition, you win
                     result_plays.append(play)
                     continue
 
@@ -287,7 +292,4 @@ class Strategy:
 
         return legal_plays
 
-
-class ContractViolation(Exception):
-    pass
 
