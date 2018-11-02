@@ -229,16 +229,11 @@ class Strategy:
                 opposition_win = False
                 worker = play[0]
                 move_dir, build_dir = play[1]
-                temp_board = deepcopy(board)
 
-                temp_board.move(worker, move_dir)
-                temp_board.build(worker, build_dir)
+                board.move(worker, move_dir)
+                board.build(worker, build_dir)
 
-                opposition_player_legal_plays = Strategy._get_legal_plays(temp_board, opposition_player_color)
-
-                if not opposition_player_legal_plays:  # if no legal options left for opposition, you win
-                    result_plays.append(play)
-                    continue
+                opposition_player_legal_plays = Strategy._get_legal_plays(board, opposition_player_color)
 
                 for opp_play in opposition_player_legal_plays:
                     if len(opp_play[1]) == 1:  # TODO: replace with RuleChecker.is_winning_play
@@ -247,6 +242,10 @@ class Strategy:
 
                 if not opposition_win:
                     result_plays.append(play)
+
+                # undoing the build and move in that order
+                board.undo_build(worker, build_dir)
+                board.move(worker, Board.get_opposite_direction(move_dir))
 
         return result_plays
 
@@ -265,8 +264,6 @@ class Strategy:
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board given: {}".format(board))
 
-        temp_board = deepcopy(board)
-
         legal_plays = []
         players = [str(color+"1"), str(color+"2")]
         player_movable_directions = [[], []]
@@ -284,12 +281,12 @@ class Strategy:
                     legal_plays.append([player, [move_dir]])
 
                 else:
-                    temp_board.move(player, move_dir)
+                    board.move(player, move_dir)
                     for build_dir in RuleChecker.DIRECTIONS:
-                        if RuleChecker.is_valid_build(temp_board, player, build_dir):
+                        if RuleChecker.is_valid_build(board, player, build_dir):
                             legal_plays.append([player, [move_dir, build_dir]])
                     opp_dir = Board.get_opposite_direction(move_dir)
-                    temp_board.move(player, opp_dir)  # undoing the move
+                    board.move(player, opp_dir)  # undoing the move
 
         return legal_plays
 

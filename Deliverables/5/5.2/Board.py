@@ -155,6 +155,29 @@ class Board:
         self.board[adj_cell_row][adj_cell_col] += 1
         return self.board
 
+    def undo_build(self, worker, direction):
+        """
+        Decreases the height of the cell adjacent to the worker's position in the specified direction by 1, if all of
+        the following are true:
+         - the cell being destroyed on exists
+         - the cell being destroyed on is not occupied
+         - the height of the cell being built on is not 0.
+
+        Note: should not be used outside the `Strategy` component.
+
+        :param string worker: a worker (as defined above).
+        :param string direction: a direction (as defined above).
+        :return: a board (as specified above) edited to reflect the undoing of the build. Nothing if move is invalid.
+        :rtype: list, void
+        """
+        if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
+            raise ValueError("Invalid (or no) worker / direction provided.")
+        worker_row, worker_col, worker_height = self.get_worker_position(worker)
+        adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
+        self.board[adj_cell_row][adj_cell_col] -= 1
+        return self.board
+
+
     def move(self, worker, direction):
         """
         Moves the specified worker from it's cell to the cell adjacent to the worker's existing position in the
