@@ -47,8 +47,6 @@ class Strategy:
         worker respectively. See `worker` and `position` in Board.py documentation.
         :rtype: list
         """
-        if not RuleChecker.is_legal_initial_board(board, color):
-            raise ContractViolation("Invalid initial board provided to Strategy class: {}".format(board))
         num_rows, num_cols = board.get_dimensions()
         corners = ([0, 0], [0, num_cols-1], [num_rows-1, num_cols-1], [num_rows-1, 0])
         placements = []
@@ -87,8 +85,6 @@ class Strategy:
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color given: {}".format(color))
-        if not RuleChecker.is_legal_board(board):
-            raise ContractViolation("Invalid board given: {}".format(board))
 
         # algorithm - a basic DFS
         #
@@ -149,8 +145,6 @@ class Strategy:
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color given: {}".format(color))
-        if not RuleChecker.is_legal_board(board):
-            raise ContractViolation("Invalid board given: {}".format(board))
 
         legal_plays = []
         players = [str(color+"1"), str(color+"2")]

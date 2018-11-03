@@ -296,7 +296,5 @@ class Board:
             opp_dir += "E"
         return opp_dir
 
-
-
 class IllegalMove(Exception):
     pass

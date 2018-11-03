@@ -5,84 +5,70 @@ from Board import Board
 
 @pytest.fixture()
 def legal_board():
-    test_board = [[0, [2, "blue2"], 1, 2, 3],
-                  [3, 2, 1, 0, 4],
-                  [1, 0, [1, "white2"], 2, 4],
-                  [0, 0, 0, 0, [2, "white1"]],
-                  [1, [0, "blue1"], 0, 2, 3]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, [1, "white2"], 2, 4],
+             [0, 0, 0, 0, [2, "white1"]],
+             [1, [0, "blue1"], 0, 2, 3]]
     return board
 
 
 @pytest.fixture()
 def illegal_extra_workers_board():
-    test_board = [[0, [2, "blue2"], 1, 2, 3],
-                  [3, 2, 1, 0, 4],
-                  [1, 0, [1, "white2"], 2, 4],
-                  [0, [0, "blue3"], 0, 0, [2, "white1"]],
-                  [1, [0, "blue1"], 0, 2, 3]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, [1, "white2"], 2, 4],
+             [0, [0, "blue3"], 0, 0, [2, "white1"]],
+             [1, [0, "blue1"], 0, 2, 3]]
     return board
 
 
 @pytest.fixture()
 def illegal_less_workers_board():
-    test_board = [[0, [2, "blue2"], 1, 2, 3],
-                  [3, 2, 1, 0, 4],
-                  [1, 0, 1, 2, 4],
-                  [0, 0, 0, 0, [2, "white1"]],
-                  [1, [0, "blue1"], 0, 2, 3]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, 1, 2, 4],
+             [0, 0, 0, 0, [2, "white1"]],
+             [1, [0, "blue1"], 0, 2, 3]]
     return board
 
 
 @pytest.fixture()
 def illegal_num_workers_board():
-    test_board = [[0, [2, "blue2"], 1, 2, 3],
-                  [3, 2, 1, 0, 4],
-                  [1, 0, [1, "blue3"], 2, 4],
-                  [0, 0, 0, 0, [2, "white1"]],
-                  [1, [0, "blue1"], 0, 2, 3]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, [1, "blue3"], 2, 4],
+             [0, 0, 0, 0, [2, "white1"]],
+             [1, [0, "blue1"], 0, 2, 3]]
     return board
 
 
 @pytest.fixture()
 def illegal_heights_board():
-    test_board = [[0, [2, "blue2"], 1, 2, 3],
-                  [3, 2, 1, 0, 4],
-                  [1, 0, [1, "white2"], 2, 5],
-                  [0, 0, 0, 0, [2, "white1"]],
-                  [1, [0, "blue1"], 0, 2, 3]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, [1, "white2"], 2, 5],
+             [0, 0, 0, 0, [2, "white1"]],
+              [1, [0, "blue1"], 0, 2, 3]]
     return board
 
 
 @pytest.fixture()
 def legal_initial_board():
-    test_board = [[0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0]]
     return board
 
 
 def legal_initial_board_with_workers(color):
-    test_board = [[0, 0, [0, color+"1"], 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, 0, 0, 0],
-                  [0, 0, [0, color+"2"], 0, 0],
-                  [0, 0, 0, 0, 0]]
-    board = Board()
-    board.set_board(test_board)
+    board = [[0, 0, [0, color+"1"], 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, [0, color+"2"], 0, 0],
+             [0, 0, 0, 0, 0]]
     return board
 
 
@@ -93,7 +79,9 @@ def legal_initial_board_with_workers(color):
     ("white2", "E", True)
 ])
 def test_is_valid_move(legal_board, worker, direction, expected):
-    assert expected == RuleChecker.is_valid_move(legal_board, worker, direction)
+    board = Board()
+    board.set_board(legal_board)
+    assert expected == RuleChecker.is_valid_move(board, worker, direction)
 
 
 @pytest.mark.parametrize("worker, direction, expected", [
@@ -103,7 +91,9 @@ def test_is_valid_move(legal_board, worker, direction, expected):
     ("white2", "E", True)
 ])
 def test_is_valid_build(legal_board, worker, direction, expected):
-    assert expected == RuleChecker.is_valid_build(legal_board, worker, direction)
+    board = Board()
+    board.set_board(legal_board)
+    assert expected == RuleChecker.is_valid_build(board, worker, direction)
 
 
 @pytest.mark.parametrize("worker, directions, expected", [
@@ -126,7 +116,9 @@ def test_is_valid_build(legal_board, worker, direction, expected):
 
 ])
 def test_is_legal_play(legal_board, worker, directions, expected):
-    assert expected == RuleChecker.is_legal_play(legal_board, worker, directions)
+    board = Board()
+    board.set_board(legal_board)
+    assert expected == RuleChecker.is_legal_play(board, worker, directions)
 
 
 @pytest.mark.parametrize("board, color, expected", [
@@ -199,7 +191,9 @@ def test_is_valid_color(color, expected):
     ("white2", "N", False)
 ])
 def test_is_winning_move(legal_board, worker, direction, expected):
-    assert expected == RuleChecker.is_winning_move(legal_board, worker, direction)
+    board = Board()
+    board.set_board(legal_board)
+    assert expected == RuleChecker.is_winning_move(board, worker, direction)
 
 
 @pytest.mark.parametrize("worker, direction, expected", [])

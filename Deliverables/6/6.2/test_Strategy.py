@@ -4,6 +4,7 @@ from Strategy import Strategy
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation
 
+# TODO: modify tests to reflect that the strategy component no longer does a check for a valid (initial) board
 
 @pytest.fixture()
 def legal_initial_board():

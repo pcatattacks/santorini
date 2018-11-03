@@ -90,23 +90,50 @@ class RuleChecker:
     def is_legal_initial_board(board, color):
         """
 
-        :param list board:
-        :param string color:
-        :return:
+        :param list board: board to check for valid initial conditions
+        :param string color: string denoting the color of the player checking initial conditions
+        :return: boolean indicating validity of initial board
+        :rtype: bool
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color given: {}".format(color))
-        # TODO
-        return True
+
+        unset_workers = [color + "1", color + "2"]
+        return RuleChecker.is_legal_board(board, unset_workers, 0)
 
     @staticmethod
-    def is_legal_board(board):
+    def is_legal_board(board, unset_workers=[], max_height=4):
         """
 
-        :param list board:
-        :return:
+        :param list board: board to check for validity
+        :param list unset_workers: list of workers not in board that will be accounted for (default: empty list)
+        :param int max_height: maximum height that any cell in the board should have (default: 4)
+        :return: boolean indicating validity of board
+        :rtype: bool
         """
-        # TODO
+        workers = unset_workers
+        for row in range(5):
+            for col in range(5):
+                cell = board[row][col]
+                if isinstance(cell, list):
+                    cell_height = cell[0]
+                    cell_worker = cell[1]
+                    max_cell_height = max(max_height, 2)
+                    if cell_worker in workers or not RuleChecker.is_valid_worker(cell_worker):
+                        return False
+                    workers.append(cell_worker)
+                else:
+                    cell_height = cell
+                    max_cell_height = max_height
+                if not -1 < cell_height <= max_cell_height:
+                    return False
+        num_workers = len(workers)
+        if unset_workers:
+            if num_workers != 2 and num_workers != 4:
+                return False
+        else:
+            if num_workers != 4:
+                return False
         return True
 
     @staticmethod
