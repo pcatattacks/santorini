@@ -3,6 +3,7 @@
 
 from CustomExceptions import ContractViolation
 
+
 class RuleChecker:
 
     WORKERS = ("blue1", "blue2", "white1", "white2")

@@ -88,6 +88,89 @@ def legal_initial_board_with_workers(color):
 
 
 @pytest.mark.parametrize("worker, direction, expected", [
+    ("blue1", "S", False),
+    ("blue2", "SW", True),
+    ("white1", "N", False),
+    ("white2", "E", True)
+])
+def test_is_valid_move(legal_board, worker, direction, expected):
+    assert expected == RuleChecker.is_valid_move(legal_board, worker, direction)
+
+
+@pytest.mark.parametrize("worker, direction, expected", [
+    ("blue1", "S", False),
+    ("blue2", "SW", True),
+    ("white1", "N", False),
+    ("white2", "E", True)
+])
+def test_is_valid_build(legal_board, worker, direction, expected):
+    assert expected == RuleChecker.is_valid_build(legal_board, worker, direction)
+
+
+@pytest.mark.parametrize("board, color, expected", [
+    (legal_initial_board(), "blue", True),
+    (legal_initial_board_with_workers("blue"), "blue", False),
+    (legal_initial_board_with_workers("white"), "blue", True),
+    (legal_initial_board_with_workers("white"), "white", False),
+    (legal_initial_board_with_workers("blue"), "white", True),
+    (illegal_heights_board(), "blue", False),
+    (illegal_heights_board(), "white", False),
+    (illegal_extra_workers_board(), "blue", False),
+    (illegal_extra_workers_board(), "white", False),
+    (illegal_less_workers_board(), "blue", False),
+    (illegal_less_workers_board(), "white", False),
+    (illegal_num_workers_board(), "blue", False),
+    (illegal_num_workers_board(), "white", False)
+])
+def test_is_legal_initial_board(board, color, expected):
+    assert expected == RuleChecker.is_legal_initial_board(board, color)
+
+
+@pytest.mark.parametrize("board, expected", [
+    (legal_board(), True),
+    (illegal_heights_board(), False),
+    (illegal_heights_board(), False),
+    (illegal_extra_workers_board(), False),
+    (illegal_extra_workers_board(), False),
+    (illegal_less_workers_board(), False),
+    (illegal_less_workers_board(), False),
+    (illegal_num_workers_board(), False),
+    (illegal_num_workers_board(), False)
+])
+def test_is_legal_board(board, expected):
+    assert expected == RuleChecker.is_legal_board(board)
+
+
+@pytest.mark.parametrize("worker, expected", [
+    ("blue1", True),
+    ("blue2", True),
+    ("white1", True),
+    ("blue3", False),
+    ("white3", False),
+    ("white2", True)
+])
+def test_is_valid_worker(worker, expected):
+    assert expected == RuleChecker.is_valid_worker(worker)
+
+
+@pytest.mark.parametrize("direction, expected", [
+    ("N", True), ("W", True), ("NW", True), ("NE", True), ("E", True), ("SE", True), ("SW", True), ("S", True),
+    ("EN", False), ('WS', False)
+])
+def test_is_valid_direction(direction, expected):
+    assert expected == RuleChecker.is_valid_direction(direction)
+
+
+@pytest.mark.parametrize("color, expected", [
+    ("grey", False),
+    ("blue", True),
+    ("white", True)
+])
+def test_is_valid_color(color, expected):
+    assert expected == RuleChecker.is_valid_color(color)
+
+
+@pytest.mark.parametrize("worker, direction, expected", [
     ("blue2", "SW", True),
     ("blue2", "S", False),
     ("white1", "S", True),
@@ -104,56 +187,4 @@ def test_is_winning_build(legal_board, worker, direction, expected):
 
 @pytest.mark.parametrize("worker, direction, expected", [])
 def test_is_winning_play(legal_board, worker, direction, expected):
-    pass
-
-
-@pytest.mark.parametrize("worker, direction, expected", [
-    ("blue1", "S", False),
-    ("blue2", "SW", True),
-    ("white1", "N", False),
-    ("white2", "E", True)
-])
-def test_is_valid_move(legal_board, worker, direction, expected):
-    assert expected == RuleChecker.is_valid_move(legal_board, worker, direction)
-
-
-@pytest.mark.parametrize("worker, direction, expected", [
-
-])
-def test_is_valid_build(legal_board, worker, direction, expected):
-    pass
-
-
-@pytest.mark.parametrize("board, color, expected", [
-
-])
-def test_is_legal_initial_board(board, color, expected):
-    pass
-
-
-@pytest.mark.parametrize("expected", [
-
-])
-def test_is_legal_board(board, expected):
-    pass
-
-
-@pytest.mark.parametrize("worker", [
-
-])
-def test_is_valid_worker(worker):
-    pass
-
-
-@pytest.mark.parametrize("direction", [
-
-])
-def test_is_valid_direction(direction):
-    pass
-
-
-@pytest.mark.parametrize("color", [
-
-])
-def test_is_valid_color(color):
     pass
