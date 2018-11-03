@@ -1,6 +1,5 @@
 import pytest
 from RuleChecker import RuleChecker
-from CustomExceptions import ContractViolation
 from Board import Board
 
 
@@ -105,6 +104,29 @@ def test_is_valid_move(legal_board, worker, direction, expected):
 ])
 def test_is_valid_build(legal_board, worker, direction, expected):
     assert expected == RuleChecker.is_valid_build(legal_board, worker, direction)
+
+
+@pytest.mark.parametrize("worker, directions, expected", [
+    ("blue1", ["N", "S"], True),
+    ("blue1", ["NW", "E"], True),
+    ("white1", ["NW", "S"], True),
+    ("blue2", ["S", "N"], True),
+    ("white2", ["W", "W"], True),
+    ("white2", ["SW", "SW"], True),
+    ("white1", ["S"], True),
+    ("blue1", ["S", "E"], False),
+    ("blue1", ["SE"], False),
+    ("white1", ["N", "S"], False),
+    ("blue2", ["NE", "N"], False),
+    ("blue2", ["NW"], False),
+    ("white2", ["E", "E"], False),
+    ("blue2", ["S"], False),
+    ("white2", ["W"], False),
+    ("blue1", ["N", "NE"], False)
+
+])
+def test_is_legal_play(legal_board, worker, directions, expected):
+    assert expected == RuleChecker.is_legal_play(legal_board, worker, directions)
 
 
 @pytest.mark.parametrize("board, color, expected", [

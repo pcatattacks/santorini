@@ -74,13 +74,14 @@ class Strategy:
         pass
 
     @staticmethod
-    def get_plays(board, color):
+    def get_plays(board, color, num_look_ahead):
         """
-        Returns a list of all possible legal plays that cannot not result in the opposing player winning with the next
-        move.
+        Returns a list of all possible legal plays that cannot not result in the opposing player winning within the next
+        `num_look_ahead` moves.
 
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param string color: color (as defined above)
+        :param int num_look_ahead: number of moves to look ahead by
         :return: a `list` of legal plays (as defined above)
         :rtype: `list`
         """

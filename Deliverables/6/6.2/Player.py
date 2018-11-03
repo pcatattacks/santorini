@@ -83,7 +83,7 @@ class Player:
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
         return Strategy.get_placements(self.board, self.color)
 
-    def play(self, board):
+    def play(self, board, num_moves_ahead):
         """
         Returns the strategized play a player wants to execute on a given turn.
 
@@ -95,9 +95,9 @@ class Player:
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
         self.board.set_board(board)
-        return Strategy.get_plays(self.board, self.color)
+        return Strategy.get_plays(self.board, self.color, num_moves_ahead)
 
-    def receive_notification(self, board, has_won, end_game):
+    def notify(self, board, has_won, end_game):
         """
         Notifies the player about the updated state of the Santorini Game.
 

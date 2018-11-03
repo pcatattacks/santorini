@@ -51,6 +51,42 @@ class RuleChecker:
                 and adj_cell_height != 4)
 
     @staticmethod
+    def is_legal_play(board, worker, directions):
+        """
+
+        :param Board board:
+        :param string worker:
+        :param list directions:
+        :return: `True` if play is legal, `False` otherwise
+        :rtype: bool
+        """
+        build_dir = None
+        if len(directions) == 1:
+            move_dir = directions[0]
+        elif len(directions) == 2:
+            move_dir, build_dir = directions
+        else:
+            raise ContractViolation("Too many/few directions provided.")
+
+        if RuleChecker.is_valid_move(board, worker, move_dir):
+            if RuleChecker.is_winning_move(board, worker, move_dir):
+                if build_dir is None:  # checking for win
+                    return True
+                else:
+                    return False
+            elif build_dir is None:
+                return False
+            board.move(worker, move_dir)
+            if RuleChecker.is_valid_build(board, worker, build_dir):
+                return_val = True
+            else:
+                return_val = False
+            board.move(worker, board.get_opposite_direction(move_dir))  # undo the move
+            return return_val
+        else:
+            return False
+
+    @staticmethod
     def is_legal_initial_board(board, color):
         """
 
