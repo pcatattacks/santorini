@@ -32,9 +32,9 @@ def main():
                 raise MalformedCommand("Unrecognized command argument: {}".format(command))
         except ContractViolation:  # unspecified behaviour for invalid input
             pass
-        # except Exception as e:
-        #     # print(json.dumps(str(e)))
-        #     # print(json.dumps(traceback.format_exc()))
+        except Exception as e:
+            print(json.dumps(str(e)))
+            # print(json.dumps(traceback.format_exc()))
 
 
 if __name__ == "__main__":
