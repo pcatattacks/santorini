@@ -15,9 +15,13 @@ def main():
     if len(json_values) < 4:
         raise MalformedCommand("Input required to begin with two Name and then two [Placement, Placement] commands.")
     player1_name = json_values.pop()
-    referee.register_player(player1_name)
+    print(referee.register_player(player1_name))
     player2_name = json_values.pop()
-    referee.register_player(player2_name)
+    print(referee.register_player(player2_name))
+    player1_placements = json_values.pop()
+    print(referee.check_placements(player1_placements))
+    player2_placements = json_values.pop()
+    print(referee.check_placements(player2_placements))
 
     for json_val in json_values:
         val = json_val["value"]

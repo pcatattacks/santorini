@@ -86,6 +86,22 @@ class RuleChecker:
         else:
             return False
 
+    # ADDED FUNCTION
+    @staticmethod
+    def is_legal_placement(board, placement):
+        """
+
+        :param list board: board to check for valid placement
+        :param list placement: list of two integers denoting the row and column for the worker to be placed
+        :return: boolean indicating validity of the placement
+        :rtype: bool
+        """
+        if not isinstance(placement, list) or len(placement) != 2:
+            raise ContractViolation("Expected a list with two elements. Received {}").format(placement)
+        row = placement[0]
+        col = placement[1]
+        dimensions = board.get_dimensions()
+
     @staticmethod
     def is_legal_initial_board(board, color):
         """
@@ -125,7 +141,7 @@ class RuleChecker:
                 else:
                     cell_height = cell
                     max_cell_height = max_height
-                if not 0 <= cell_height <= max_cell_height:
+                if not 0 <=  cell_height <= max_cell_height:
                     return False
         num_workers = len(workers)
         if unset_workers:
