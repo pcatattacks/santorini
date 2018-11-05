@@ -10,9 +10,11 @@ class Board:
 
     board
         `list` of rows of length 5. See 'row'.
+        TODO: change the description to reflect that a board can have any number of rows
 
     row
         `list` of cells of length 5. See 'cell'
+        TODO: change the description to reflect that a board can have any number of columns
 
     cell
         Either:
@@ -32,6 +34,7 @@ class Board:
 
     position
         `tuple` of `int`. `(row, col)`. A position is valid if `row` and `col` are in range [0,4].
+        TODO: change the description to reflect that boards of any length and width could be used
 
     direction
         `string` which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
@@ -49,12 +52,15 @@ class Board:
 
     """
 
+    # ADDED STATIC VARIABLE
+    DEFAULT_DIMENSIONS = (5, 5)
+
     def __init__(self):
         """
         Constructor. Initializes `board` member variable to `None`.
         `board` member variable simply stores the board for other functions to easily access.
         """
-        self.board = None
+        self.board = self.empty_board()
 
     def get_dimensions(self):
         """
@@ -68,6 +74,7 @@ class Board:
             raise ContractViolation("Cannot get dimensions if Board.board member variable has not been set!")
         return len(self.board), len(self.board[0])
 
+    # MODIFIED FUNCTION
     def set_board(self, board_obj):
         """
         Assigns the passed in board to the `board` member variable.
@@ -76,7 +83,22 @@ class Board:
         :return: No value returned.
         :rtype: void.
         """
-        # TODO: add check for if the board object is valid
+        if not board_obj or not (isinstance(board_obj), list) or all(isinstance(row, list) for row in board_obj):
+            raise ContractViolation("Not a valid board. Argument must be a not empty list of lists.")
+        col_size = len(board_obj[0])
+        if not col_size:
+            raise ContractViolation("Not a valid board. Each column must have at least one cell.")
+        dimensions = self.get_dimensions()
+        if len(board_obj) != dimensions[0] or col_size != dimensions[1]:
+            raise ContractViolation("Not a valid board. Dimensions do not match that of the current board.")
+        for row in board_obj:
+            if len(row) != col_size:
+                raise ContractViolation("Not a valid board. Mismatched column sizes.")
+            for col in row:
+                if not isinstance(board_obj[row][col], (int, [int, str])):
+                    raise ContractViolation("Not a valid board. All cells must be an int or a tuple of [int, str].")
+        if not RuleChecker.is_legal_board(board_obj):
+            raise ContractViolation("Not a valid board. Violates the rules of the game.")
         self.board = board_obj
 
     def neighboring_cell_exists(self, worker, direction):
@@ -241,11 +263,30 @@ class Board:
         :param int row: `row` in a position (as defined above).
         :param int col: `col` in a position (as defined above).
         :param string worker: a worker (as defined above).
-        :return:
+        :rtype: void
         """
         if not RuleChecker.is_valid_worker(worker):
             raise ValueError("Invalid worker provided: {}".format(worker))
         self.board[row][col] = [self.board[row][col], worker]
+
+    # ADDED FUNCTION
+    @staticmethod
+    def empty_board(num_rows=DEFAULT_DIMENSIONS[0], num_cols=DEFAULT_DIMENSIONS[1]):
+        """
+        :param int num_rows: the number of rows the board should have.
+        :param int num_cols: the number of columns the board should have.
+        :return: an empty board (as defined above) with the given number of rows and columns.
+        :rtype: list
+        """
+        if num_rows < 1 or num_cols < 1:
+            raise ValueError("A board must have dimensions of at least 1x1.")
+        board = []
+        for row_count in range(num_rows):
+            row = []
+            for col_count in range(num_cols):
+                row.append(0)
+            board.append(row)
+        return board
 
     @staticmethod
     def _get_adj_cell(worker_row, worker_col, direction_string):
@@ -273,7 +314,7 @@ class Board:
         """
         Gets the opposite direction to the direction string.
 
-        :param string direction_string: `a direction (as defined above).
+        :param string direction_string: a direction (as defined above).
         :return:
         """
         if not RuleChecker.is_valid_direction(direction_string):
@@ -288,7 +329,6 @@ class Board:
         elif "W" in direction_string:
             opp_dir += "E"
         return opp_dir
-
 
 
 class IllegalMove(Exception):

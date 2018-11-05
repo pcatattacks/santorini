@@ -6,6 +6,7 @@ from CustomExceptions import ContractViolation
 
 # TODO: modify tests to reflect that the strategy component no longer does a check for a valid (initial) board
 
+
 @pytest.fixture()
 def legal_initial_board():
     test_board = [[0, 0, 0, 0, 0],

@@ -53,7 +53,6 @@ class RuleChecker:
     @staticmethod
     def is_legal_play(board, worker, directions):
         """
-
         :param Board board:
         :param string worker:
         :param list directions:
@@ -90,46 +89,56 @@ class RuleChecker:
     @staticmethod
     def is_legal_placement(board, placement):
         """
+        Checks the validity of a placement.
 
-        :param list board: board to check for valid placement
-        :param list placement: list of two integers denoting the row and column for the worker to be placed
-        :return: boolean indicating validity of the placement
+        :param list board: A board (as defined in the documentation of Board).
+        :param list placement: A tuple of integers denoting the row and column for the worker to be placed.
+        :return: 'True' if the placement is valid, else 'False'.
         :rtype: bool
         """
-        if not isinstance(placement, list) or len(placement) != 2:
-            raise ContractViolation("Expected a list with two elements. Received {}").format(placement)
+        if not isinstance(placement, list)\
+                or len(placement) != 2\
+                or not all(isinstance(index, int) for index in placement):
+            raise ContractViolation("Expected a tuple of integers. Received {}".format(placement))
         row = placement[0]
         col = placement[1]
-        dimensions = board.get_dimensions()
+        if row > len(board) or col > len(board[0]):
+            return False
+        if isinstance(board[row][col], list):
+            return False
+        return True
 
     @staticmethod
     def is_legal_initial_board(board, color):
         """
+        Checks the validity of an initial board.
 
-        :param list board: board to check for valid initial conditions
-        :param string color: string denoting the color of the player checking initial conditions
-        :return: boolean indicating validity of initial board
+        :param list board: A board (as defined in the documentation of Board).
+        :param string color: A color (as defined in the documentation of Referee).
+        :return: 'True' if the board is a valid initial board, else 'False'.
         :rtype: bool
         """
         if not RuleChecker.is_valid_color(color):
-            raise ContractViolation("Invalid color given: {}".format(color))
-
+            raise ContractViolation("Invalid color provided: {}".format(color))
         unset_workers = [color + "1", color + "2"]
         return RuleChecker.is_legal_board(board, unset_workers, 0)
 
     @staticmethod
     def is_legal_board(board, unset_workers=[], max_height=4):
         """
+        Checks the validity of a board.
 
-        :param list board: board to check for validity
-        :param list unset_workers: list of workers not in board that will be accounted for (default: empty list)
-        :param int max_height: maximum height that any cell in the board should have (default: 4)
-        :return: boolean indicating validity of board
+        :param list board: A board (as defined in the documentation of Board).
+        :param list unset_workers: A list of workers (as defined in the documentation of Board) not in the board that
+        will be accounted for later (default: empty list).
+        :param int max_height: Maximum height (as defined in the documentation of Board) that any cell in the board
+        should have (default: 4).
+        :return: 'True' if the board is a valid board, else 'False'.
         :rtype: bool
         """
         workers = unset_workers
-        for row in range(5):
-            for col in range(5):
+        for row in range(len(board)):
+            for col in range(len(board[0])):
                 cell = board[row][col]
                 if isinstance(cell, list):
                     cell_height = cell[0]

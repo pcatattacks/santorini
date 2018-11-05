@@ -171,5 +171,3 @@ class Strategy:
                     board.move(player, opp_dir)  # undoing the move
 
         return legal_plays
-
-

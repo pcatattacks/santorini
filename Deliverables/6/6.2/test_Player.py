@@ -15,4 +15,3 @@ def test_play():
 
 def test_notify():
     pass
-

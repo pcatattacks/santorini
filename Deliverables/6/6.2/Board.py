@@ -177,7 +177,6 @@ class Board:
         self.board[adj_cell_row][adj_cell_col] -= 1
         return self.board
 
-
     def move(self, worker, direction):
         """
         Moves the specified worker from it's cell to the cell adjacent to the worker's existing position in the
@@ -241,7 +240,7 @@ class Board:
         :param int row: `row` in a position (as defined above).
         :param int col: `col` in a position (as defined above).
         :param string worker: a worker (as defined above).
-        :return:
+        :rtype: void
         """
         if not RuleChecker.is_valid_worker(worker):
             raise ValueError("Invalid worker provided: {}".format(worker))
