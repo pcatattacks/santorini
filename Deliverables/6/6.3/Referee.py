@@ -60,7 +60,7 @@ class Referee:
 
     def register_player(self, name):
         if not type(name) is str or not name:
-            raise
+            pass
 
 
 
