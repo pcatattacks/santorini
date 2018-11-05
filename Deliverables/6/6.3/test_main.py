@@ -11,7 +11,7 @@ def exe_name():
     return "referee-test-harness.sh"
 
 
-@pytest.mark.parametrize("input_num", [1])
+@pytest.mark.parametrize("input_num", [1, 2, 3, 4, 5])
 def test_input_x(exe_name, input_num):
     # getting output from executable script
     actual_output = subprocess.check_output(["./{filename} < input{num}".format(filename=exe_name, num=input_num)],
