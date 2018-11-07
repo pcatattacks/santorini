@@ -1,7 +1,6 @@
 import pytest
 from Board import Board
-from Strategy import Strategy
-from RuleChecker import RuleChecker
+from RuleChecker import RuleChecker, Strategy
 from CustomExceptions import ContractViolation
 
 # TODO: modify tests to reflect that the strategy component no longer does a check for a valid (initial) board
@@ -70,5 +69,5 @@ def test_get_plays():
 def test_get_legal_plays(legal_board, color):
     # Not a complete test, only tests for legality of plays output. Getting all possible move/build combos would be a
     # pain by hand, so this will do for now
-    for play in Strategy._get_legal_plays(legal_board, color):
+    for play in Strategy.get_legal_plays(legal_board, color):
         assert RuleChecker.is_legal_play(legal_board, *play)

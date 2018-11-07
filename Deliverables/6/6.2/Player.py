@@ -1,6 +1,5 @@
 from Board import Board
-from RuleChecker import RuleChecker
-from Strategy import Strategy
+from RuleChecker import RuleChecker, Strategy
 from CustomExceptions import ContractViolation
 
 
