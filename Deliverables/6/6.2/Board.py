@@ -55,6 +55,7 @@ class Board:
         `board` member variable simply stores the board for other functions to easily access.
         """
         self.board = None
+        self.worker_positions = {}  # key-value pair of worker : position
 
     def get_dimensions(self):
         """
@@ -78,6 +79,11 @@ class Board:
         """
         # TODO: add check for if the board object is valid
         self.board = board_obj
+        for r, row in enumerate(self.board):
+            for c, cell in enumerate(row):
+                if isinstance(cell, list):
+                    worker = cell[1]
+                    self.worker_positions[worker] = (r, c, cell[0])
 
     def neighboring_cell_exists(self, worker, direction):
         """
@@ -196,12 +202,13 @@ class Board:
         :rtype: list, void
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         adj_cell_height = self.board[adj_cell_row][adj_cell_col]
         self.board[adj_cell_row][adj_cell_col] = [adj_cell_height, worker]
         self.board[worker_row][worker_col] = worker_height
+        self.worker_positions[worker] = (adj_cell_row, adj_cell_col, adj_cell_height)
         return self.board
 
     def get_worker_position(self, worker):
@@ -215,12 +222,12 @@ class Board:
         :rtype: tuple of ints
         """
         if not RuleChecker.is_valid_worker(worker):
-            raise ValueError("Invalid worker provided: {}".format(worker))
+            raise ContractViolation("Invalid worker provided: {}".format(worker))
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
-        for r, row in enumerate(self.board):
-            for c, cell in enumerate(row):
-                if isinstance(cell, list) and cell[1] == worker:
-                    return r, c, cell[0]
+        if worker in self.worker_positions:
+            return self.worker_positions[worker]
+        else:
+            raise ContractViolation("Worker does not exist in worker_dictionary!")
 
     def has_worker(self, row, col):
         """
@@ -251,7 +258,9 @@ class Board:
         # lets check anyway. it's redundant but doesn't matter, doesn't cost anything either.
         if self.has_worker(row, col):
             raise IllegalMove("Cannot place worker in occupied cell!")
-        self.board[row][col] = [self.board[row][col], worker]
+        height = self.board[row][col]
+        self.board[row][col] = [height, worker]
+        self.worker_positions[worker] = (row, col, height)
 
     @staticmethod
     def _get_adj_cell(worker_row, worker_col, direction_string):
@@ -294,6 +303,7 @@ class Board:
         elif "W" in direction_string:
             opp_dir += "E"
         return opp_dir
+
 
 class IllegalMove(Exception):
     pass

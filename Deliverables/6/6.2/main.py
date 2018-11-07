@@ -9,6 +9,7 @@ from CustomExceptions import MalformedCommand, ContractViolation
 def main():
     player = Player()
     json_values = parse_json(take_input())
+
     with open("strategy.config") as f:
         data = f.read() + '\n'
         num_moves_ahead = parse_json(data)[0]["value"]["look-ahead"]
@@ -27,19 +28,21 @@ def main():
 
             if command == "Place":
                 player.register(color)
-                placements = player.place(given_board) # TODO - check the place function
+                placements = player.place(given_board)  # TODO - check the place function
                 print(json.dumps(placements))
             elif command == "Play":
                 plays = player.play(given_board, num_moves_ahead)
                 print(json.dumps(plays))
             else:
                 raise MalformedCommand("Unrecognized command argument: {}".format(command))
-        except ContractViolation:  # unspecified behaviour for invalid input
+        except ContractViolation as e:  # unspecified behaviour for invalid input
+            # print(json.dumps(str(e)))
+            # print(traceback.format_exc())
             pass
         except Exception as e:
-            # print(json.dumps(str(e)))
+            print(json.dumps(str(e)))
             # print(json.dumps(traceback.format_exc()))
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
 
 
 if __name__ == "__main__":

@@ -166,28 +166,40 @@ class RuleChecker:
         :return: 'True' if the board is a valid board, else 'False'.
         :rtype: bool
         """
-        workers = unset_workers
+        if not unset_workers:
+            workers = []
+        else:
+            workers = unset_workers
         for row in range(len(board)):
             for col in range(len(board[0])):
                 cell = board[row][col]
                 if isinstance(cell, list):
-                    cell_height = cell[0]
-                    cell_worker = cell[1]
-                    max_cell_height = max(max_height, 2)
+                    cell_height, cell_worker = cell
+                    max_cell_height = min(max_height, 2)
                     if cell_worker in workers or not RuleChecker.is_valid_worker(cell_worker):
+                        # print("executes cell_worker in workers condition")
+                        # print("cell worker is", cell_worker)
+                        # print("workers already seen are", workers)
                         return False
+                    # print("cell worker is", cell_worker)
+                    # print("workers already seen are", workers)
+                    # print("appending", cell_worker)
+                    # print("---------------")
                     workers.append(cell_worker)
                 else:
                     cell_height = cell
                     max_cell_height = max_height
                 if not 0 <= cell_height <= max_cell_height:
+                    # print("executes bounds check condition")
                     return False
         num_workers = len(workers)
         if unset_workers:
             if num_workers != 2 and num_workers != 4:
+                # print("executes unset workers condition")
                 return False
         else:
             if num_workers != 4:
+                # print("executes num workers condition")
                 return False
         return True
 
