@@ -27,7 +27,7 @@ def main():
 
             if command == "Place":
                 player.register(color)
-                placements = player.place(given_board)
+                placements = player.place(given_board) # TODO - check the place function
                 print(json.dumps(placements))
             elif command == "Play":
                 plays = player.play(given_board, num_moves_ahead)
@@ -37,8 +37,9 @@ def main():
         except ContractViolation:  # unspecified behaviour for invalid input
             pass
         except Exception as e:
-            print(json.dumps(str(e)))
+            # print(json.dumps(str(e)))
             # print(json.dumps(traceback.format_exc()))
+            print(traceback.format_exc())
 
 
 if __name__ == "__main__":

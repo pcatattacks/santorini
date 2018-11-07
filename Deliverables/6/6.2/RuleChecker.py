@@ -57,8 +57,10 @@ class RuleChecker:
         if not RuleChecker.is_legal_play(board, worker, directions):
             raise ContractViolation("Illegal play passed into is_winning_play: {}".format([worker, directions]))
 
-        color = worker[-1]
-        opp_color = list(RuleChecker.COLORS).remove(color)[0]
+        color = worker[:-1]
+        available_colors = list(RuleChecker.COLORS)
+        available_colors.remove(color)
+        opp_color = available_colors[0]
 
         if len(directions) == 1:  # must be winning, since one direction is only legal in the winning case
             return True
@@ -70,7 +72,7 @@ class RuleChecker:
             board.move(worker, move_dir)
             board.build(worker, build_dir)
 
-            opposition_player_legal_plays = Strategy.Strategy.get_legal_plays(board, opp_color)
+            opposition_player_legal_plays = Strategy.get_legal_plays(board, opp_color)
 
             if not opposition_player_legal_plays:
                 opp_cannot_play = True
