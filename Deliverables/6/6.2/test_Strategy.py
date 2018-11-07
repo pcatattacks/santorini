@@ -46,15 +46,9 @@ def legal_board():
     (legal_initial_board(), "white", [[0, 0], [0, 4]]),
     (legal_initial_board_with_workers("white"), "blue", [[0, 4], [4, 0]]),
     (legal_initial_board_with_workers("blue"), "white", [[0, 4], [4, 0]]),
-    (legal_initial_board_with_workers("blue"), "blue", ContractViolation),
-    (legal_initial_board_with_workers("white"), "white", ContractViolation)
 ])
 def test_get_placements(board, color, expected):
-    if not isinstance(expected, list) and issubclass(expected, Exception):
-        with pytest.raises(expected):
-            Strategy.get_placements(board, color)
-    else:
-        assert expected == Strategy.get_placements(board, color)
+    assert expected == Strategy.get_placements(board, color)
 
 
 def test_get_play():
@@ -62,6 +56,10 @@ def test_get_play():
 
 
 def test_get_plays():
+    pass
+
+
+def test_loses_in_n_moves():
     pass
 
 

@@ -276,6 +276,9 @@ class Strategy:
         Returns a list of all possible legal plays that cannot not result in the opposing player winning within the next
         `num_look_ahead` moves.
 
+        CONTRACT:
+         - `num_look_ahead` must be >= 1
+
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param string color: color (as defined above)
         :param int num_look_ahead: number of moves to look ahead by
@@ -284,53 +287,51 @@ class Strategy:
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color given: {}".format(color))
-
-        # algorithm - a basic DFS
-        #
-        # R <- []
-        # P <- get legal plays for current player
-        # for p in P:
-        #   simulate p
-        #   Q <- get legal plays for opposing player
-        #   for q in Q:
-        #       simulate q
-        #
-        #       if q not is winning_play: # TODO - will have to write a function in RuleChecker for this
-        #           R.append(p)
-        #   undo p (if you're using the same board - don't need if we're deepcopy-ing the board for each play)
+        if num_look_ahead < 1:
+            return ContractViolation("Must look at least 1 move ahead! Given {}".format(num_look_ahead))
 
         available_colors = list(RuleChecker.COLORS)
         available_colors.remove(color)
-        opposition_player_color = available_colors[0]
+        opp_color = available_colors[0]
 
         result_plays = []
 
-        player_legal_plays = Strategy.get_legal_plays(board, color)
-
-        for play in player_legal_plays:
-            if len(play[1]) == 1:  # TODO: replace with RuleChecker.is_winning_play
+        for play in Strategy.get_legal_plays(board, color):
+            if RuleChecker.is_winning_play(board, *play):
                 result_plays.append(play)
             else:
                 opposition_win = False
                 worker = play[0]
                 move_dir, build_dir = play[1]
 
+                # player play
                 board.move(worker, move_dir)
                 board.build(worker, build_dir)
 
-                opposition_player_legal_plays = Strategy.get_legal_plays(board, opposition_player_color)
-
-                for opp_play in opposition_player_legal_plays:
-                    if len(opp_play[1]) == 1:  # TODO: replace with RuleChecker.is_winning_play
+                for opp_play in Strategy.get_legal_plays(board, opp_color):
+                    if RuleChecker.is_winning_play(board, *opp_play):
                         opposition_win = True
                         break
+                    elif num_look_ahead > 1:
+                        opp_worker = opp_play[0]
+                        opp_move_dir, opp_build_dir = opp_play[1]
+
+                        # opposition play
+                        board.move(opp_worker, opp_move_dir)
+                        board.build(opp_worker, opp_build_dir)
+
+                        opposition_win = Strategy._loses_in_n_moves(board, color, num_look_ahead - 1)
+
+                        # undoing opposition play
+                        board.undo_build(opp_worker, opp_build_dir)
+                        board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+
+                # undoing player play
+                board.undo_build(worker, build_dir)
+                board.move(worker, board.get_opposite_direction(move_dir))
 
                 if not opposition_win:
                     result_plays.append(play)
-
-                # undoing the build and move in that order
-                board.undo_build(worker, build_dir)
-                board.move(worker, board.get_opposite_direction(move_dir))
 
         return result_plays
 
@@ -339,22 +340,50 @@ class Strategy:
         """
 
         :param Board board:
-        :param string olor:
+        :param string color:
         :param int n:
         :return:
         :rtype: bool
         """
-        if n == 1:
-            pass
-        else:
-            for play in Strategy.get_legal_plays(board, color):
-                worker = play[0]
-                move_dir, build_dir = play[1]
+        if n == 0:
+            return False
 
-                board.move(worker, move_dir)
-                board.build(worker, build_dir)
+        opp_color = "blue" if color == "white" else "white"
 
-                pass
+        loses = True  # if the player has no plays, which means player lost, which means loop never executes
+        for play in Strategy.get_legal_plays(board, color):
+            if RuleChecker.is_winning_play(board, *play):
+                return False
+            worker = play[0]
+            move_dir, build_dir = play[1]
+
+            # player play
+            board.move(worker, move_dir)
+            board.build(worker, build_dir)
+
+            loses = False  # if the opposition has no plays, which means player wins, which means loop never executes
+            for opp_play in Strategy.get_legal_plays(board, opp_color):
+                if RuleChecker.is_winning_play(board, *opp_play):
+                    loses = True
+                elif n > 1:  # TODO - check. should this be 1 or 0
+                    opp_worker = opp_play[0]
+                    opp_move_dir, opp_build_dir = opp_play[1]
+
+                    # opposition play
+                    board.move(opp_worker, opp_move_dir)
+                    board.build(opp_worker, opp_build_dir)
+
+                    loses = Strategy._loses_in_n_moves(board, color, n-1)  # recurse
+
+                    # undoing opposition play
+                    board.undo_build(opp_worker, opp_build_dir)
+                    board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+
+            # undoing player play
+            board.undo_build(worker, build_dir)
+            board.move(worker, board.get_opposite_direction(move_dir))
+
+        return loses
 
 
 
