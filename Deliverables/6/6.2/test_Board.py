@@ -1,53 +1,53 @@
 import pytest
 
 
-def test_get_dimensions(self):
+def test_get_dimensions():
     pass
 
 
-def test_set_board(self, board_obj):
+def test_set_board():
     pass
 
 
-def test_neighboring_cell_exists(self, worker, direction):
+def test_neighboring_cell_exists():
     pass
 
 
-def test_get_height(self, worker, direction):
+def test_get_height():
     pass
 
 
-def test_is_occupied(self, worker, direction):
+def test_is_occupied():
     pass
 
 
-def test_build(self, worker, direction):
+def test_build():
     pass
 
 
-def test_undo_build(self, worker, direction):
+def test_undo_build():
     pass
 
 
-def test_move(self, worker, direction):
+def test_move():
     pass
 
 
-def test_get_worker_position(self, worker):
+def test_get_worker_position():
     pass
 
 
-def has_worker(self, row, col):
+def has_worker():
     pass
 
 
-def place_worker(self, row, col, worker):
+def place_worker():
     pass
 
 
-def _get_adj_cell(worker_row, worker_col, direction_string):
+def _get_adj_cell():
     pass
 
 
-def get_opposite_direction(direction_string):
+def get_opposite_direction():
     pass

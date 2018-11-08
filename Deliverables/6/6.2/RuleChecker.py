@@ -312,7 +312,9 @@ class Strategy:
         result_plays = []
 
         for play in Strategy.get_legal_plays(board, color):
-            if RuleChecker.is_winning_play(board, *play):
+            # if RuleChecker.is_winning_play(board, *play):
+            #     result_plays.append(play)
+            if len(play[1]) == 1:
                 result_plays.append(play)
             else:
                 opposition_win = False
@@ -324,7 +326,10 @@ class Strategy:
                 board.build(worker, build_dir)
 
                 for opp_play in Strategy.get_legal_plays(board, opp_color):
-                    if RuleChecker.is_winning_play(board, *opp_play):
+                    # if RuleChecker.is_winning_play(board, *opp_play):
+                    #     opposition_win = True
+                    #     break
+                    if len(opp_play[1]) == 1:
                         opposition_win = True
                         break
                     elif num_look_ahead > 1:
@@ -367,7 +372,9 @@ class Strategy:
 
         loses = True  # if the player has no plays, which means player lost, which means loop never executes
         for play in Strategy.get_legal_plays(board, color):
-            if RuleChecker.is_winning_play(board, *play):
+            # if RuleChecker.is_winning_play(board, *play):
+            #     return False
+            if len(play[1]) == 1:
                 return False
             worker = play[0]
             move_dir, build_dir = play[1]
@@ -378,7 +385,9 @@ class Strategy:
 
             loses = False  # if the opposition has no plays, which means player wins, which means loop never executes
             for opp_play in Strategy.get_legal_plays(board, opp_color):
-                if RuleChecker.is_winning_play(board, *opp_play):
+                # if RuleChecker.is_winning_play(board, *opp_play):
+                #     loses = True
+                if len(opp_play[1]) == 1:
                     loses = True
                 elif n > 1:  # TODO - check. should this be 1 or 0
                     opp_worker = opp_play[0]
@@ -399,9 +408,6 @@ class Strategy:
             board.move(worker, board.get_opposite_direction(move_dir))
 
         return loses
-
-
-
 
     @staticmethod
     def get_legal_plays(board, color):
