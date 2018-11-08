@@ -104,6 +104,28 @@ class RuleChecker:
                 and adj_cell_height != 4)
 
     @staticmethod
+    def is_legal_placement(board, placement):
+        """
+        Checks the validity of a placement.
+
+        :param list board: A board (as defined in the documentation of Board).
+        :param list placement: A tuple of integers denoting the row and column for the worker to be placed.
+        :return: 'True' if the placement is valid, else 'False'.
+        :rtype: bool
+        """
+        if (not isinstance(placement, list)
+                or len(placement) != 2
+                or not all(isinstance(index, int) for index in placement)):
+            raise ContractViolation("Expected a tuple of integers. Received {}".format(placement))
+        row = placement[0]
+        col = placement[1]
+        if not 0 <= row < len(board) or not 0 <= col < len(board[0]):
+            return False
+        if isinstance(board[row][col], list):
+            return False
+        return True
+
+    @staticmethod
     def is_legal_play(board, worker, directions):
         """
         :param Board board:
