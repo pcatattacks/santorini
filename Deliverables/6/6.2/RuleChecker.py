@@ -170,6 +170,7 @@ class RuleChecker:
             workers = []
         else:
             workers = unset_workers
+        # TODO - look into mutation of keyword params
         for row in range(len(board)):
             for col in range(len(board[0])):
                 cell = board[row][col]
