@@ -49,12 +49,14 @@ class Board:
 
     """
 
+    DEFAULT_DIMENSIONS = (5, 5)
+
     def __init__(self):
         """
         Constructor. Initializes `board` member variable to `None`.
         `board` member variable simply stores the board for other functions to easily access.
         """
-        self.board = None
+        self.board = self._create_empty_board()
         self.worker_positions = {}  # key-value pair of worker : position
 
     def get_dimensions(self):
@@ -251,16 +253,29 @@ class Board:
         """
         if not RuleChecker.is_valid_worker(worker):
             raise ValueError("Invalid worker provided: {}".format(worker))
-        # TODO: Discuss. Should we check if the cell has a worker here, or should we expect the RuleChecker to do that
-        # using the board's has_worker function?
-        # Pranav: I think we should let the RuleChecker do that. place_worker should only be responsible for putting
-        # a worker on a cell. Maybe there's god powers that allow you to replace your worker with another players? But
-        # lets check anyway. it's redundant but doesn't matter, doesn't cost anything either.
         if self.has_worker(row, col):
             raise IllegalMove("Cannot place worker in occupied cell!")
         height = self.board[row][col]
         self.board[row][col] = [height, worker]
         self.worker_positions[worker] = (row, col, height)
+
+    @staticmethod
+    def _create_empty_board(num_rows=DEFAULT_DIMENSIONS[0], num_cols=DEFAULT_DIMENSIONS[1]):
+        """
+        :param int num_rows: the number of rows the board should have.
+        :param int num_cols: the number of columns the board should have.
+        :return: an empty board (as defined above) with the given number of rows and columns.
+        :rtype: list
+        """
+        if num_rows < 1 or num_cols < 1:
+            raise ValueError("A board must have dimensions of at least 1x1.")
+        board = []
+        for row_count in range(num_rows):
+            row = []
+            for col_count in range(num_cols):
+                row.append(0)
+            board.append(row)
+        return board
 
     @staticmethod
     def _get_adj_cell(worker_row, worker_col, direction_string):
