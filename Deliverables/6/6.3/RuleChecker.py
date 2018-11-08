@@ -96,13 +96,13 @@ class RuleChecker:
         :return: 'True' if the placement is valid, else 'False'.
         :rtype: bool
         """
-        if not isinstance(placement, list)\
-                or len(placement) != 2\
-                or not all(isinstance(index, int) for index in placement):
+        if (not isinstance(placement, list)
+                or len(placement) != 2
+                or not all(isinstance(index, int) for index in placement)):
             raise ContractViolation("Expected a tuple of integers. Received {}".format(placement))
         row = placement[0]
         col = placement[1]
-        if row > len(board) or col > len(board[0]):
+        if not 0 <= row < len(board) or not 0 <= col < len(board[0]):
             return False
         if isinstance(board[row][col], list):
             return False

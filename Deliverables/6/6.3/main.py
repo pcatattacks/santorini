@@ -4,7 +4,7 @@ import traceback
 from Player import Player
 from Referee import Referee
 from JsonParser import take_input, parse_json
-from CustomExceptions import ContractViolation, InvalidInput, InvalidCommand, MalformedCommand
+from CustomExceptions import ContractViolation, InvalidInput, InvalidCommand, MalformedCommand, IllegalPlay
 
 
 def main():
@@ -28,8 +28,12 @@ def main():
                 print(json.dumps(referee.check_play(val)))
             else:
                 raise MalformedCommand("Unrecognized command: {}".format(val))
-        except (ContractViolation, InvalidCommand):  # unspecified behaviour for invalid input
+        except (ContractViolation):  # unspecified behaviour for invalid input
             pass
+        except IllegalPlay as e:
+            winning_player = e.args[0]
+            print(json.dumps(winning_player))
+            break
         except Exception as e:
             print(json.dumps(str(e)))
             # print(json.dumps(traceback.format_exc()))
