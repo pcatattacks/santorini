@@ -1,6 +1,2 @@
-[[0, 4], [4, 4]]
-[["white1", ["S"]], ["white2", ["W", "NW"]], ["white2", ["NW", "W"]]]
-[["white1", ["S"]], ["white1", ["SW"]], ["white1", ["W"]], ["white1", ["NW"]], ["white2", ["W", "NW"]], ["white2", ["NW", "W"]]]
-[["white1", ["S"]], ["white1", ["SW"]], ["white1", ["W"]], ["white1", ["NW"]], ["white2", ["E"]], ["white2", ["SE"]], ["white2", ["W"]], ["white2", ["NW", "W"]]]
+[[0, 0], [4, 0]]
 []
-[["white2", ["W", "N"]], ["white2", ["NW"]]]
