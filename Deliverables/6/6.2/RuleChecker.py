@@ -325,26 +325,33 @@ class Strategy:
                 board.move(worker, move_dir)
                 board.build(worker, build_dir)
 
-                for opp_play in Strategy.get_legal_plays(board, opp_color):
-                    # if RuleChecker.is_winning_play(board, *opp_play):
-                    #     opposition_win = True
-                    #     break
-                    if len(opp_play[1]) == 1:
-                        opposition_win = True
-                        break
-                    elif num_look_ahead > 1:
-                        opp_worker = opp_play[0]
-                        opp_move_dir, opp_build_dir = opp_play[1]
+                opp_legal_plays = Strategy.get_legal_plays(board, opp_color)
+                if any(len(opp_play[1]) == 1 for opp_play in opp_legal_plays):  # try and prune search
+                    opposition_win = True
+                else:
+                    for opp_play in opp_legal_plays:
+                        # if RuleChecker.is_winning_play(board, *opp_play):
+                        #     opposition_win = True
+                        #     break
+                        if len(opp_play[1]) == 1:
+                            opposition_win = True
+                            break
+                        elif num_look_ahead > 1:
+                            opp_worker = opp_play[0]
+                            opp_move_dir, opp_build_dir = opp_play[1]
 
-                        # opposition play
-                        board.move(opp_worker, opp_move_dir)
-                        board.build(opp_worker, opp_build_dir)
+                            # opposition play
+                            board.move(opp_worker, opp_move_dir)
+                            board.build(opp_worker, opp_build_dir)
 
-                        opposition_win = Strategy._loses_in_n_moves(board, color, num_look_ahead - 1)
+                            opposition_win = Strategy._loses_in_n_moves(board, color, num_look_ahead - 1)
 
-                        # undoing opposition play
-                        board.undo_build(opp_worker, opp_build_dir)
-                        board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+                            # undoing opposition play
+                            board.undo_build(opp_worker, opp_build_dir)
+                            board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+
+                            if opposition_win:
+                                break
 
                 # undoing player play
                 board.undo_build(worker, build_dir)
@@ -370,12 +377,14 @@ class Strategy:
 
         opp_color = "blue" if color == "white" else "white"
 
+        legal_plays = Strategy.get_legal_plays(board, color)
+        if all(len(play[1]) == 1 for play in legal_plays):
+            return False
+
         loses = True  # if the player has no plays, which means player lost, which means loop never executes
-        for play in Strategy.get_legal_plays(board, color):
-            # if RuleChecker.is_winning_play(board, *play):
-            #     return False
+        for play in legal_plays:
             if len(play[1]) == 1:
-                return False
+                continue
             worker = play[0]
             move_dir, build_dir = play[1]
 
@@ -383,29 +392,40 @@ class Strategy:
             board.move(worker, move_dir)
             board.build(worker, build_dir)
 
-            loses = False  # if the opposition has no plays, which means player wins, which means loop never executes
-            for opp_play in Strategy.get_legal_plays(board, opp_color):
-                # if RuleChecker.is_winning_play(board, *opp_play):
-                #     loses = True
-                if len(opp_play[1]) == 1:
-                    loses = True
-                elif n > 1:  # TODO - check. should this be 1 or 0
-                    opp_worker = opp_play[0]
-                    opp_move_dir, opp_build_dir = opp_play[1]
+            opp_legal_plays = Strategy.get_legal_plays(board, opp_color)
+            if any(len(opp_play[1]) == 1 for opp_play in opp_legal_plays):  # try and prune search
+                loses = True
+            else:
+                loses = False  # if opposition has no plays, which means player wins, which means loop never executes
+                for opp_play in opp_legal_plays:
+                    # if RuleChecker.is_winning_play(board, *opp_play):
+                    #     loses = True
+                    if len(opp_play[1]) == 1:
+                        loses = True
+                        break
+                    elif n > 1:  # TODO - check. should this be 1 or 0
+                        opp_worker = opp_play[0]
+                        opp_move_dir, opp_build_dir = opp_play[1]
 
-                    # opposition play
-                    board.move(opp_worker, opp_move_dir)
-                    board.build(opp_worker, opp_build_dir)
+                        # opposition play
+                        board.move(opp_worker, opp_move_dir)
+                        board.build(opp_worker, opp_build_dir)
 
-                    loses = Strategy._loses_in_n_moves(board, color, n-1)  # recurse
+                        loses = Strategy._loses_in_n_moves(board, color, n-1)  # recurse
 
-                    # undoing opposition play
-                    board.undo_build(opp_worker, opp_build_dir)
-                    board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+                        # undoing opposition play
+                        board.undo_build(opp_worker, opp_build_dir)
+                        board.move(opp_worker, board.get_opposite_direction(opp_move_dir))
+
+                        if loses:
+                            break
 
             # undoing player play
             board.undo_build(worker, build_dir)
             board.move(worker, board.get_opposite_direction(move_dir))
+
+            if loses:
+                break
 
         return loses
 

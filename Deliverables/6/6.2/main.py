@@ -42,7 +42,7 @@ def main():
         except Exception as e:
             print(json.dumps(str(e)))
             # print(json.dumps(traceback.format_exc()))
-            # print(traceback.format_exc())
+            print(traceback.format_exc())
 
 
 if __name__ == "__main__":
