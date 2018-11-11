@@ -34,20 +34,48 @@ class Referee:
         self.player_turn = None
         self.board = Board()
 
-    def start_game(self):
+    def play_game(self):
         """
         Drives the Santorini game and invokes interfaces of the Player and RuleChecker components to notify them of the
-        updated game state and prompt them for plays.
+        updated game state and prompt them for plays. Returns the name of the winning player.
 
         CONTRACT:
          - Cannot be called more than once.
 
-        :return:
-        :rtype: void
+        :return: the name of the winning player.
+        :rtype: string
         """
-        pass
+        turn = 0
+        while True:
+            # mocking server receiving message
+            message = self.players[turn].get_message()
+            if not message:
+                break
 
-    def register_player(self, name):
+            try:
+                message_type = Referee._get_message_type(message)
+                if message_type == "name":
+                    self._register_player(message)
+                elif message_type == "place":
+                    self._update_board_with_placements(message)
+                elif message_type == "play":
+                    won = self._update_board_with_play(message)
+                    if won:
+                        return self.player_names[turn]
+
+                self.board.display()  # display current state of board
+                turn = 1 if turn == 0 else 0  # swapping turn
+
+            except IllegalPlay:
+                return self.player_names[turn * -1 + 1]
+            except InvalidCommand:
+                # TODO - unspecified behaviour since we never expect this
+                pass
+            except ContractViolation:
+                # TODO - unspecified behaviour since we never expect this
+                pass
+
+    def _register_player(self, name):
         """
         Registers a player's name and assigns them a color.
 
@@ -60,13 +88,32 @@ class Referee:
         if not self.player_names:
             self.players[0].register(RuleChecker.COLORS[0])
             self.player_names.append(name)
-            return RuleChecker.COLORS[0]
         if len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
-            self.player_turn = 0
-            return RuleChecker.COLORS[1]
         raise InvalidCommand("Can only register two players.")
+
+    def _update_board_with_placements(self, placements):
+        """
+        Updates the board with the given placements.
+
+        :param list placements: a list of placements (as defined above)
+        :return:
+        :rtype: void
+        """
+        # TODO
+        pass
+
+    def _update_board_with_play(self, play):
+        """
+        Updates the board state with the play and returns `True` if the given play resulted in a win. `False` otherwise.
+
+        :param list play: a play (as defined above)
+        :return: Boolean indicating whether the play resulted in the player winning on that turn
+        :rtype: bool
+        """
+        # TODO
+        pass
 
     def check_placements(self, placements):
         """
@@ -141,3 +188,29 @@ class Referee:
             self.player_turn = 1
         else:
             self.player_turn = 0
+
+    @staticmethod
+    def _get_message_type(message):
+        """
+        Checks if a message is correctly formatted and returns the type of message.
+
+        Message types may be:
+        - name
+        - place
+        - play
+
+        :param any message:
+        :return: the type of the message received
+        :rtype: string
+        """
+        if isinstance(message, str):
+            return "name"
+        if isinstance(message, list):
+            # TODO: add more stringent checking for items within the command
+            if len(message) == 2:
+                item1, item2 = message
+                if isinstance(item1, str) and isinstance(item2, list):  # play command
+                    return "play"
+                elif all(isinstance(item, list) and all(isinstance(x, int) for x in item) for item in message):
+                    return "place"
+        raise InvalidCommand("Message format not supported: {}".format(message))

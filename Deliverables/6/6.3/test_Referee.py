@@ -12,7 +12,7 @@ def test_register_player(names, expected):
     player2 = Player()
     referee = Referee(player1, player2)
     for count, name in enumerate(names):
-        assert expected[count] == referee.register_player(name)
+        assert expected[count] == referee._register_player(name)
 
 
 @pytest.mark.parametrize("placements, expected", [
@@ -36,8 +36,8 @@ def test_check_placements(placements, expected):
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
-    referee.register_player("P1")
-    referee.register_player("P2")
+    referee._register_player("P1")
+    referee._register_player("P2")
     for count, placement in enumerate(placements):
         assert expected[count] == referee.check_placements(placement)
 
@@ -53,8 +53,8 @@ def test_check_play(plays, expected):
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
-    referee.register_player("P1")
-    referee.register_player("P2")
+    referee._register_player("P1")
+    referee._register_player("P2")
     referee.check_placements([[0, 0], [4, 0]])
     referee.check_placements([[4, 4], [0, 4]])
     for count, play in enumerate(plays):

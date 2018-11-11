@@ -1,7 +1,7 @@
 from Board import Board
-from RuleChecker import RuleChecker
-from Strategy import Strategy
+from RuleChecker import RuleChecker, Strategy
 from CustomExceptions import ContractViolation
+from JsonParser import take_input, parse_json # For testing, remove later
 
 
 class Player:
@@ -27,6 +27,8 @@ class Player:
 
 
     """
+
+    MESSAGES = list(reversed(parse_json(take_input())))  # TESTING
 
     def __init__(self):
         # TODO: Discuss / Document for code walk.
@@ -54,7 +56,7 @@ class Player:
         :rtype: void
         """
         if not RuleChecker.is_valid_color(color):
-            raise ValueError("Invalid color provided: {}".format(color))
+            raise ContractViolation("Invalid color provided: {}".format(color))
         if self.color:
             raise ContractViolation("Cannot call Player.register() again until game ends!")
         self.color = color
@@ -114,3 +116,17 @@ class Player:
         :rtype: void
         """
         pass
+
+    @staticmethod
+    def get_message():
+        """
+        Fake method for testing - REMOVE LATER.
+        :return:
+        """
+        if not Player.MESSAGES:
+            return None
+        message = Player.MESSAGES.pop()
+        return message["value"]
+
+
+

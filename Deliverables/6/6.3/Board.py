@@ -1,3 +1,4 @@
+import json
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation
 
@@ -10,11 +11,9 @@ class Board:
 
     board
         `list` of rows of length 5. See 'row'.
-        TODO: change the description to reflect that a board can have any number of rows
 
     row
         `list` of cells of length 5. See 'cell'
-        TODO: change the description to reflect that a board can have any number of columns
 
     cell
         Either:
@@ -34,7 +33,6 @@ class Board:
 
     position
         `tuple` of `int`. `(row, col)`. A position is valid if `row` and `col` are in range [0,4].
-        TODO: change the description to reflect that boards of any length and width could be used
 
     direction
         `string` which is either "N", "NE", "E", "SE", "S", "SW", "W", "NW".
@@ -52,7 +50,6 @@ class Board:
 
     """
 
-    # ADDED STATIC VARIABLE
     DEFAULT_DIMENSIONS = (5, 5)
 
     def __init__(self):
@@ -60,7 +57,8 @@ class Board:
         Constructor. Initializes `board` member variable to `None`.
         `board` member variable simply stores the board for other functions to easily access.
         """
-        self.board = self.empty_board()
+        self.board = self._create_empty_board()
+        self.worker_positions = {}  # key-value pair of worker : position
 
     def get_dimensions(self):
         """
@@ -74,7 +72,6 @@ class Board:
             raise ContractViolation("Cannot get dimensions if Board.board member variable has not been set!")
         return len(self.board), len(self.board[0])
 
-    # MODIFIED FUNCTION
     def set_board(self, board_obj):
         """
         Assigns the passed in board to the `board` member variable.
@@ -83,23 +80,13 @@ class Board:
         :return: No value returned.
         :rtype: void.
         """
-        if not board_obj or not (isinstance(board_obj), list) or all(isinstance(row, list) for row in board_obj):
-            raise ContractViolation("Not a valid board. Argument must be a not empty list of lists.")
-        col_size = len(board_obj[0])
-        if not col_size:
-            raise ContractViolation("Not a valid board. Each column must have at least one cell.")
-        dimensions = self.get_dimensions()
-        if len(board_obj) != dimensions[0] or col_size != dimensions[1]:
-            raise ContractViolation("Not a valid board. Dimensions do not match that of the current board.")
-        for row in board_obj:
-            if len(row) != col_size:
-                raise ContractViolation("Not a valid board. Mismatched column sizes.")
-            for col in row:
-                if not isinstance(board_obj[row][col], (int, [int, str])):
-                    raise ContractViolation("Not a valid board. All cells must be an int or a tuple of [int, str].")
-        if not RuleChecker.is_legal_board(board_obj):
-            raise ContractViolation("Not a valid board. Violates the rules of the game.")
+        # TODO: add check for if the board object is valid
         self.board = board_obj
+        for r, row in enumerate(self.board):
+            for c, cell in enumerate(row):
+                if isinstance(cell, list):
+                    worker = cell[1]
+                    self.worker_positions[worker] = (r, c, cell[0])
 
     def neighboring_cell_exists(self, worker, direction):
         """
@@ -113,7 +100,7 @@ class Board:
         :rtype: bool
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
         return 0 <= adj_cell_row < len(self.board) and 0 <= adj_cell_col < len(self.board[0])
@@ -128,7 +115,7 @@ class Board:
         :rtype: int
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, worker_height = self.get_worker_position(worker)
             adj_cell_row, adj_cell_col = Board._get_adj_cell(worker_row, worker_col, direction)
@@ -151,7 +138,7 @@ class Board:
         :rtype: bool, void
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         if self.neighboring_cell_exists(worker, direction):
             worker_row, worker_col, cell_height = self.get_worker_position(worker)
             adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
@@ -171,7 +158,7 @@ class Board:
         :rtype: list, void
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         self.board[adj_cell_row][adj_cell_col] += 1
@@ -193,7 +180,7 @@ class Board:
         :rtype: list, void
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         self.board[adj_cell_row][adj_cell_col] -= 1
@@ -218,12 +205,13 @@ class Board:
         :rtype: list, void
         """
         if not RuleChecker.is_valid_worker(worker) or not RuleChecker.is_valid_direction(direction):
-            raise ValueError("Invalid (or no) worker / direction provided.")
+            raise ContractViolation("Invalid (or no) worker / direction provided.")
         worker_row, worker_col, worker_height = self.get_worker_position(worker)
         adj_cell_row, adj_cell_col = self._get_adj_cell(worker_row, worker_col, direction)
         adj_cell_height = self.board[adj_cell_row][adj_cell_col]
         self.board[adj_cell_row][adj_cell_col] = [adj_cell_height, worker]
         self.board[worker_row][worker_col] = worker_height
+        self.worker_positions[worker] = (adj_cell_row, adj_cell_col, adj_cell_height)
         return self.board
 
     def get_worker_position(self, worker):
@@ -237,12 +225,12 @@ class Board:
         :rtype: tuple of ints
         """
         if not RuleChecker.is_valid_worker(worker):
-            raise ValueError("Invalid worker provided: {}".format(worker))
+            raise ContractViolation("Invalid worker provided: {}".format(worker))
         # Note: would use a dictionary for O(1) access if the board wasn't being reset with every command.
-        for r, row in enumerate(self.board):
-            for c, cell in enumerate(row):
-                if isinstance(cell, list) and cell[1] == worker:
-                    return r, c, cell[0]
+        if worker in self.worker_positions:
+            return self.worker_positions[worker]
+        else:
+            raise ContractViolation("Worker does not exist in worker_dictionary!")
 
     def has_worker(self, row, col):
         """
@@ -255,7 +243,6 @@ class Board:
         """
         return isinstance(self.board[row][col], list)
 
-    # MODIFIED FUNCTION
     def place_worker(self, row, col, worker):
         """
         Places a worker at the cell at position (row, col)
@@ -266,12 +253,15 @@ class Board:
         :rtype: void
         """
         if not RuleChecker.is_valid_worker(worker):
-            raise ValueError("Invalid worker provided: {}".format(worker))
-        self.board[row][col] = [self.board[row][col], worker]
+            raise ContractViolation("Invalid worker provided: {}".format(worker))
+        if self.has_worker(row, col):
+            raise IllegalMove("Cannot place worker in occupied cell!")
+        height = self.board[row][col]
+        self.board[row][col] = [height, worker]
+        self.worker_positions[worker] = (row, col, height)
 
-    # ADDED FUNCTION
     @staticmethod
-    def empty_board(num_rows=DEFAULT_DIMENSIONS[0], num_cols=DEFAULT_DIMENSIONS[1]):
+    def _create_empty_board(num_rows=DEFAULT_DIMENSIONS[0], num_cols=DEFAULT_DIMENSIONS[1]):
         """
         :param int num_rows: the number of rows the board should have.
         :param int num_cols: the number of columns the board should have.
@@ -314,7 +304,7 @@ class Board:
         """
         Gets the opposite direction to the direction string.
 
-        :param string direction_string: a direction (as defined above).
+        :param string direction_string: `a direction (as defined above).
         :return:
         """
         if not RuleChecker.is_valid_direction(direction_string):
@@ -329,6 +319,16 @@ class Board:
         elif "W" in direction_string:
             opp_dir += "E"
         return opp_dir
+
+    def display(self):
+        # TODO - maybe remove once proxy is implemented?
+        """
+        Prints a json representation of the current board state.
+
+        :return:
+        :rtype: void
+        """
+        print(json.dumps(self.board))
 
 
 class IllegalMove(Exception):
