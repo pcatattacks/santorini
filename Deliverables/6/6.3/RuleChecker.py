@@ -16,9 +16,9 @@ class RuleChecker:
         and direction2 is the direction to build.
     """
 
-    WORKERS = ("blue1", "blue2", "white1", "white2")
     DIRECTIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
     COLORS = ("blue", "white")
+    WORKERS = (COLORS[0]+"1", COLORS[0]+"2", COLORS[1]+"1", COLORS[1]+"2")
 
     @staticmethod
     def is_winning_move(board, worker, direction):

@@ -3,8 +3,8 @@ import traceback
 
 from Player import Player
 from Referee import Referee
-from JsonParser import take_input, parse_json
-from CustomExceptions import ContractViolation, InvalidInput, InvalidCommand, MalformedCommand, IllegalPlay
+# from JsonParser import take_input, parse_json
+# from CustomExceptions import ContractViolation, InvalidInput, InvalidCommand, MalformedCommand, IllegalPlay
 
 
 def main():
@@ -12,7 +12,8 @@ def main():
     player2 = Player()
     referee = Referee(player1, player2)
     winner = referee.play_game()
-    json.dumps(winner)
+    if winner:
+        print(json.dumps(winner))
 
     # json_values = parse_json(take_input())
     # if len(json_values) < 4:

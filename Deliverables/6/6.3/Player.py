@@ -28,7 +28,7 @@ class Player:
 
     """
 
-    MESSAGES = list(reversed(parse_json(take_input())))  # TESTING
+    # MESSAGES = list(reversed(parse_json(take_input())))  # TESTING
 
     def __init__(self):
         # TODO: Discuss / Document for code walk.
@@ -117,16 +117,16 @@ class Player:
         """
         pass
 
-    @staticmethod
-    def get_message():
-        """
-        Fake method for testing - REMOVE LATER.
-        :return:
-        """
-        if not Player.MESSAGES:
-            return None
-        message = Player.MESSAGES.pop()
-        return message["value"]
+    # @staticmethod
+    # def get_message():
+    #     """
+    #     Fake method for testing - REMOVE LATER.
+    #     :return:
+    #     """
+    #     if not Player.MESSAGES:
+    #         return None
+    #     message = Player.MESSAGES.pop()
+    #     return message["value"]
 
 
 

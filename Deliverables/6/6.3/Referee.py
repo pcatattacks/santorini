@@ -1,6 +1,7 @@
+import json
 from Board import Board
-from Player import Player
 from RuleChecker import RuleChecker
+from JsonParser import parse_json, take_input
 from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay
 
 
@@ -34,6 +35,9 @@ class Referee:
         self.board = Board()
         self.turn = None
 
+        # shadow state
+        self.unplaced_workers = list(RuleChecker.WORKERS)
+
     def play_game(self):
         """
         Drives the Santorini game and invokes interfaces of the Player and RuleChecker components to notify them of the
@@ -45,25 +49,30 @@ class Referee:
         :return: the name of the winning player.
         :rtype: string
         """
+        messages = list(reversed(parse_json(take_input())))  # only for testing
+
         while True:
             # mocking server receiving message
-            message = self.players[self.turn].get_message()
-            if not message:
+            if not messages:
                 break
+            message = messages.pop()["value"]
 
             try:
                 message_type = Referee._get_message_type(message)
                 if message_type == "name":
-                    self._register_player(message)
-                elif message_type == "place":
-                    self._update_board_with_placements(message)
-                elif message_type == "play":
-                    won = self._update_board_with_play(message)
-                    if won:
-                        return self.player_names[self.turn]
+                    assigned_color = self._register_player(message)
+                    print(json.dumps(assigned_color))
+                else:
 
-                self.board.display()  # display current state of board
-                self.turn = 1 if self.turn == 0 else 0  # swapping turn
+                    if message_type == "place":
+                        self._update_board_with_placements(message)
+                    elif message_type == "play":
+                        won = self._update_board_with_play(message)
+                        if won:
+                            return self.player_names[self.turn]
+
+                    self.board.display()
+                    self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
             except IllegalPlay:
                 return self.player_names[self.turn * -1 + 1]
@@ -73,6 +82,8 @@ class Referee:
             except ContractViolation:
                 # TODO - unspecified behaviour since we never expect this
                 pass
+
+        return None  # placeholder for testing
 
     def _register_player(self, name):
         """
@@ -90,10 +101,12 @@ class Referee:
         if not self.player_names:
             self.players[0].register(RuleChecker.COLORS[0])
             self.player_names.append(name)
+            return RuleChecker.COLORS[0]
         if len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
             self.turn = 0
+            return RuleChecker.COLORS[1]
         raise InvalidCommand("Can only register two players.")
 
     def _update_board_with_placements(self, placements):
@@ -111,7 +124,7 @@ class Referee:
         if self.turn is None:
             # TODO: use InvalidCommand or IllegalPlay?
             raise InvalidCommand("Both players must be registered before making other commands.")
-        if not RuleChecker.is_legal_initial_board(self.board, RuleChecker.COLORS[self.turn]):
+        if not self.unplaced_workers:
             # TODO: use InvalidCommand or IllegalPlay?
             raise InvalidCommand("Cannot place workers on this board.")
         for placement in placements:
@@ -119,7 +132,9 @@ class Referee:
                 raise IllegalPlay("Invalid placement position given: {}".format(placement))
         for worker_num, placement in enumerate(placements, 1):
             row, col = placement
-            self.board.place_worker(row, col, RuleChecker.COLORS[self.turn] + str(worker_num))
+            worker = RuleChecker.COLORS[self.turn] + str(worker_num)
+            self.board.place_worker(row, col, worker)
+            self.unplaced_workers.remove(worker)
 
     def _update_board_with_play(self, play):
         """
@@ -133,7 +148,21 @@ class Referee:
         :rtype: bool
         """
         # TODO
-        pass
+        if self.unplaced_workers:
+            raise InvalidCommand("Both players must have placed workers before making other commands.")
+        worker, directions = play
+        if (worker[:-1] != RuleChecker.COLORS[self.turn]
+                or not RuleChecker.is_legal_play(self.board, worker, directions)):
+            raise IllegalPlay("Illegal play made by {player}: {play}".format(player=self.players[self.turn], play=play))
+
+        if len(directions) == 1:
+            return True
+
+        move_dir, build_dir = directions
+        self.board.move(worker, move_dir)
+        self.board.build(worker, build_dir)
+
+        return False
 
     def check_placements(self, placements):
         """
@@ -223,7 +252,8 @@ class Referee:
             # TODO: add more stringent checking for items within the command
             if len(message) == 2:
                 item1, item2 = message
-                if isinstance(item1, str) and isinstance(item2, list):  # play command
+                if (isinstance(item1, str) and isinstance(item2, list)
+                        and all(RuleChecker.is_valid_direction(direction) for direction in item2)):
                     return "play"
                 elif all(isinstance(item, list) and all(isinstance(x, int) for x in item) for item in message):
                     return "place"
