@@ -56,8 +56,7 @@ def congested_board():
     (congested_board(), (5, 5))
 ])
 def test_get_dimensions(test_board, expected):
-    length, width = test_board.get_dimensions()
-    assert expected == (length, width)
+    assert expected == test_board.get_dimensions()
 
 
 @pytest.mark.parametrize("test_board", [
@@ -66,9 +65,8 @@ def test_get_dimensions(test_board, expected):
     (legal_board()),
     (congested_board())
 ])
-# TODO - edit test to check if worker_positions dict and get_worker_position
+# TODO: use get_worker_position to test accuracy of worker_positions dict update
 def test_set_board(test_board):
-    # assert test_board == test_board.board
     pass
 
 
@@ -173,8 +171,7 @@ def test_place_worker(empty_board, row, col, worker, expected):
     (4, 4, "NW", (3, 3))
 ])
 def test_get_adj_cell(row, col, direction, expected):
-    adj_row, adj_col = Board._get_adj_cell(row, col, direction)
-    assert expected == (adj_row, adj_col)
+    assert expected == Board._get_adj_cell(row, col, direction)
 
 
 @pytest.mark.parametrize("direction, expected", [
