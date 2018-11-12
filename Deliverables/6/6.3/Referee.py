@@ -31,8 +31,8 @@ class Referee:
         """
         self.players = [player1, player2]
         self.player_names = []
-        self.player_turn = None
         self.board = Board()
+        self.turn = None
 
     def play_game(self):
         """
@@ -45,10 +45,9 @@ class Referee:
         :return: the name of the winning player.
         :rtype: string
         """
-        turn = 0
         while True:
             # mocking server receiving message
-            message = self.players[turn].get_message()
+            message = self.players[self.turn].get_message()
             if not message:
                 break
 
@@ -61,13 +60,13 @@ class Referee:
                 elif message_type == "play":
                     won = self._update_board_with_play(message)
                     if won:
-                        return self.player_names[turn]
+                        return self.player_names[self.turn]
 
                 self.board.display()  # display current state of board
-                turn = 1 if turn == 0 else 0  # swapping turn
+                self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
             except IllegalPlay:
-                return self.player_names[turn * -1 + 1]
+                return self.player_names[self.turn * -1 + 1]
             except InvalidCommand:
                 # TODO - unspecified behaviour since we never expect this
                 pass
@@ -78,6 +77,9 @@ class Referee:
     def _register_player(self, name):
         """
         Registers a player's name and assigns them a color.
+
+        CONTRACT:
+         - Can only be called once per distinct player per game (two players).
 
         :param string name: The name of the player to be registered.
         :return: The Color (as defined above) assigned to the player that has registered.
@@ -91,22 +93,40 @@ class Referee:
         if len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
+            self.turn = 0
         raise InvalidCommand("Can only register two players.")
 
     def _update_board_with_placements(self, placements):
         """
         Updates the board with the given placements.
 
+        CONTRACT:
+         - Can only be called after _register_player has been called for every player.
+         - Can only be called once per distinct player per game (two players).
+
         :param list placements: a list of placements (as defined above)
         :return:
         :rtype: void
         """
-        # TODO
-        pass
+        if self.turn is None:
+            # TODO: use InvalidCommand or IllegalPlay?
+            raise InvalidCommand("Both players must be registered before making other commands.")
+        if not RuleChecker.is_legal_initial_board(self.board, RuleChecker.COLORS[self.turn]):
+            # TODO: use InvalidCommand or IllegalPlay?
+            raise InvalidCommand("Cannot place workers on this board.")
+        for placement in placements:
+            if not RuleChecker.is_legal_placement(self.board, placement):
+                raise IllegalPlay("Invalid placement position given: {}".format(placement))
+        for worker_num, placement in enumerate(placements, 1):
+            row, col = placement
+            self.board.place_worker(row, col, RuleChecker.COLORS[self.turn] + str(worker_num))
 
     def _update_board_with_play(self, play):
         """
         Updates the board state with the play and returns `True` if the given play resulted in a win. `False` otherwise.
+
+        CONTRACT:
+         - Can only be called after _update_board_with_placements has been called for every player.
 
         :param list play: a play (as defined above)
         :return: Boolean indicating whether the play resulted in the player winning on that turn

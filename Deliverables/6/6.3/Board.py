@@ -232,6 +232,16 @@ class Board:
         else:
             raise ContractViolation("Worker does not exist in worker_dictionary!")
 
+    def get_cell_height(self, row, col):
+        if self.has_worker(row, col):
+            return self.board[row][col][0]
+        return self.board[row][col]
+
+    def get_cell_worker(self, row, col):
+        if self.has_worker(row, col):
+            return self.board[row][col][1]
+        return None
+
     def has_worker(self, row, col):
         """
         Returns whether a cell has a worker present in it or not.
