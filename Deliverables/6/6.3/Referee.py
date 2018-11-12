@@ -71,8 +71,10 @@ class Referee:
                         if won:
                             return self.player_names[self.turn]
 
+                    print("turn is", self.turn)
                     self.board.display()
                     self.turn = 1 if self.turn == 0 else 0  # swapping turn
+                    print("switched turn to", self.turn)
 
             except IllegalPlay:
                 return self.player_names[self.turn * -1 + 1]
@@ -134,6 +136,7 @@ class Referee:
             row, col = placement
             worker = RuleChecker.COLORS[self.turn] + str(worker_num)
             self.board.place_worker(row, col, worker)
+            print(self.unplaced_workers, worker, self.turn)  # debug
             self.unplaced_workers.remove(worker)
 
     def _update_board_with_play(self, play):
@@ -163,74 +166,6 @@ class Referee:
         self.board.build(worker, build_dir)
 
         return False
-
-    def check_placements(self, placements):
-        """
-        Checks the validity of worker placements.
-
-        CONTRACT:
-         - Both players must be registered.
-
-        :param list placements: A Placement (as defined above).
-        :return: A Board (as defined in the documentation for Board).
-        :rtype: list
-        """
-        if not isinstance(placements, list) or len(placements) != 2 or placements[0] == placements[1]:  # TODO - raise error or lose game?
-            raise ContractViolation("Expected a tuple of distinct values. Received {}".format(placements))
-        if self.player_turn is None:
-            raise InvalidCommand("Both players must be registered before making other commands.")
-        # TODO: should we store a boolean indicating whether or not a player has placed their workers or just check the board member variable directly
-        # TODO: a way to pass the board member variable of self.board to RuleChecker functions without accessing it directly
-        if not RuleChecker.is_legal_initial_board(self.board.board, RuleChecker.COLORS[self.player_turn]):
-            raise InvalidCommand("Cannot place workers on this board.")
-        for placement in placements:
-            # SEE ABOVE: argument modification required
-            if not RuleChecker.is_legal_placement(self.board.board, placement):
-                raise IllegalPlay(self.player_names[self.player_turn * -1 + 1],
-                                  "Invalid placement position given: {}".format(placement))
-        for worker_num, placement in enumerate(placements, 1):
-            self.board.place_worker(placement[0], placement[1], RuleChecker.COLORS[self.player_turn] + str(worker_num))
-        self.swap_turn()
-        # TODO: a way to return the board member variable of self.board without accessing it directly, so that it can be provided to the players
-        return self.board.board
-
-    def check_play(self, play):
-        """
-        Checks if a play violates the rules of the game.
-
-        CONTRACT:
-         - Both players must be registered.
-
-        :param list play: A Play (as defined above).
-        :return: `True` if the rules of the game are violated, `False` otherwise.
-        :rtype: bool
-        """
-        if not isinstance(play, list) or len(play) != 2:
-            raise ContractViolation("Expected a tuple. Received {}".format(play))
-        if not isinstance(play[0], str):
-            raise ContractViolation("Expected a string for worker name. Received {}".format(play[0]))
-        if (not isinstance(play[1], list)
-                or not 0 < len(play[1]) <= 2
-                or not all(isinstance(direction, str) for direction in play[1])):
-            raise (ContractViolation
-                   ("Expected a non-empty list (max length = 2) of strings for directions. Received {}"
-                    .format(play[1])))
-        if self.player_turn is None:
-            raise InvalidCommand("Both players must be registered before making other commands.")
-        if play[0][:-1] != RuleChecker.COLORS[self.player_turn]\
-                or not RuleChecker.is_legal_play(self.board, play[0], play[1]):
-            raise IllegalPlay(self.player_names[self.player_turn * -1 + 1],
-                              "Illegal play made by {player}: {play}".format(player=self.players[self.player_turn],
-                                                                             play=play))
-        if RuleChecker.is_winning_move(self.board, play[0], play[1][0]):
-            # TODO - don't raise a fucking exception
-            raise IllegalPlay(self.player_names[self.player_turn])
-            # return self.player_names[self.player_turn]
-        self.board.move(play[0], play[1][0])
-        self.board.build(play[0], play[1][1])
-        self.swap_turn()
-        # SEE ABOVE: return value modification required
-        return self.board.board
 
     @staticmethod
     def _get_message_type(message):

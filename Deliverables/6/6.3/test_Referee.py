@@ -32,14 +32,15 @@ def test_register_player(names, expected):
                                              [0, 0, 0, 0, 0],
                                              [[0, "blue2"], 0, 0, 0, [0, "white1"]]]])
 ])
-def test_check_placements(placements, expected):
+def test_check_placements(placements, expected):  # TODO - turn into fixtures
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
     referee._register_player("P1")
     referee._register_player("P2")
     for count, placement in enumerate(placements):
-        assert expected[count] == referee.check_placements(placement)
+        referee._update_board_with_placements(placement)
+        assert expected[count] == referee.board.board
 
 
 @pytest.mark.parametrize("plays, expected", [

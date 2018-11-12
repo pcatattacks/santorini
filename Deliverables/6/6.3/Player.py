@@ -28,8 +28,6 @@ class Player:
 
     """
 
-    # MESSAGES = list(reversed(parse_json(take_input())))  # TESTING
-
     def __init__(self):
         # TODO: Discuss / Document for code walk.
         # Should we have the player store a board object and call the set_board() method within Player,
@@ -117,16 +115,6 @@ class Player:
         """
         pass
 
-    # @staticmethod
-    # def get_message():
-    #     """
-    #     Fake method for testing - REMOVE LATER.
-    #     :return:
-    #     """
-    #     if not Player.MESSAGES:
-    #         return None
-    #     message = Player.MESSAGES.pop()
-    #     return message["value"]
 
 
 
