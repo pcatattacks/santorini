@@ -185,3 +185,13 @@ def test_get_adj_cell(row, col, direction, expected):
 ])
 def test_get_opposite_direction(direction, expected):
     assert expected == Board.get_opposite_direction(direction)
+
+
+@pytest.mark.parametrize("", [])  # TODO
+def test_get_cell_height():
+    pass
+
+
+@pytest.mark.parametrize("", [])  # TODO
+def test_get_cell_worker():
+    pass

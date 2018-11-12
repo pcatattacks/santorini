@@ -203,12 +203,6 @@ class Referee:
         # SEE ABOVE: return value modification required
         return self.board.board
 
-    def swap_turn(self):
-        if self.player_turn == 0:
-            self.player_turn = 1
-        else:
-            self.player_turn = 0
-
     @staticmethod
     def _get_message_type(message):
         """
