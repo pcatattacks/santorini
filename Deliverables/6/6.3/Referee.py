@@ -71,10 +71,8 @@ class Referee:
                         if won:
                             return self.player_names[self.turn]
 
-                    print("turn is", self.turn)
                     self.board.display()
                     self.turn = 1 if self.turn == 0 else 0  # swapping turn
-                    print("switched turn to", self.turn)
 
             except IllegalPlay:
                 return self.player_names[self.turn * -1 + 1]
@@ -136,7 +134,6 @@ class Referee:
             row, col = placement
             worker = RuleChecker.COLORS[self.turn] + str(worker_num)
             self.board.place_worker(row, col, worker)
-            print(self.unplaced_workers, worker, self.turn)  # debug
             self.unplaced_workers.remove(worker)
 
     def _update_board_with_play(self, play):

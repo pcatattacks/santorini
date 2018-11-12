@@ -32,7 +32,7 @@ def test_register_player(names, expected):
                                              [0, 0, 0, 0, 0],
                                              [[0, "blue2"], 0, 0, 0, [0, "white1"]]]])
 ])
-def test_check_placements(placements, expected):  # TODO - turn into fixtures
+def test_update_board_with_placements(placements, expected):  # TODO - turn into fixtures
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
@@ -40,6 +40,7 @@ def test_check_placements(placements, expected):  # TODO - turn into fixtures
     referee._register_player("P2")
     for count, placement in enumerate(placements):
         referee._update_board_with_placements(placement)
+        referee.turn = 1 if referee.turn == 0 else 0  # TODO - get rid of hacky fix
         assert expected[count] == referee.board.board
 
 
@@ -50,13 +51,17 @@ def test_check_placements(placements, expected):  # TODO - turn into fixtures
                                 [0, 0, 0, 0, 0],
                                 [[0, "blue2"], 0, 0, 0, [0, "white1"]]]])
 ])
-def test_check_play(plays, expected):
+def test_update_board_with_play(plays, expected):
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
     referee._register_player("P1")
     referee._register_player("P2")
-    referee.check_placements([[0, 0], [4, 0]])
-    referee.check_placements([[4, 4], [0, 4]])
+    referee._update_board_with_placements([[0, 0], [4, 0]])
+    referee.turn = 1 if referee.turn == 0 else 0
+    referee._update_board_with_placements([[4, 4], [0, 4]])
+    referee.turn = 1 if referee.turn == 0 else 0
     for count, play in enumerate(plays):
-        assert expected[count] == referee.check_play(play)
+        referee._update_board_with_play(play)
+        referee.turn = 1 if referee.turn == 0 else 0  # TODO - get rid of hacky fix
+        assert expected[count] == referee.board.board
