@@ -145,7 +145,7 @@ def test_is_legal_play(legal_board, worker, directions, expected):
     (illegal_num_workers_board(), "white", False)
 ])
 def test_is_legal_initial_board(board, color, expected):
-    assert expected == RuleChecker.is_legal_initial_board(board, color)
+    assert expected == RuleChecker.is_legal_initial_board(board.board, color)
 
 
 @pytest.mark.parametrize("board, expected", [
@@ -160,7 +160,7 @@ def test_is_legal_initial_board(board, color, expected):
     (illegal_num_workers_board(), False)
 ])
 def test_is_legal_board(board, expected):
-    assert expected == RuleChecker.is_legal_board(board)
+    assert expected == RuleChecker.is_legal_board(board.board)
 
 
 @pytest.mark.parametrize("worker, expected", [

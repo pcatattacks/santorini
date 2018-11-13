@@ -33,7 +33,7 @@ class Referee:
         self.players = [player1, player2]
         self.player_names = []
         self.board = Board()
-        self.turn = None
+        self.turn = 0
 
         # shadow state
         self.unplaced_workers = list(RuleChecker.WORKERS)
@@ -49,41 +49,85 @@ class Referee:
         :return: the name of the winning player.
         :rtype: string
         """
-        messages = list(reversed(parse_json(take_input())))  # only for testing
 
-        while True:
-            # mocking server receiving message
-            if not messages:
-                break
-            message = messages.pop()["value"]
+        for player in self.players:
+            name = player.get_name()
+            # the ProxyPlayer will wait for an incoming connection
+            # - till then, this method will block
+            self._register_player(name)
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
+        for player in self.players:
+            placements = player.place(self.board)
+            self._update_board_with_placements(placements)
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+            for p in self.players:
+                p.notify(self.board, has_won=False, end_game=False)
+
+        won = False
+        winner = None
+        while not winner:
+            player = self.players[self.turn]
             try:
-                message_type = Referee._get_message_type(message)
-                if message_type == "name":
-                    assigned_color = self._register_player(message)
-                    print(json.dumps(assigned_color))
+                play = player.play(self.board, 5)  # TODO: get num_look_ahead from file
+                won = self._update_board_with_play(play)
+                if won:
+                    winner = self.player_names[self.turn]
+                    player.notify(self.board, has_won=True, end_game=True)
                 else:
-
-                    if message_type == "place":
-                        self._update_board_with_placements(message)
-                    elif message_type == "play":
-                        won = self._update_board_with_play(message)
-                        if won:
-                            return self.player_names[self.turn]
-
-                    self.board.display()
-                    self.turn = 1 if self.turn == 0 else 0  # swapping turn
+                    for p in self.players:
+                        p.notify(self.board, has_won=False, end_game=False)
 
             except IllegalPlay:
-                return self.player_names[self.turn * -1 + 1]
+                winner = self.player_names[self.turn * -1 + 1]
+                player.notify(self.board, has_won=won, end_game=True)
             except InvalidCommand:
-                # TODO - unspecified behaviour since we never expect this
+                # TODO - unspecified behaviour since we never expect this in assignment 6
                 pass
             except ContractViolation:
-                # TODO - unspecified behaviour since we never expect this
+                # TODO - unspecified behaviour since we never expect this in assignment 6
                 pass
 
-        return None  # placeholder for testing
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+
+        self.players[self.turn].notify(self.board, has_won=(not won), end_game=True)  # notify other player
+        return winner
+
+        # messages = list(reversed(parse_json(take_input())))  # only for testing
+        #
+        # while True:
+        #     # mocking server receiving message
+        #     if not messages:
+        #         break
+        #     message = messages.pop()["value"]
+        #
+        #     try:
+        #         message_type = Referee._get_message_type(message)
+        #         if message_type == "name":
+        #             assigned_color = self._register_player(message)
+        #             print(json.dumps(assigned_color))
+        #         else:
+        #
+        #             if message_type == "place":
+        #                 self._update_board_with_placements(message)
+        #             elif message_type == "play":
+        #                 won = self._update_board_with_play(message)
+        #                 if won:
+        #                     return self.player_names[self.turn]
+        #
+        #             self.board.display()
+        #             self.turn = 1 if self.turn == 0 else 0  # swapping turn
+        #
+        #     except IllegalPlay:
+        #         return self.player_names[self.turn * -1 + 1]
+        #     except InvalidCommand:
+        #         # TODO - unspecified behaviour since we never expect this
+        #         pass
+        #     except ContractViolation:
+        #         # TODO - unspecified behaviour since we never expect this
+        #         pass
+        #
+        # return None  # placeholder for testing
 
     def _register_player(self, name):
         """
@@ -93,21 +137,19 @@ class Referee:
          - Can only be called once per distinct player per game (two players).
 
         :param string name: The name of the player to be registered.
-        :return: The Color (as defined above) assigned to the player that has registered.
-        :rtype: string
+        :return:
+        :rtype: void
         """
         if not name or not isinstance(name, str):
             raise ContractViolation("Expected a non-empty string. Received {}".format(name))
         if not self.player_names:
             self.players[0].register(RuleChecker.COLORS[0])
             self.player_names.append(name)
-            return RuleChecker.COLORS[0]
-        if len(self.player_names) == 1:
+        elif len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
-            self.turn = 0
-            return RuleChecker.COLORS[1]
-        raise InvalidCommand("Can only register two players.")
+        else:
+            raise InvalidCommand("Can only register two players.")
 
     def _update_board_with_placements(self, placements):
         """
@@ -121,9 +163,6 @@ class Referee:
         :return:
         :rtype: void
         """
-        if self.turn is None:
-            # TODO: use InvalidCommand or IllegalPlay?
-            raise InvalidCommand("Both players must be registered before making other commands.")
         if not self.unplaced_workers:
             # TODO: use InvalidCommand or IllegalPlay?
             raise InvalidCommand("Cannot place workers on this board.")

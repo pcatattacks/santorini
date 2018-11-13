@@ -72,7 +72,7 @@ class Board:
             raise ContractViolation("Cannot get dimensions if Board.board member variable has not been set!")
         return len(self.board), len(self.board[0])
 
-    def set_board(self, board_obj):
+    def set_board(self, board_obj):  # TODO - discuss whether should take board or list
         """
         Assigns the passed in board to the `board` member variable.
 
@@ -330,15 +330,14 @@ class Board:
             opp_dir += "E"
         return opp_dir
 
-    def display(self):
-        # TODO - maybe remove once proxy is implemented?
+    def extract_json_board(self):
         """
-        Prints a json representation of the current board state.
+        returns a json representation of the current board state.
 
-        :return:
-        :rtype: void
+        :return: json array
+        :rtype: string
         """
-        print(json.dumps(self.board))
+        return json.dumps(self.board)
 
 
 class IllegalMove(Exception):
