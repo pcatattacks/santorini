@@ -2,11 +2,14 @@ from Board import Board
 import sys
 from JsonParser import take_input, parse_json # For testing, remove later
 import json
+import copy
 
 
 class StubPlayer:
 
+    # TODO: isn't it bad practice to mutate static variables?
     messages = list(reversed(parse_json(take_input())))
+    print = True
 
     def __init__(self):
         self.name = None
@@ -31,4 +34,6 @@ class StubPlayer:
         if has_won:
             print(json.dumps(self.name))
         elif not end_game:
-            print(json.dumps(board.board))
+            if StubPlayer.print:
+                print(json.dumps(board.board))
+            StubPlayer.print = not StubPlayer.print

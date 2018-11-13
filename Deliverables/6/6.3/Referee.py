@@ -61,7 +61,8 @@ class Referee:
             placements = player.place(self.board)
             self._update_board_with_placements(placements)
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
-            player.notify(self.board, has_won=False, end_game=False)
+            for p in self.players:
+                p.notify(self.board, has_won=False, end_game=False)
 
         won = False
         winner = None
