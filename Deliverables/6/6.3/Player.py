@@ -70,7 +70,7 @@ class Player:
          - `board` must be a valid initial board (a board where all cell's heights are 0, and no workers of `self.color`
          are present any cell.
 
-        :param Board board: an instance of Board (refer to documentation of Board class).
+        :param list board: an instance of Board (refer to documentation of Board class).
         :return: `list` of [position1, position2] denoting the position of the player's 1st and 2nd worker respectively.
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
@@ -83,10 +83,12 @@ class Player:
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
         return Strategy.get_placements(self.board, self.color)
 
-    def play(self, board, num_moves_ahead):
+    def play(self, board, num_moves_ahead):   # TODO: get rid of num_look_ahead parameter, just take from file
         """
         Returns the strategized play a player wants to execute on a given turn.
 
+        :param list board:
+        :param int num_moves_ahead:
         :return: a play (as defined above)
         :rtype: list
         """

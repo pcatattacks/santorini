@@ -33,7 +33,7 @@ class Referee:
         self.players = [player1, player2]
         self.player_names = []
         self.board = Board()
-        self.turn = None
+        self.turn = 0
 
         # shadow state
         self.unplaced_workers = list(RuleChecker.WORKERS)
@@ -51,20 +51,23 @@ class Referee:
         """
 
         for player in self.players:
-            name = player.register(RuleChecker.COLORS[self.turn]) # the ProxyPlayer will wait for an incoming connection
+            name = player.get_name()
+            # the ProxyPlayer will wait for an incoming connection
             # - till then, this method will block
             self._register_player(name)
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
         for player in self.players:
             placements = player.place(self.board)
             self._update_board_with_placements(placements)
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
         won = False
         winner = None
         while not winner:
             player = self.players[self.turn]
             try:
-                play = player.play()
+                play = player.play(self.board, 5)  # TODO: get num_look_ahead from file
                 won = self._update_board_with_play(play)
                 if won:
                     winner = self.player_names[self.turn]
@@ -144,7 +147,6 @@ class Referee:
         if len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
-            self.turn = 0
             return RuleChecker.COLORS[1]
         raise InvalidCommand("Can only register two players.")
 
@@ -160,9 +162,6 @@ class Referee:
         :return:
         :rtype: void
         """
-        if self.turn is None:
-            # TODO: use InvalidCommand or IllegalPlay?
-            raise InvalidCommand("Both players must be registered before making other commands.")
         if not self.unplaced_workers:
             # TODO: use InvalidCommand or IllegalPlay?
             raise InvalidCommand("Cannot place workers on this board.")
