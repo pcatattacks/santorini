@@ -53,7 +53,7 @@ class Referee:
         for player in self.players:
             name = player.register(RuleChecker.COLORS[self.turn]) # the ProxyPlayer will wait for an incoming connection
             # - till then, this method will block
-            self.player_names.append(name)
+            self._register_player(name)
 
         for player in self.players:
             placements = player.place(self.board)
@@ -77,10 +77,10 @@ class Referee:
                 winner = self.player_names[self.turn * -1 + 1]
                 player.notify(self.board, has_won=won, end_game=True)
             except InvalidCommand:
-                # TODO - unspecified behaviour since we never expect this
+                # TODO - unspecified behaviour since we never expect this in assignment 6
                 pass
             except ContractViolation:
-                # TODO - unspecified behaviour since we never expect this
+                # TODO - unspecified behaviour since we never expect this in assignment 6
                 pass
 
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
