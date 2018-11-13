@@ -137,8 +137,8 @@ class Referee:
          - Can only be called once per distinct player per game (two players).
 
         :param string name: The name of the player to be registered.
-        :return: The Color (as defined above) assigned to the player that has registered.
-        :rtype: string
+        :return:
+        :rtype: void
         """
         if not name or not isinstance(name, str):
             raise ContractViolation("Expected a non-empty string. Received {}".format(name))

@@ -148,7 +148,7 @@ class RuleChecker:
             return False
 
     @staticmethod
-    def is_legal_initial_board(board, color):  # TODO - should it take a board or a list?
+    def is_legal_initial_board(board, color):
         """
         Checks the validity of an initial board.
 
@@ -163,7 +163,7 @@ class RuleChecker:
         return RuleChecker.is_legal_board(board, unset_workers, 0)
 
     @staticmethod
-    def is_legal_board(board, unset_workers=[], max_height=4):  # TODO - should it take a board or a list?
+    def is_legal_board(board, unset_workers=None, max_height=4):
         """
         Checks the validity of a board.
 
@@ -179,7 +179,6 @@ class RuleChecker:
             workers = []
         else:
             workers = unset_workers
-        # TODO - look into mutation of keyword params
         for row in range(len(board)):
             for col in range(len(board[0])):
                 cell = board[row][col]
@@ -187,29 +186,19 @@ class RuleChecker:
                     cell_height, cell_worker = cell
                     max_cell_height = min(max_height, 2)
                     if cell_worker in workers or not RuleChecker.is_valid_worker(cell_worker):
-                        # print("executes cell_worker in workers condition")
-                        # print("cell worker is", cell_worker)
-                        # print("workers already seen are", workers)
                         return False
-                    # print("cell worker is", cell_worker)
-                    # print("workers already seen are", workers)
-                    # print("appending", cell_worker)
-                    # print("---------------")
                     workers.append(cell_worker)
                 else:
                     cell_height = cell
                     max_cell_height = max_height
                 if not 0 <= cell_height <= max_cell_height:
-                    # print("executes bounds check condition")
                     return False
         num_workers = len(workers)
         if unset_workers:
             if num_workers != 2 and num_workers != 4:
-                # print("executes unset workers condition")
                 return False
         else:
             if num_workers != 4:
-                # print("executes num workers condition")
                 return False
         return True
 

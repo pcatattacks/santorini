@@ -144,8 +144,8 @@ def test_is_legal_play(legal_board, worker, directions, expected):
     (illegal_num_workers_board(), "blue", False),
     (illegal_num_workers_board(), "white", False)
 ])
-def test_is_legal_initial_board(board, color, expected):  # TODO: fails because takes in a list, not Board
-    assert expected == RuleChecker.is_legal_initial_board(board, color)
+def test_is_legal_initial_board(board, color, expected):
+    assert expected == RuleChecker.is_legal_initial_board(board.board, color)
 
 
 @pytest.mark.parametrize("board, expected", [
@@ -159,8 +159,8 @@ def test_is_legal_initial_board(board, color, expected):  # TODO: fails because 
     (illegal_num_workers_board(), False),
     (illegal_num_workers_board(), False)
 ])
-def test_is_legal_board(board, expected):  # TODO: fails because takes in a list, not Board
-    assert expected == RuleChecker.is_legal_board(board)
+def test_is_legal_board(board, expected):
+    assert expected == RuleChecker.is_legal_board(board.board)
 
 
 @pytest.mark.parametrize("worker, expected", [

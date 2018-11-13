@@ -54,16 +54,17 @@ def play_board(num_turns=0):
     return board.board
 
 
-@pytest.mark.parametrize("names, expected", [
-    (["P1"], RuleChecker.COLORS[:-1]),
-    (["P1", "P2"], RuleChecker.COLORS)
+@pytest.mark.parametrize("names", [
+    (["P1"]),
+    (["P1", "P2"])
 ])
-def test_register_player(names, expected):
+def test_register_player(names):
     player1 = Player()
     player2 = Player()
     referee = Referee(player1, player2)
     for count, name in enumerate(names):
-        assert expected[count] == referee._register_player(name)
+        referee._register_player(name)
+        assert referee.player_names[count] == name
 
 
 @pytest.mark.parametrize("placements, expected", [

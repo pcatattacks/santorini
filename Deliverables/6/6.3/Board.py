@@ -330,15 +330,14 @@ class Board:
             opp_dir += "E"
         return opp_dir
 
-    def display(self):
-        # TODO - maybe remove once proxy is implemented?
+    def extract_json_board(self):
         """
-        Prints a json representation of the current board state.
+        returns a json representation of the current board state.
 
-        :return:
-        :rtype: void
+        :return: json array
+        :rtype: string
         """
-        print(json.dumps(self.board))
+        return json.dumps(self.board)
 
 
 class IllegalMove(Exception):
