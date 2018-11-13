@@ -61,6 +61,7 @@ class Referee:
             placements = player.place(self.board)
             self._update_board_with_placements(placements)
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
+            player.notify(self.board, has_won=False, end_game=False)
 
         won = False
         winner = None
@@ -143,12 +144,11 @@ class Referee:
         if not self.player_names:
             self.players[0].register(RuleChecker.COLORS[0])
             self.player_names.append(name)
-            return RuleChecker.COLORS[0]
-        if len(self.player_names) == 1:
+        elif len(self.player_names) == 1:
             self.players[1].register(RuleChecker.COLORS[1])
             self.player_names.append(name)
-            return RuleChecker.COLORS[1]
-        raise InvalidCommand("Can only register two players.")
+        else:
+            raise InvalidCommand("Can only register two players.")
 
     def _update_board_with_placements(self, placements):
         """

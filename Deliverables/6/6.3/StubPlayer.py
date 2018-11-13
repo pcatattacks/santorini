@@ -10,7 +10,6 @@ class StubPlayer:
 
     def __init__(self):
         self.name = None
-        self.board = None
 
     def get_name(self):
         message = StubPlayer.messages.pop()["value"]
