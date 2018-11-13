@@ -144,7 +144,7 @@ def test_is_legal_play(legal_board, worker, directions, expected):
     (illegal_num_workers_board(), "blue", False),
     (illegal_num_workers_board(), "white", False)
 ])
-def test_is_legal_initial_board(board, color, expected):
+def test_is_legal_initial_board(board, color, expected):  # TODO: fails because takes in a list, not Board
     assert expected == RuleChecker.is_legal_initial_board(board, color)
 
 
@@ -159,7 +159,7 @@ def test_is_legal_initial_board(board, color, expected):
     (illegal_num_workers_board(), False),
     (illegal_num_workers_board(), False)
 ])
-def test_is_legal_board(board, expected):
+def test_is_legal_board(board, expected):  # TODO: fails because takes in a list, not Board
     assert expected == RuleChecker.is_legal_board(board)
 
 

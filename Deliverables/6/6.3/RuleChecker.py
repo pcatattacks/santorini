@@ -148,7 +148,7 @@ class RuleChecker:
             return False
 
     @staticmethod
-    def is_legal_initial_board(board, color):  # TODO - Pranav needs to read over implementation
+    def is_legal_initial_board(board, color):  # TODO - should it take a board or a list?
         """
         Checks the validity of an initial board.
 
@@ -163,7 +163,7 @@ class RuleChecker:
         return RuleChecker.is_legal_board(board, unset_workers, 0)
 
     @staticmethod
-    def is_legal_board(board, unset_workers=[], max_height=4):  # TODO - Pranav needs to read over implementation
+    def is_legal_board(board, unset_workers=[], max_height=4):  # TODO - should it take a board or a list?
         """
         Checks the validity of a board.
 
