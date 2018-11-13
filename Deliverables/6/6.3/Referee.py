@@ -49,33 +49,33 @@ class Referee:
         :return: the name of the winning player.
         :rtype: string
         """
-        messages = list(reversed(parse_json(take_input())))  # only for testing
 
-        while True:
-            # mocking server receiving message
-            if not messages:
-                break
-            message = messages.pop()["value"]
+        for player in self.players:
+            name = player.register(RuleChecker.COLORS[self.turn]) # the ProxyPlayer will wait for an incoming connection
+            # - till then, this method will block
+            self.player_names.append(name)
 
+        for player in self.players:
+            placements = player.place(self.board)
+            self._update_board_with_placements(placements)
+
+        won = False
+        winner = None
+        while not winner:
+            player = self.players[self.turn]
             try:
-                message_type = Referee._get_message_type(message)
-                if message_type == "name":
-                    assigned_color = self._register_player(message)
-                    print(json.dumps(assigned_color))
+                play = player.play()
+                won = self._update_board_with_play(play)
+                if won:
+                    winner = self.player_names[self.turn]
+                    player.notify(self.board, has_won=True, end_game=True)
                 else:
-
-                    if message_type == "place":
-                        self._update_board_with_placements(message)
-                    elif message_type == "play":
-                        won = self._update_board_with_play(message)
-                        if won:
-                            return self.player_names[self.turn]
-
-                    self.board.display()
-                    self.turn = 1 if self.turn == 0 else 0  # swapping turn
+                    for p in self.players:
+                        p.notify(self.board, has_won=False, end_game=False)
 
             except IllegalPlay:
-                return self.player_names[self.turn * -1 + 1]
+                winner = self.player_names[self.turn * -1 + 1]
+                player.notify(self.board, has_won=won, end_game=True)
             except InvalidCommand:
                 # TODO - unspecified behaviour since we never expect this
                 pass
@@ -83,7 +83,46 @@ class Referee:
                 # TODO - unspecified behaviour since we never expect this
                 pass
 
-        return None  # placeholder for testing
+            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+
+        self.players[self.turn].notify(self.board, has_won=(not won), end_game=True)  # notify other player
+        return winner
+
+        # messages = list(reversed(parse_json(take_input())))  # only for testing
+        #
+        # while True:
+        #     # mocking server receiving message
+        #     if not messages:
+        #         break
+        #     message = messages.pop()["value"]
+        #
+        #     try:
+        #         message_type = Referee._get_message_type(message)
+        #         if message_type == "name":
+        #             assigned_color = self._register_player(message)
+        #             print(json.dumps(assigned_color))
+        #         else:
+        #
+        #             if message_type == "place":
+        #                 self._update_board_with_placements(message)
+        #             elif message_type == "play":
+        #                 won = self._update_board_with_play(message)
+        #                 if won:
+        #                     return self.player_names[self.turn]
+        #
+        #             self.board.display()
+        #             self.turn = 1 if self.turn == 0 else 0  # swapping turn
+        #
+        #     except IllegalPlay:
+        #         return self.player_names[self.turn * -1 + 1]
+        #     except InvalidCommand:
+        #         # TODO - unspecified behaviour since we never expect this
+        #         pass
+        #     except ContractViolation:
+        #         # TODO - unspecified behaviour since we never expect this
+        #         pass
+        #
+        # return None  # placeholder for testing
 
     def _register_player(self, name):
         """

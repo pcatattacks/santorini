@@ -43,15 +43,15 @@ class Player:
 
     def register(self, color):
         """
-        Sets the `color` member variable to the parameter `color`.
+        Sets the `color` member variable to the parameter `color`. Returns the name of the player.
 
         CONTRACT:
          - Must be the first function to be called after Player is instantiated.
          - Cannot be called more than once.
 
         :param string color: a color (as defined above)
-        :return:
-        :rtype: void
+        :return: the name of the player
+        :rtype: string
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color provided: {}".format(color))
@@ -97,7 +97,7 @@ class Player:
         self.board.set_board(board)
         return Strategy.get_plays(self.board, self.color, num_moves_ahead)
 
-    def notify(self, board, has_won, end_game):
+    def notify(self, board, has_won, end_game):  # TODO: end_game keyword argument may be unnecessary
         """
         Notifies the player about the updated state of the Santorini Game.
 
@@ -110,8 +110,8 @@ class Player:
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param bool has_won: `True` if this Player has won the Santorini game, `False` otherwise.
         :param bool end_game: `True` if the Santorini game has ended, `False` otherwise.
-        :return:
-        :rtype: void
+        :return: An acknowledgement string of "OK" # TODO - not always true - could be void as well, when the game doesn't end
+        :rtype: string
         """
         pass
 
