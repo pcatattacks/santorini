@@ -3,6 +3,9 @@ from RuleChecker import RuleChecker
 from Board import Board
 
 
+# TODO: test cases for new RuleChecker functions
+
+
 @pytest.fixture()
 def legal_board():
     board = [[0, [2, "blue2"], 1, 2, 3],

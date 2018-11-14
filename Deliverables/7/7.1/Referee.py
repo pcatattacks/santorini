@@ -157,6 +157,9 @@ class Referee:
         :return:
         :rtype: void
         """
+        if not RuleChecker.is_valid_placement(placements):
+            # TODO: what to do here?
+            raise InvalidCommand("Placements not in correct format.")
         for placement in placements:
             if not RuleChecker.is_legal_placement(self.board, placement):
                 raise IllegalPlay("Invalid placement position given: {}".format(placement))
@@ -176,6 +179,9 @@ class Referee:
         :return: Boolean indicating whether the play resulted in the player winning on that turn
         :rtype: bool
         """
+        if not RuleChecker.is_valid_play(play):
+            # TODO: what to do here?
+            raise InvalidCommand("Play not in correct format.")
         worker, directions = play
         if (worker[:-1] != RuleChecker.COLORS[self.turn]
                 or not RuleChecker.is_legal_play(self.board, worker, directions)):
