@@ -89,6 +89,28 @@ def legal_initial_board_with_workers(color):
     return board_obj
 
 
+def invalid_dimensions_board():
+    board = [[0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0]]
+    board_obj = Board()
+    board_obj.set_board(board)
+    return board_obj
+
+
+def invalid_heights_board():
+    board = [[0, [2, "blue2"], 1, 2, 3],
+             [3, 2, 1, 0, 4],
+             [1, 0, ["white1", "white2"], 2, 4],
+             [0, 0, 0, 0, 2],
+             [1, [0, "blue1"], 0, 2, 3]]
+    board_obj = Board()
+    board_obj.set_board(board)
+    return board_obj
+
+
 @pytest.mark.parametrize("worker, direction, expected", [
     ("blue1", "S", False),
     ("blue2", "SW", True),
@@ -137,7 +159,9 @@ def test_is_legal_play(legal_board, worker, directions, expected):
     (legal_initial_board_with_workers("blue"), True),
     (illegal_heights_board(), True),
     (illegal_extra_workers_board(), True),
-    (illegal_less_workers_board(), True)
+    (illegal_less_workers_board(), True),
+    (invalid_dimensions_board(), False),
+    (invalid_heights_board(), False)
 ])
 def test_is_valid_board(board, expected):
     assert expected == RuleChecker.is_valid_board(board.board)

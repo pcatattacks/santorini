@@ -12,8 +12,7 @@ class Referee:
     Definitions:
 
     color
-        `string`: either "blue" or "white"
-        # TODO: should this description refer to the static variable RuleChecker.COLORS
+        `string`: either of the two strings stored in RuleChecker.COLORS
 
     placement
         `list`: [position1, position2] where position1 and position2 are the position of a player's workers 1 and 2
@@ -57,10 +56,7 @@ class Referee:
             placements = player.place(self.board, RuleChecker.COLORS[self.turn])
             self._update_board_with_placements(placements)
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
-            for p in self.players:
-                p.notify(self.board, has_won=False, end_game=False)
 
-        won = False
         winner = None
         while not winner:
             player = self.players[self.turn]
@@ -69,14 +65,11 @@ class Referee:
                 won = self._update_board_with_play(play)
                 if won:
                     winner = self.player_names[self.turn]
-                    player.notify(self.board, has_won=True, end_game=True)
-                else:
                     for p in self.players:
-                        p.notify(self.board, has_won=False, end_game=False)
-
+                        p.notify(self.player_names[self.turn])
             except IllegalPlay:
-                winner = self.player_names[self.turn * -1 + 1]
-                player.notify(self.board, has_won=won, end_game=True)
+                for p in self.players:
+                    p.notify(self.player_names[self.turn * -1 + 1])
             except InvalidCommand:
                 # TODO - unspecified behaviour since we never expect this in assignment 6
                 pass
@@ -86,7 +79,6 @@ class Referee:
 
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
-        self.players[self.turn].notify(self.board, has_won=(not won), end_game=True)  # notify other player
         return winner
 
         # messages = list(reversed(parse_json(take_input())))  # only for testing
