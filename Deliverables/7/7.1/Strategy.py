@@ -1,6 +1,7 @@
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation
 
+
 class Strategy:
     """
     A class that is used by the player to construct plays that a `Player` uses.

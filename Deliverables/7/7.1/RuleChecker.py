@@ -125,7 +125,7 @@ class RuleChecker:
             worker, directions = play
             if ((isinstance(worker, str) and
                  isinstance(directions, list) and
-                 len(directions) < 3 and
+                 0 < len(directions) < 3 and
                  all(RuleChecker.is_valid_direction(direction) for direction in directions))):
                 return True
         return False

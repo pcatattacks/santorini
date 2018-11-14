@@ -68,7 +68,7 @@ def is_valid_game_over_command(command):
     :return: `True` if command is `["Game Over", Name]`
     :rtype: bool
     """
-    return isinstance(command, list) and len(command) == 2 and command[0] == "Game Over" and isinstance(command[2], str)
+    return isinstance(command, list) and len(command) == 2 and command[0] == "Game Over" and isinstance(command[1], str)
 
 
 class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
@@ -84,7 +84,8 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         data = self.request.recv(4096).strip()
         data = data.decode('utf-8')
-        print("player driver received: ", data) # debug
+        print("player driver received: ", data)  # debug
+        print("--------------------------------")  # debug
         json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
         try:
             for json_val in json_values:
@@ -95,7 +96,6 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
                 elif is_valid_place_command(command):
                     color, board_list = command[1:]
                     placements = player.place(board_list, color)
-                    print("Placements are", placements)  # debug
                     self._send_response(placements)
                 elif is_valid_play_command(command):
                     board_list = command[1]

@@ -12,8 +12,8 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         # TODO: contract checks for host and port
         self.host = host
         self.port = port
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
+        # self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.socket.connect((self.host, self.port))
 
     def register(self):
         """
@@ -26,13 +26,13 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         :return: the name of the player
         :rtype: string
         """
-        print("player.register() called.")
+        # print("player.register() called.")  # debug
         # TODO: contract checks
         message = ["Register"]
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not isinstance(response, str):  # checking if is_valid_name. Potentially create well named micro-function?
-            self.socket.close()
+            # self.socket.close()
             raise IllegalResponse("ProxyPlayer didn't receive string for name. Received: {}".format(response))
         return response
 
@@ -53,12 +53,12 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
         """
-        print("player.place() called.")
+        # print("player.place() called.")  # debug
         message = ["Place", color, board]
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not RuleChecker.is_valid_placement(response):
-            self.socket.close()
+            # self.socket.close()
             raise IllegalResponse("ProxyPlayer didn't receive correctly formatted placement. Received {}"
                                   .format(response))
         return response
@@ -71,12 +71,12 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         :return: a play (as defined above)
         :rtype: list
         """
-        print("player.play() called.")
+        # print("player.play() called.")  # debug
         message = ["Play", board]
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
-        if not RuleChecker.is_valid_play(response):
-            self.socket.close()
+        if not isinstance(response, list) or not all(RuleChecker.is_valid_play(play) for play in response):
+            # self.socket.close()
             raise IllegalResponse("ProxyPlayer didn't receive correctly formatted play. Received {}"
                                   .format(response))
         return response
@@ -93,11 +93,11 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         :return: An acknowledgement string of "OK"
         :rtype: string
         """
-        print("player.notify() called.")
+        # print("player.notify() called.")  # debug
         message = ["Game Over", winner_name]
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
-        self.socket.close()
+        # self.socket.close()
         if not response == "OK":
             raise IllegalResponse('ProxyPlayer didn\'t receive correctly formatted "OK". Received {}'
                                   .format(response))
@@ -111,19 +111,21 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         :rtype: any
         """
         data = bytes(json.dumps(message) + "\n", "utf-8")
-        self.socket.sendall(data)
-        response = str(self.socket.recv(4096), "utf-8")  # Receive data from the server
-        print("response is", response)
-        print("parsed response is", parse_json(response))
-        print("parsed response with newline is", parse_json(response + '\n'))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((self.host, self.port))
+        sock.sendall(data)
+        response = str(sock.recv(4096), "utf-8")  # Receive data from the server
+        sock.close()
+        # self.socket.sendall(data)
+        # response = str(self.socket.recv(4096), "utf-8")  # Receive data from the server
+        # print("response is", response)  # debug
         if not response:
             raise IllegalResponse("Response was empty!")
         response = parse_json(response)[0]["value"]
         return response
 
-    def _examine_for_error(self, response):
-        if response in ["InvalidCommand", "IllegalPlay", "ContractViolation"]:
-            self.socket.close()
+    @staticmethod
+    def _examine_for_error(response):
         if response == "InvalidCommand":
             raise InvalidCommand()
         if response == "IllegalPlay":

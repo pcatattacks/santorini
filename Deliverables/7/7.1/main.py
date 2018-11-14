@@ -8,14 +8,9 @@ from player_driver import is_valid_register_command,\
 
 def main():
 
-    with open("strategy.config") as f:
-        # TODO: may need /n appended to data
-        data = parse_json(f.read())[0]["value"]
-        num_looks_ahead = data["look-ahead"]
-
     host, port = "localhost", 9999
     player = ProxyPlayer(host, port)
-    json.dumps(player.register())
+    player.register()  # we don't have to print it for this assignment.
     json_values = parse_json(take_input())
     for json_val in json_values:
         command = json_val["value"]
@@ -46,8 +41,8 @@ def main():
             # could we possibly use ContractViolation instead, since giving an incorrect response is the same as
             # violating a function contract.
             raise e  # debug
-        except ContractViolation:  # TODO: unspecified behaviour for invalid input
-            pass
+        except ContractViolation as e:  # TODO: unspecified behaviour for invalid input
+            raise e  # debug
         # except Exception as e:
         #     print(json.dumps(str(e)))
         #     # print(json.dumps(traceback.format_exc()))
