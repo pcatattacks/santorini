@@ -54,7 +54,7 @@ class Referee:
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
 
         for player in self.players:
-            placements = player.place(self.board)
+            placements = player.place(self.board, RuleChecker.COLORS[self.turn])
             self._update_board_with_placements(placements)
             self.turn = 1 if self.turn == 0 else 0  # swapping turn
             for p in self.players:
@@ -138,10 +138,8 @@ class Referee:
         """
         if not name or not isinstance(name, str):
             raise ContractViolation("Expected a non-empty string. Received {}".format(name))
-        player = len(self.player_names)
-        if player > 2:
+        if len(self.player_names) > 2:
             raise InvalidCommand("Can only register two players.")
-        self.players[player].register_color(RuleChecker.COLORS[player])
         self.player_names.append(name)
 
     def _update_board_with_placements(self, placements):
