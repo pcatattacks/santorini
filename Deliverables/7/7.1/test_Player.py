@@ -63,24 +63,15 @@ def test_register(name):
     assert name == player.register()
 
 
-@pytest.mark.parametrize("color, expected", [
-    (RuleChecker.COLORS[0], RuleChecker.COLORS[0]),
-    (RuleChecker.COLORS[1], RuleChecker.COLORS[1])
-])
-def test_register_color(color, expected):
-    player = Player("P1", 5)
-    player.register_color(color)
-    assert expected == player.color
-
-
 @pytest.mark.parametrize("board, color, expected", [
-    (initial_board(), RuleChecker.COLORS[0], placement_positions(1)),
-    (initial_board(2), RuleChecker.COLORS[1], placement_positions(2))
+    (initial_board(), RuleChecker.COLORS[0], [placement_positions(1), RuleChecker.COLORS[0]]),
+    (initial_board(2), RuleChecker.COLORS[1], [placement_positions(2), RuleChecker.COLORS[1]])
 ])
 def test_place(board, color, expected):
     player = Player("P1", 5)
-    player.register_color(color)
-    assert expected == player.place(board)
+    player.register()
+    assert expected[0] == player.place(board, color)
+    assert expected[1] == player.color
 
 
 @pytest.mark.parametrize("board, expected", [
@@ -89,7 +80,8 @@ def test_place(board, color, expected):
 ])
 def test_play(board, expected):
     player = Player("P1", 5)
-    player.register_color(RuleChecker.COLORS[0])
+    player.register()
+    player.place(initial_board(), RuleChecker.COLORS[0])
     assert expected == player.play(board)
 
 

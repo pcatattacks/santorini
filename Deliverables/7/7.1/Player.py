@@ -110,7 +110,7 @@ class Player(PlayerInterface):
         :rtype: list
         """
         if not self.color:
-            raise ContractViolation("Function must be called after player.register()!")
+            raise ContractViolation("Function must be called after player.place()!")
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
         self.board.set_board(board)
