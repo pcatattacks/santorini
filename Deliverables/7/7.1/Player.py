@@ -1,10 +1,10 @@
 from Board import Board
 from RuleChecker import RuleChecker, Strategy
 from CustomExceptions import ContractViolation
-from JsonParser import take_input, parse_json # For testing, remove later
+from PlayerInterface import PlayerInterface
 
 
-class Player:
+class Player(PlayerInterface):
     """
     A class to maintain the state of a player and allow it to perform player actions within the Santorini game, and get
     notified about the state of the Game after each action.
@@ -28,7 +28,11 @@ class Player:
 
     """
 
-    def __init__(self):
+    def __init__(self, name, num_looks_ahead=1):
+        """
+
+        :param string name: the name of the Santorini player.
+        """
         # TODO: Discuss / Document for code walk.
         # Should we have the player store a board object and call the set_board() method within Player,
         # or should we have a Player.set_board() function that simply reassigns self.board to a board object that's
@@ -38,20 +42,39 @@ class Player:
         # functionality that's exposed to users. May as well abstract that using a Player function. If we do option 2,
         # we'll also have to write an extra contract to make sure a board that's been passed in has had set_board()
         # called on it, which will be overly complicated.
+        if not isinstance(name, str):
+            raise ContractViolation("Name must be a string!")
+        if not isinstance(num_looks_ahead, int) or num_looks_ahead < 1:
+            raise ContractViolation("num_looks_ahead must be a positive integer! Given: {}".format(num_looks_ahead))
+        self.name = name
         self.board = Board()
+        self.num_looks_ahead = num_looks_ahead
         self.color = None
 
-    def register(self, color):
+    def register(self):
         """
-        Sets the `color` member variable to the parameter `color`. Returns the name of the player.
+        Returns the name of the player.
 
         CONTRACT:
          - Must be the first function to be called after Player is instantiated.
          - Cannot be called more than once.
 
-        :param string color: a color (as defined above)
         :return: the name of the player
         :rtype: string
+        """
+        return self.name
+
+    def register_color(self, color):
+        """
+        Sets the `color` member variable to the parameter `color`.
+
+        CONTRACT:
+         - Must be the called after player.register().
+         - Cannot be called more than once.
+
+        :param string color: a color (as defined above)
+        :return:
+        :rtype: void
         """
         if not RuleChecker.is_valid_color(color):
             raise ContractViolation("Invalid color provided: {}".format(color))
@@ -83,7 +106,7 @@ class Player:
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
         return Strategy.get_placements(self.board, self.color)
 
-    def play(self, board, num_moves_ahead):   # TODO: get rid of num_look_ahead parameter, just take from file
+    def play(self, board):   # TODO: get rid of num_look_ahead parameter, just take from file
         """
         Returns the strategized play a player wants to execute on a given turn.
 
@@ -97,7 +120,7 @@ class Player:
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
         self.board.set_board(board)
-        return Strategy.get_plays(self.board, self.color, num_moves_ahead)
+        return Strategy.get_plays(self.board, self.color, self.num_moves_ahead)
 
     def notify(self, board, has_won, end_game):  # TODO: end_game keyword argument may be unnecessary
         """
@@ -112,11 +135,8 @@ class Player:
         :param Board board: an instance of Board (refer to documentation of Board class).
         :param bool has_won: `True` if this Player has won the Santorini game, `False` otherwise.
         :param bool end_game: `True` if the Santorini game has ended, `False` otherwise.
-        :return: An acknowledgement string of "OK" # TODO - not always true - could be void as well, when the game doesn't end
-        :rtype: string
+        :return: An acknowledgement string of "OK" or None
+        :rtype: string or void
         """
         pass
-
-
-
 
