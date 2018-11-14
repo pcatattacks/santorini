@@ -35,9 +35,6 @@ class Referee:
         self.board = Board()
         self.turn = 0
 
-        # shadow state
-        self.unplaced_workers = list(RuleChecker.WORKERS)
-
     def play_game(self):
         """
         Drives the Santorini game and invokes interfaces of the Player and RuleChecker components to notify them of the
@@ -142,14 +139,11 @@ class Referee:
         """
         if not name or not isinstance(name, str):
             raise ContractViolation("Expected a non-empty string. Received {}".format(name))
-        if not self.player_names:
-            self.players[0].register(RuleChecker.COLORS[0])
-            self.player_names.append(name)
-        elif len(self.player_names) == 1:
-            self.players[1].register(RuleChecker.COLORS[1])
-            self.player_names.append(name)
-        else:
+        player = len(self.player_names)
+        if player > 2:
             raise InvalidCommand("Can only register two players.")
+        self.players[player].register_color(RuleChecker.COLORS[player])
+        self.player_names.append(name)
 
     def _update_board_with_placements(self, placements):
         """
@@ -163,9 +157,6 @@ class Referee:
         :return:
         :rtype: void
         """
-        if not self.unplaced_workers:
-            # TODO: use InvalidCommand or IllegalPlay?
-            raise InvalidCommand("Cannot place workers on this board.")
         for placement in placements:
             if not RuleChecker.is_legal_placement(self.board, placement):
                 raise IllegalPlay("Invalid placement position given: {}".format(placement))
@@ -173,7 +164,6 @@ class Referee:
             row, col = placement
             worker = RuleChecker.COLORS[self.turn] + str(worker_num)
             self.board.place_worker(row, col, worker)
-            self.unplaced_workers.remove(worker)
 
     def _update_board_with_play(self, play):
         """
@@ -186,9 +176,6 @@ class Referee:
         :return: Boolean indicating whether the play resulted in the player winning on that turn
         :rtype: bool
         """
-        # TODO
-        if self.unplaced_workers:
-            raise InvalidCommand("Both players must have placed workers before making other commands.")
         worker, directions = play
         if (worker[:-1] != RuleChecker.COLORS[self.turn]
                 or not RuleChecker.is_legal_play(self.board, worker, directions)):

@@ -1,5 +1,6 @@
 from Board import Board
-from RuleChecker import RuleChecker, Strategy
+from RuleChecker import RuleChecker
+from Strategy import Strategy
 from CustomExceptions import ContractViolation
 from PlayerInterface import PlayerInterface
 
@@ -120,7 +121,7 @@ class Player(PlayerInterface):
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
         self.board.set_board(board)
-        return Strategy.get_plays(self.board, self.color, self.num_moves_ahead)
+        return Strategy.get_plays(self.board, self.color, self.num_looks_ahead)
 
     def notify(self, board, has_won, end_game):  # TODO: end_game keyword argument may be unnecessary
         """

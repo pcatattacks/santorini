@@ -58,9 +58,9 @@ def play_board(num_turns=0):
     (["P1"]),
     (["P1", "P2"])
 ])
-def test_register_player(names):
-    player1 = Player()
-    player2 = Player()
+def test_register_player(names):  # TODO: default value for Player constructor's name parameter so we don't have to give one to Player instances that don't need to return one with the register function
+    player1 = Player("P1")
+    player2 = Player("P2")
     referee = Referee(player1, player2)
     for count, name in enumerate(names):
         referee._register_player(name)
@@ -72,11 +72,11 @@ def test_register_player(names):
     ([placement_positions(1), placement_positions(2)], [initial_board(2), initial_board(4)])
 ])
 def test_update_board_with_placements(placements, expected):
-    player1 = Player()
-    player2 = Player()
+    player1 = Player("P1")
+    player2 = Player("P2")
     referee = Referee(player1, player2)
-    referee._register_player("P1")
-    referee._register_player("P2")
+    referee._register_player(player1.register())
+    referee._register_player(player2.register())
     for count, placement in enumerate(placements):
         referee._update_board_with_placements(placement)
         referee.turn = 1 if referee.turn == 0 else 0
@@ -90,13 +90,12 @@ def test_update_board_with_placements(placements, expected):
     (player_plays(4), play_board(4))
 ])
 def test_update_board_with_play(plays, expected):
-    player1 = Player()
-    player2 = Player()
+    player1 = Player("P1")
+    player2 = Player("P2")
     referee = Referee(player1, player2)
-    referee._register_player("P1")
-    referee._register_player("P2")
+    referee._register_player(player1.register())
+    referee._register_player(player2.register())
     referee.board.set_board(initial_board(4))
-    referee.unplaced_workers = []
     for count, play in enumerate(plays):
         referee._update_board_with_play(play)
         referee.turn = 1 if referee.turn == 0 else 0
