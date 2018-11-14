@@ -182,6 +182,29 @@ class RuleChecker:
             return False
 
     @staticmethod
+    def is_valid_board(board):
+        """
+        Checks the format of a board.
+
+        :param list board: A board (as defined in the documentation of Board).
+        :return: 'True' if the board format is valid, else 'False'.
+        :rtype: bool
+        """
+        if ((not isinstance(board, list) or
+             not all(isinstance(row, list) and len(board) == len(row) for row in board))):
+            return False
+        for row_count in range(len(board)):
+            for col_count in range(len(board[0])):
+                cell = board[row_count][col_count]
+                if not isinstance(cell, int):
+                    if ((not isinstance(cell, list) or
+                         len(cell) != 2 or
+                         not isinstance(cell[0], int) or
+                         not isinstance(cell[1], str))):
+                        return False
+        return True
+
+    @staticmethod
     def is_legal_initial_board(board, color):
         """
         Checks the validity of an initial board.

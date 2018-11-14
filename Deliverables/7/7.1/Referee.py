@@ -46,7 +46,6 @@ class Referee:
         :return: the name of the winning player.
         :rtype: string
         """
-
         for player in self.players:
             name = player.get_name()
             # the ProxyPlayer will wait for an incoming connection

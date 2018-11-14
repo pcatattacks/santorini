@@ -3,6 +3,9 @@ from RuleChecker import RuleChecker
 from Board import Board
 
 
+# TODO: test cases for new RuleChecker functions
+
+
 @pytest.fixture()
 def legal_board():
     board = [[0, [2, "blue2"], 1, 2, 3],
@@ -127,6 +130,17 @@ def test_is_valid_build(legal_board, worker, direction, expected):
 ])
 def test_is_legal_play(legal_board, worker, directions, expected):
     assert expected == RuleChecker.is_legal_play(legal_board, worker, directions)
+
+
+@pytest.mark.parametrize("board, expected", [
+    (legal_initial_board(), True),
+    (legal_initial_board_with_workers("blue"), True),
+    (illegal_heights_board(), True),
+    (illegal_extra_workers_board(), True),
+    (illegal_less_workers_board(), True)
+])
+def test_is_valid_board(board, expected):
+    assert expected == RuleChecker.is_valid_board(board.board)
 
 
 @pytest.mark.parametrize("board, color, expected", [
