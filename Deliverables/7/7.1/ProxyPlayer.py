@@ -3,9 +3,6 @@ from PlayerInterface import PlayerInterface
 
 class ProxyPlayer(PlayerInterface):
 
-    def __init__(self):
-        pass
-
     def register(self, color):
         pass
 

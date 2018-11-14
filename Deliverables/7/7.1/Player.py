@@ -52,6 +52,9 @@ class Player(PlayerInterface):
         self.num_looks_ahead = num_looks_ahead
         self.color = None
 
+        # shadow state
+        self.registered = False
+
     def register(self):
         """
         Returns the name of the player.
@@ -63,27 +66,12 @@ class Player(PlayerInterface):
         :return: the name of the player
         :rtype: string
         """
+        if self.registered:
+            raise ContractViolation("Cannot call Player.register() again until game ends!")
+        self.registered = True
         return self.name
 
-    def register_color(self, color):
-        """
-        Sets the `color` member variable to the parameter `color`.
-
-        CONTRACT:
-         - Must be the called after player.register().
-         - Cannot be called more than once.
-
-        :param string color: a color (as defined above)
-        :return:
-        :rtype: void
-        """
-        if not RuleChecker.is_valid_color(color):
-            raise ContractViolation("Invalid color provided: {}".format(color))
-        if self.color:
-            raise ContractViolation("Cannot call Player.register() again until game ends!")
-        self.color = color
-
-    def place(self, board):
+    def place(self, board, color):
         """
         Returns the worker placements for the player.
 
@@ -99,15 +87,20 @@ class Player(PlayerInterface):
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
         """
-        if not self.color:
+        if not self.registered:
             raise ContractViolation("Function must be called after player.register()!")
+        if self.color:
+            raise ContractViolation("Cannot call Player.place() again until game ends!")
+        if not RuleChecker.is_valid_color(color):
+            raise ContractViolation("Invalid color provided: {}".format(color))
+        self.color = color
         if not RuleChecker.is_legal_initial_board(board, self.color):
             raise ContractViolation("Invalid initial board provided: {}".format(board))
         self.board.set_board(board)
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
         return Strategy.get_placements(self.board, self.color)
 
-    def play(self, board):   # TODO: get rid of num_look_ahead parameter, just take from file
+    def play(self, board):
         """
         Returns the strategized play a player wants to execute on a given turn.
 
@@ -123,21 +116,17 @@ class Player(PlayerInterface):
         self.board.set_board(board)
         return Strategy.get_plays(self.board, self.color, self.num_looks_ahead)
 
-    def notify(self, board, has_won, end_game):  # TODO: end_game keyword argument may be unnecessary
+    def notify(self, winner_name):
         """
-        Notifies the player about the updated state of the Santorini Game.
-
-        Ends the game if `end_game` is `True`, else continues the game.
-        Notifies the Player if it has won if `has_won` is `True`, else notifies the player otherwise.
+        Notifies the player with the winner of the Santorini game.
 
         CONTRACT:
-         - if `has_won` is `True`, `end_game` must be `True`.
+         - can only be called once per game
+         - must be the last function to be called by an object that implements PlayerInterface.
 
-        :param Board board: an instance of Board (refer to documentation of Board class).
-        :param bool has_won: `True` if this Player has won the Santorini game, `False` otherwise.
-        :param bool end_game: `True` if the Santorini game has ended, `False` otherwise.
-        :return: An acknowledgement string of "OK" or None
-        :rtype: string or void
+        :param string winner_name: Name of the winner of the Santorini game
+        :return: An acknowledgement string of "OK"
+        :rtype: string
         """
         pass
 

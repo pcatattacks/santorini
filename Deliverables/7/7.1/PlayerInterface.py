@@ -36,24 +36,9 @@ class PlayerInterface(ABC):
         pass
 
     @abstractmethod
-    def register_color(self, color):
+    def place(self, board, color):
         """
-        Sets the `color` member variable to the parameter `color`.
-
-        CONTRACT:
-         - Must be the called after player.register().
-         - Cannot be called more than once.
-
-        :param string color: a color (as defined above)
-        :return:
-        :rtype: void
-        """
-        pass
-
-    @abstractmethod
-    def place(self, board):
-        """
-        Returns the worker placements for the player.
+        Sets the `color` member variable to the parameter `color`. Returns the worker placements for the player.
 
         CONTRACT:
          - Can only be called after Player.register() has been called.
@@ -63,6 +48,7 @@ class PlayerInterface(ABC):
          are present any cell.
 
         :param list board: an instance of Board (refer to documentation of Board class).
+        :param string color: a color (as defined above)
         :return: `list` of [position1, position2] denoting the position of the player's 1st and 2nd worker respectively.
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
@@ -81,20 +67,16 @@ class PlayerInterface(ABC):
         pass
 
     @abstractmethod
-    def notify(self, board, has_won, end_game):
+    def notify(self, winner_name):
         """
-        Notifies the player about the updated state of the Santorini Game.
-
-        Ends the game if `end_game` is `True`, else continues the game.
-        Notifies the Player if it has won if `has_won` is `True`, else notifies the player otherwise.
+        Notifies the player with the winner of the Santorini game.
 
         CONTRACT:
-         - if `has_won` is `True`, `end_game` must be `True`.
+         - can only be called once per game
+         - must be the last function to be called by an object that implements PlayerInterface.
 
-        :param Board board: an instance of Board (refer to documentation of Board class).
-        :param bool has_won: `True` if this Player has won the Santorini game, `False` otherwise.
-        :param bool end_game: `True` if the Santorini game has ended, `False` otherwise.
-        :return: An acknowledgement string of "OK" or None
-        :rtype: string or void
+        :param string winner_name: Name of the winner of the Santorini game
+        :return: An acknowledgement string of "OK"
+        :rtype: string
         """
         pass
