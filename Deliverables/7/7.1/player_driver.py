@@ -34,7 +34,7 @@ def is_valid_place_command(command):
     """
     return (isinstance(command, list) and len(command) == 3
             and command[0] == "Place" and command[1] in RuleChecker.COLORS
-            and RuleChecker.is_valid_board(command[3]))
+            and RuleChecker.is_valid_board(command[2]))
     # TODO: might have to do is_legal_board check here too, since InvalidCommand and IllegalPlay may both result in
     # "Santorini is Broken". Discuss.
 
@@ -84,41 +84,63 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         data = self.request.recv(4096).strip()
         data = data.decode('utf-8')
-
+        print("player driver received: ", data) # debug
         json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
-        for json_val in json_values:
-            command = json_val["value"]
-            if is_valid_register_command(command):
-                name = player.register()  # should raise error since player is already registered
-                self.request.sendall(name)
-            elif is_valid_place_command(command):
-                color, board_list = command[1:]
-                player.register_color(color)
-                placements = player.place(board_list)
-                self.request.sendall(placements)
-            elif is_valid_play_command(command):
-                board_list = command[1]
-                plays = player.play(board_list)
-                self.request.sendall(plays)
-            elif is_valid_game_over_command(command):
-                name = command[1]
-                acknowledgement = player.notify(name)
-                self.request.sendall(acknowledgement)
+        try:
+            for json_val in json_values:
+                command = json_val["value"]
+                if is_valid_register_command(command):
+                    name = player.register()  # should raise error since player is already registered
+                    self._send_response(name)
+                elif is_valid_place_command(command):
+                    color, board_list = command[1:]
+                    placements = player.place(board_list, color)
+                    print("Placements are", placements)  # debug
+                    self._send_response(placements)
+                elif is_valid_play_command(command):
+                    board_list = command[1]
+                    plays = player.play(board_list)
+                    self._send_response(plays)
+                elif is_valid_game_over_command(command):
+                    name = command[1]
+                    acknowledgement = player.notify(name)
+                    self._send_response(acknowledgement)
+                    self._cleanup()
 
-                # closing the socket
-                self.server.server_close()  # TODO: May or may not be graceful - check. Might have to call shutdown() from another thread.
+                else:
+                    raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
 
-                # # stopping the loop. must be called from different thread or will deadlock.
-                # thread = Thread(target=self.server.shutdown)
-                # thread.start()
-                # thread.join()
-            else:
-                raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
+        except InvalidCommand as e:
+            self._send_response("InvalidCommand")
+            self._cleanup()
+            raise e
+        except IllegalPlay as e:
+            self._send_response("IllegalPlay")
+            self._cleanup()
+            raise e
+        except ContractViolation as e:
+            self._send_response("ContractViolation")
+            self._cleanup()
+            raise e
+
+    def _send_response(self, message):
+        data = bytes(json.dumps(message) + "\n", "utf-8")
+        self.request.sendall(data)
+
+    def _cleanup(self):
+        # # closing the socket
+        # self.server.server_close()
+        # TODO: May or may not be graceful - check. Might have to call shutdown() from another thread.
+
+        # stopping the loop. must be called from different thread or will deadlock.
+        thread = Thread(target=self.server.shutdown)
+        thread.start()
+        thread.join()
 
 
 with open("strategy.config", "r") as f:
     num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
-    player = Player("P1", num_looks_ahead)
+    player = Player("P1", num_looks_ahead=num_looks_ahead)
 
 HOST, PORT = "localhost", 9999
 
@@ -131,14 +153,17 @@ def main():
     try:
         print("Player Driver Server is starting...")
         server.serve_forever() # TODO: doesn't exit when game is over, will keep listening. spawn another thread to call server_close()? Or sys.exit()
-    except (InvalidCommand, IllegalPlay):
-        print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))  # TODO: print or return?
-    # except IllegalPlay:  # TODO: donno the behaviour yet
-    #     pass
+    except InvalidCommand:
+        print("Santorini game stopped because of receiving an invalid command from Referee.")
+    except IllegalPlay:
+        print("Santorini game stopped because of receiving an Illegal Play.")  # TODO: will this ever happen?
     except ContractViolation:  # TODO: unspecified behaviour for invalid input
-        pass
+        print("Santorini game stopped because of internal Contract Error.")
     except Exception as e:
-        print(json.dumps(str(e)))
+        thread = Thread(target=server.shutdown)
+        thread.start()
+        thread.join()
+        raise e
 
 
 if __name__ == "__main__":

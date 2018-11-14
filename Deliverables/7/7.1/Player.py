@@ -128,5 +128,5 @@ class Player(PlayerInterface):
         :return: An acknowledgement string of "OK"
         :rtype: string
         """
-        pass
+        return "OK"
 

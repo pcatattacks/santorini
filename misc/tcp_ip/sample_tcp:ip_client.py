@@ -16,7 +16,7 @@ if __name__ == "__main__":
     s.sendall(test)
 
     data = s.recv(1024)
-    print (data)
+    print(data)
 
 # ------------------------ Admin --------------------------- #
 

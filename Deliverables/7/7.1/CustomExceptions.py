@@ -14,5 +14,5 @@ class IllegalPlay(Exception):
     pass
 
 
-class MalformedCommand(Exception):
+class IllegalResponse(Exception):
     pass
