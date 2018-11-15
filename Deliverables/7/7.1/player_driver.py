@@ -172,8 +172,6 @@ def main():
         # raise e
         pass
 
-    # print(enumerate())  # debug
-
 
 if __name__ == "__main__":
     main()
