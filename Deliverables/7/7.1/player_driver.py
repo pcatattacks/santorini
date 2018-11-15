@@ -1,6 +1,6 @@
 import json
 import socketserver
-from threading import Thread
+from threading import Thread, enumerate
 from Player import Player
 from RuleChecker import RuleChecker
 from CustomExceptions import InvalidCommand, ContractViolation, IllegalPlay
@@ -84,8 +84,8 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         data = self.request.recv(4096).strip()
         data = data.decode('utf-8')
-        print("player driver received: ", data)  # debug
-        print("--------------------------------")  # debug
+        # print("player driver received: ", data)  # debug
+        # print("--------------------------------")  # debug
         json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
         try:
             for json_val in json_values:
@@ -128,14 +128,18 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
         self.request.sendall(data)
 
     def _cleanup(self):
-        # # closing the socket
-        # self.server.server_close()
-        # TODO: May or may not be graceful - check. Might have to call shutdown() from another thread.
-
         # stopping the loop. must be called from different thread or will deadlock.
-        thread = Thread(target=self.server.shutdown)
+        thread = Thread(target=release_resources(self.server))
         thread.start()
-        thread.join()
+
+
+def release_resources(server):
+    """
+    :param ServerSocket.BaseServer server:
+    :return: void
+    """
+    server.shutdown()
+    server.server_close()
 
 
 with open("strategy.config", "r") as f:
@@ -152,7 +156,7 @@ def main():
 
     try:
         print("Player Driver Server is starting...")
-        server.serve_forever() # TODO: doesn't exit when game is over, will keep listening. spawn another thread to call server_close()? Or sys.exit()
+        server.serve_forever()  # TODO: doesn't exit when game is over, will keep listening. spawn another thread to call server_close()? Or sys.exit()
     except InvalidCommand:
         print("Santorini game stopped because of receiving an invalid command from Referee.")
     except IllegalPlay:
@@ -160,11 +164,11 @@ def main():
     except ContractViolation:  # TODO: unspecified behaviour for invalid input
         print("Santorini game stopped because of internal Contract Error.")
     except Exception as e:
-        thread = Thread(target=server.shutdown)
+        thread = Thread(target=release_resources(server))
         thread.start()
-        thread.join()
         raise e
 
+    print(enumerate())  # debug
 
 if __name__ == "__main__":
     main()
