@@ -5,9 +5,6 @@ from Referee import Referee
 from RuleChecker import RuleChecker
 
 
-# TODO: avoid manual turn swap in testing functions
-
-
 @pytest.fixture()
 def placement_positions(player=None):
     positions = [[0, 0],
@@ -58,7 +55,7 @@ def play_board(num_turns=0):
     (["P1"]),
     (["P1", "P2"])
 ])
-def test_register_player(names):  # TODO: default value for Player constructor's name parameter so we don't have to give one to Player instances that don't need to return one with the register function
+def test_register_player(names):
     player1 = Player("P1")
     player2 = Player("P2")
     referee = Referee(player1, player2)
@@ -79,7 +76,7 @@ def test_update_board_with_placements(placements, expected):
     referee._register_player(player2.register())
     for count, placement in enumerate(placements):
         referee._update_board_with_placements(placement)
-        referee.turn = 1 if referee.turn == 0 else 0
+        referee._swap_turn()
         assert expected[count] == referee.board.board
 
 
@@ -98,5 +95,5 @@ def test_update_board_with_play(plays, expected):
     referee.board.set_board(initial_board(4))
     for count, play in enumerate(plays):
         referee._update_board_with_play(play)
-        referee.turn = 1 if referee.turn == 0 else 0
+        referee._swap_turn()
     assert expected == referee.board.board

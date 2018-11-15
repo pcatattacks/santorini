@@ -3,9 +3,6 @@ from RuleChecker import RuleChecker
 from Board import Board
 
 
-# TODO: test cases for new RuleChecker functions
-
-
 @pytest.fixture()
 def legal_board():
     board = [[0, [2, "blue2"], 1, 2, 3],
@@ -129,6 +126,39 @@ def test_is_valid_move(legal_board, worker, direction, expected):
 ])
 def test_is_valid_build(legal_board, worker, direction, expected):
     assert expected == RuleChecker.is_valid_build(legal_board, worker, direction)
+
+
+@pytest.mark.parametrize("placement, expected", [
+    ([0, 4], False),
+    ([[2, 3]], False),
+    ([[3, 1], [1]], False),
+    ([[3, 3], [2, 1]], True),
+    ([[5, 2], [0, 0]], True),
+    ([[3, 2], [2, 4], [1, 1]], False)
+])
+def test_is_valid_placement(placement, expected):
+    assert expected == RuleChecker.is_valid_placement(placement)
+
+
+@pytest.mark.parametrize("play, expected", [
+    (["blue1"], False),
+    (["blue1", "white1"], False),
+    (["blue2", ["NE"]], True),
+    (["white1", ["NW", "NE"]], True),
+    (["white2", ["NE", "S", "E"]], False)
+])
+def test_is_valid_play(play, expected):
+    assert expected == RuleChecker.is_valid_play(play)
+
+
+@pytest.mark.parametrize("board, placement, expected", [
+    (legal_initial_board(), [0, 0], True),
+    (legal_initial_board(), [2, 3], True),
+    (legal_initial_board(), [4, 5], False),
+    (legal_initial_board(), [-1, 2], False)
+])
+def test_is_legal_placement(board, placement, expected):
+    assert expected == RuleChecker.is_legal_placement(board, placement)
 
 
 @pytest.mark.parametrize("worker, directions, expected", [

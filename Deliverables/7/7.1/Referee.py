@@ -1,7 +1,5 @@
-import json
 from Board import Board
 from RuleChecker import RuleChecker
-from JsonParser import parse_json, take_input
 from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay
 
 
@@ -31,8 +29,8 @@ class Referee:
         """
         self.players = [player1, player2]
         self.player_names = []
-        self.board = Board()
         self.turn = 0
+        self.board = Board()
 
     def play_game(self):
         """
@@ -46,22 +44,20 @@ class Referee:
         :rtype: string
         """
         for player in self.players:
-            name = player.get_name()
-            # the ProxyPlayer will wait for an incoming connection
-            # - till then, this method will block
+            name = player.register()
             self._register_player(name)
-            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+            self._swap_turn()
 
         for player in self.players:
             placements = player.place(self.board, RuleChecker.COLORS[self.turn])
             self._update_board_with_placements(placements)
-            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+            self._swap_turn()
 
         winner = None
         while not winner:
             player = self.players[self.turn]
             try:
-                play = player.play(self.board, 5)  # TODO: get num_look_ahead from file
+                play = player.play(self.board)
                 won = self._update_board_with_play(play)
                 if won:
                     winner = self.player_names[self.turn]
@@ -71,51 +67,16 @@ class Referee:
                 for p in self.players:
                     p.notify(self.player_names[self.turn * -1 + 1])
             except InvalidCommand:
-                # TODO - unspecified behaviour since we never expect this in assignment 6
+                # TODO - unspecified behaviour
                 pass
             except ContractViolation:
-                # TODO - unspecified behaviour since we never expect this in assignment 6
+                # TODO - unspecified behaviour
                 pass
 
-            self.turn = 1 if self.turn == 0 else 0  # swapping turn
+            self._swap_turn()
 
         return winner
 
-        # messages = list(reversed(parse_json(take_input())))  # only for testing
-        #
-        # while True:
-        #     # mocking server receiving message
-        #     if not messages:
-        #         break
-        #     message = messages.pop()["value"]
-        #
-        #     try:
-        #         message_type = Referee._get_message_type(message)
-        #         if message_type == "name":
-        #             assigned_color = self._register_player(message)
-        #             print(json.dumps(assigned_color))
-        #         else:
-        #
-        #             if message_type == "place":
-        #                 self._update_board_with_placements(message)
-        #             elif message_type == "play":
-        #                 won = self._update_board_with_play(message)
-        #                 if won:
-        #                     return self.player_names[self.turn]
-        #
-        #             self.board.display()
-        #             self.turn = 1 if self.turn == 0 else 0  # swapping turn
-        #
-        #     except IllegalPlay:
-        #         return self.player_names[self.turn * -1 + 1]
-        #     except InvalidCommand:
-        #         # TODO - unspecified behaviour since we never expect this
-        #         pass
-        #     except ContractViolation:
-        #         # TODO - unspecified behaviour since we never expect this
-        #         pass
-        #
-        # return None  # placeholder for testing
 
     def _register_player(self, name):
         """
@@ -147,8 +108,7 @@ class Referee:
         :rtype: void
         """
         if not RuleChecker.is_valid_placement(placements):
-            # TODO: what to do here?
-            raise InvalidCommand("Placements not in correct format.")
+            raise ContractViolation("Placements not in correct format.")
         for placement in placements:
             if not RuleChecker.is_legal_placement(self.board, placement):
                 raise IllegalPlay("Invalid placement position given: {}".format(placement))
@@ -169,8 +129,7 @@ class Referee:
         :rtype: bool
         """
         if not RuleChecker.is_valid_play(play):
-            # TODO: what to do here?
-            raise InvalidCommand("Play not in correct format.")
+            raise ContractViolation("Play not in correct format.")
         worker, directions = play
         if (worker[:-1] != RuleChecker.COLORS[self.turn]
                 or not RuleChecker.is_legal_play(self.board, worker, directions)):
@@ -185,29 +144,5 @@ class Referee:
 
         return False
 
-    @staticmethod
-    def _get_message_type(message):
-        """
-        Checks if a message is correctly formatted and returns the type of message.
-
-        Message types may be:
-        - name
-        - place
-        - play
-
-        :param any message:
-        :return: the type of the message received
-        :rtype: string
-        """
-        if isinstance(message, str):
-            return "name"
-        if isinstance(message, list):
-            # TODO: add more stringent checking for items within the command
-            if len(message) == 2:
-                item1, item2 = message
-                if (isinstance(item1, str) and isinstance(item2, list)
-                        and all(RuleChecker.is_valid_direction(direction) for direction in item2)):
-                    return "play"
-                elif all(isinstance(item, list) and all(isinstance(x, int) for x in item) for item in message):
-                    return "place"
-        raise InvalidCommand("Message format not supported: {}".format(message))
+    def _swap_turn(self):
+        self.turn = 1 if self.turn == 0 else 0

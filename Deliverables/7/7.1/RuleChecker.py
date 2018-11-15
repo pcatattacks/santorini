@@ -65,6 +65,7 @@ class RuleChecker:
             board.move(worker, move_dir)
             board.build(worker, build_dir)
 
+            # commented out to avoid circular imports
             # opposition_player_legal_plays = Strategy.get_legal_plays(board, opp_color)
 
             # if not opposition_player_legal_plays:
@@ -106,10 +107,12 @@ class RuleChecker:
         :rtype: bool
         """
         if isinstance(placements, list) and len(placements) == 2:
-            if ((isinstance(placement, list) and
-                 len(placement) == 2 and
-                 all(isinstance(i, int) for i in placement) for placement in placements)):
-                return True
+            for placement in placements:
+                if (not isinstance(placement, list) or
+                    len(placement) != 2 or
+                    not all(isinstance(i, int) for i in placement)):
+                    return False
+            return True
         return False
 
     @staticmethod

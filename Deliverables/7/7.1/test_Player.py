@@ -146,9 +146,9 @@ def test_play(prev_board, curr_board, expected):
     assert expected == player.play(curr_board)
 
 
-@pytest.mark.parametrize("", [])
 def test_notify():
-    pass
+    player = Player("P1", 5)
+    assert "OK" == player.notify("P2")
 
 
 @pytest.mark.parametrize("prev_board, curr_board, color, expected", [

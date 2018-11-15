@@ -1,5 +1,6 @@
 import pytest
 from Board import Board
+from RuleChecker import RuleChecker
 
 
 @pytest.fixture()
@@ -59,16 +60,17 @@ def test_get_dimensions(test_board, expected):
     assert expected == test_board.get_dimensions()
 
 
-@pytest.mark.parametrize("test_board", [
-    (empty_board()),
-    (mini_board()),
-    (legal_board()),
-    (congested_board())
+@pytest.mark.parametrize("test_board, expected", [
+    (legal_board(), [(4, 0, 0), (0, 1, 2), (3, 4, 2), (2, 2, 1)]),
+    (congested_board(), [(4, 2, 0), (2, 1, 2), (3, 3, 2), (2, 2, 1)])
 ])
-# TODO: use get_worker_position to test accuracy of worker_positions dict update
-def test_set_board(test_board):
-    pass
-
+def test_set_board(test_board, expected):
+    board = Board()
+    board.set_board(test_board.board)
+    positions = []
+    for worker in RuleChecker.WORKERS:
+        positions.append(board.get_worker_position(worker))
+    assert expected == positions
 
 @pytest.mark.parametrize("worker, direction, expected", [
     ("blue1", "SW", False),
@@ -184,11 +186,21 @@ def test_get_opposite_direction(direction, expected):
     assert expected == Board.get_opposite_direction(direction)
 
 
-@pytest.mark.parametrize("", [])  # TODO
-def test_get_cell_height():
-    pass
+@pytest.mark.parametrize("board, row, col, expected", [
+    (legal_board(), 2, 3, 2),
+    (legal_board(), 4, 0, 0),
+    (congested_board(), 1, 4, 4),
+    (congested_board(), 3, 3, 2)
+])
+def test_get_cell_height(board, row, col, expected):
+    assert expected == board.get_cell_height(row, col)
 
 
-@pytest.mark.parametrize("", [])  # TODO
-def test_get_cell_worker():
-    pass
+@pytest.mark.parametrize("board, row, col, expected", [
+    (legal_board(), 0, 0, None),
+    (legal_board(), 3, 4, "white1"),
+    (congested_board(), 1, 2, None),
+    (congested_board(), 4, 2, "blue1")
+])
+def test_get_cell_worker(board, row, col, expected):
+    assert expected == board.get_cell_worker(row, col)
