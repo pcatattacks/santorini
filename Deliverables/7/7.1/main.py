@@ -12,6 +12,7 @@ def main():
     player = ProxyPlayer(host, port)
     player.register()  # we don't have to print it for this assignment.
     json_values = parse_json(take_input())
+    acknowledgement = None
     for json_val in json_values:
         command = json_val["value"]
         try:
@@ -46,6 +47,10 @@ def main():
         # except Exception as e:
         #     print(json.dumps(str(e)))
         #     # print(json.dumps(traceback.format_exc()))
+
+    # ensures that player_driver server terminates if EOF is reached in std in, but Game Over isn't called.
+    if not acknowledgement:
+        player.notify("placeholder")
 
 
 if __name__ == "__main__":
