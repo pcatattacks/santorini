@@ -5,6 +5,7 @@ from Player import Player
 from RuleChecker import RuleChecker
 from CustomExceptions import InvalidCommand, ContractViolation, IllegalPlay
 from JsonParser import parse_json
+import time
 
 
 def is_valid_register_command(command):
@@ -112,16 +113,10 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
 
         except InvalidCommand as e:
             self._send_response("InvalidCommand")
-            self._cleanup()
-            raise e
         except IllegalPlay as e:
             self._send_response("IllegalPlay")
-            self._cleanup()
-            raise e
         except ContractViolation as e:
             self._send_response("ContractViolation")
-            self._cleanup()
-            raise e
 
     def _send_response(self, message):
         data = bytes(json.dumps(message) + "\n", "utf-8")
@@ -135,8 +130,8 @@ class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
 
 def release_resources(server):
     """
-    :param ServerSocket.BaseServer server:
-    :return: void
+    :param socketserver.BaseServer server:
+    :return:
     """
     server.shutdown()
     server.server_close()
@@ -154,23 +149,13 @@ def main():
     # Create the server, binding to HOST on port PORT
     server = socketserver.TCPServer((HOST, PORT), PlayerDriverRequestHandler)
 
+    # print("Player Driver Server is starting...")
     try:
-        # print("Player Driver Server is starting...")
-        server.serve_forever()  # TODO: doesn't exit when game is over, will keep listening. spawn another thread to call server_close()? Or sys.exit()
-    except InvalidCommand:
-        # print("Santorini game stopped because of receiving an invalid command from Referee.")
-        pass
-    except IllegalPlay:
-        # print("Santorini game stopped because of receiving an Illegal Play.")  # TODO: will this ever happen?
-        pass
-    except ContractViolation:  # TODO: unspecified behaviour for invalid input
-        # print("Santorini game stopped because of internal Contract Error.")
-        pass
-    except Exception as e:
-        thread = Thread(target=release_resources(server))
+        server.serve_forever()
+        # TODO: Implement a timeout for the real game
+    except Exception:
+        thread = Thread(target=release_resources, args=(server,))
         thread.start()
-        # raise e
-        pass
 
 
 if __name__ == "__main__":

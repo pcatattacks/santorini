@@ -8,7 +8,7 @@ from player_driver import is_valid_register_command,\
 
 def main():
 
-    host, port = "localhost", 9999
+    host, port = "127.0.0.1", 9999
     player = ProxyPlayer(host, port)
     player.register()  # we don't have to print it for this assignment.
     json_values = parse_json(take_input())
@@ -36,6 +36,7 @@ def main():
 
         except InvalidCommand:
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
+            break
         except IllegalPlay:  # TODO: donno the behaviour yet
             pass
         except IllegalResponse as e:  # TODO: Defined for Proxy receiving incorrectly formatted responses. what behaviour?
@@ -44,6 +45,7 @@ def main():
             raise e  # debug
         except ContractViolation as e:  # TODO: unspecified behaviour for invalid input
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
+            break
         # except Exception as e:
         #     print(json.dumps(str(e)))
         #     # print(json.dumps(traceback.format_exc()))

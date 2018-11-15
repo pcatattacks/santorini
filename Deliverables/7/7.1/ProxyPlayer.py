@@ -106,7 +106,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.host, self.port))
         sock.sendall(data)
-        response = str(sock.recv(4096), "utf-8")  # Receive data from the server
+        response = str(sock.recv(1024), "utf-8")  # Receive data from the server
         # sock.shutdown(socket.SHUT_RDWR)
         sock.close()
         if not response:
