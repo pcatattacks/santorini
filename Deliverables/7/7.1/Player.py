@@ -130,3 +130,76 @@ class Player(PlayerInterface):
         """
         return "OK"
 
+    def check_board(self, board):
+        """
+
+        :param board:
+        :return:
+        :type: bool
+        """
+        for color in RuleChecker.COLORS:
+            if color != self.color:
+                opp_color = color
+
+        if RuleChecker.is_legal_initial_board(self.board.board, self.color):
+
+            placements = Strategy.get_placements(self.board, self.color)
+            for count, placement in enumerate(placements, 1):
+                row, col = placement
+                self.board.place_worker(row, col, self.color + str(count))
+
+            if RuleChecker.is_legal_board(self.board.board):
+
+                for opp_play in Strategy.get_legal_plays(self.board, opp_color):
+                    worker, directions = opp_play
+                    move_dir, build_dir = directions
+                    self.board.move(worker, move_dir)
+                    self.board.build(worker, build_dir)
+
+                    if board == self.board.board:
+                        return True
+
+                    self.board.undo_build(worker, build_dir)
+                    self.board.move(worker, Board.get_opposite_direction(move_dir))
+
+                return False
+
+            else:
+
+                rows, cols = self.board.get_dimensions()
+                for row_count in range(rows):
+                    for col_count in range(cols):
+                        prev_cell = self.board.board[row_count][col_count]
+                        curr_cell = board[row_count][col_count]
+                        if prev_cell != curr_cell:
+                            if isinstance(prev_cell, list):
+                                return False
+                            if prev_cell != curr_cell[0]:
+                                return False
+
+                return True
+
+        else:
+
+            for play in Strategy.get_legal_plays(self.board, self.color):
+                worker, directions = play
+                move_dir, build_dir = directions
+                self.board.move(worker, move_dir)
+                self.board.build(worker, build_dir)
+
+                for opp_play in Strategy.get_legal_plays(self.board, opp_color):
+                    opp_worker, opp_directions = opp_play
+                    opp_move_dir, opp_build_dir = opp_directions
+                    self.board.move(opp_worker, opp_move_dir)
+                    self.board.build(opp_worker, opp_build_dir)
+
+                    if board == self.board.board:
+                        return True
+
+                    self.board.undo_build(opp_worker, opp_build_dir)
+                    self.board.move(opp_worker, Board.get_opposite_direction(opp_move_dir))
+
+                self.board.undo_build(worker, build_dir)
+                self.board.move(worker, Board.get_opposite_direction(move_dir))
+
+            return False

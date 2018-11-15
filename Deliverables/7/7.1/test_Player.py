@@ -48,6 +48,46 @@ def test_board_1():
 
 
 @pytest.fixture()
+def test_board_2():
+    board = [[1, [0, "blue1"], 0, 0, [0, "blue2"]],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [[0, "white2"], 0, 0, 0, [0, "white1"]]]
+    return board
+
+
+@pytest.fixture()
+def test_board_3():
+    board = [[1, 1, 0, 0, [0, "blue2"]],
+             [0, [0, "blue1"], 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [[0, "white2"], 0, 0, 0, [0, "white1"]]]
+    return board
+
+
+@pytest.fixture()
+def test_board_4():
+    board = [[1, [0, "blue1"], 0, 0, [0, "blue2"]],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [0, 0, 0, 1, [0, "white1"]],
+             [[0, "white2"], 0, 0, 0, 0]]
+    return board
+
+
+@pytest.fixture()
+def test_board_5():
+    board = [[1, 1, 0, 0, [0, "blue2"]],
+             [0, [0, "blue1"], 0, 0, 0],
+             [0, 0, 0, 0, 0],
+             [[0, "white2"], 0, 0, 0, 0],
+             [1, 0, 0, 0, [0, "white1"]]]
+    return board
+
+
+@pytest.fixture()
 def valid_plays(play):
     plays = [[["blue2", ["SW"]]],
              [["blue1", ["E", "E"]], ["blue1", ["SE", "NE"]]]]
@@ -88,3 +128,20 @@ def test_play(board, expected):
 @pytest.mark.parametrize("", [])
 def test_notify():
     pass
+
+
+@pytest.mark.parametrize("prev_board, curr_board, color, expected", [
+    (initial_board(), initial_board(4), RuleChecker.COLORS[0], True),
+    (initial_board(), test_board_0(), RuleChecker.COLORS[0], False),
+    (initial_board(), test_board_1(), RuleChecker.COLORS[1], False),
+    (initial_board(2), test_board_2(), RuleChecker.COLORS[1], True),
+    (initial_board(2), test_board_3(), RuleChecker.COLORS[1], False),
+    (initial_board(4), test_board_4(), RuleChecker.COLORS[0], True),
+    (test_board_3(), test_board_5(), RuleChecker.COLORS[0], False)
+])
+def test_check_board(prev_board, curr_board, color, expected):
+    player = Player("P1", 5)
+    player.register()
+    player.place(initial_board(), color)
+    player.board.set_board(prev_board)
+    assert expected == player.check_board(curr_board)
