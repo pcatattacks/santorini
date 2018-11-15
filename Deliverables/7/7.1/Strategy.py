@@ -97,6 +97,7 @@ class Strategy:
         result_plays = []
 
         for play in Strategy.get_legal_plays(board, color):
+            # avoid circular import
             # if RuleChecker.is_winning_play(board, *play):
             #     result_plays.append(play)
             if len(play[1]) == 1:
@@ -115,6 +116,7 @@ class Strategy:
                     opposition_win = True
                 else:
                     for opp_play in opp_legal_plays:
+                        # avoid circular import
                         # if RuleChecker.is_winning_play(board, *opp_play):
                         #     opposition_win = True
                         #     break
@@ -183,12 +185,13 @@ class Strategy:
             else:
                 loses = False  # if opposition has no plays, which means player wins, which means loop never executes
                 for opp_play in opp_legal_plays:
+                    # avoid circular import
                     # if RuleChecker.is_winning_play(board, *opp_play):
                     #     loses = True
                     if len(opp_play[1]) == 1:
                         loses = True
                         break
-                    elif n > 1:  # TODO - check. should this be 1 or 0
+                    elif n > 1:
                         opp_worker = opp_play[0]
                         opp_move_dir, opp_build_dir = opp_play[1]
 
@@ -231,13 +234,13 @@ class Strategy:
         players = [str(color+"1"), str(color+"2")]
         player_movable_directions = [[], []]
 
-    #   Valid Move directions
+        # Valid Move directions
         for direc in RuleChecker.DIRECTIONS:
             for i, player in enumerate(players):
                 if RuleChecker.is_valid_move(board, player, direc):
                     player_movable_directions[i].append(direc)
 
-    #   Constructing all possible legal plays.
+        # Constructing all possible legal plays
         for i, player in enumerate(players):
             for move_dir in player_movable_directions[i]:
                 if RuleChecker.is_winning_move(board, player, move_dir):

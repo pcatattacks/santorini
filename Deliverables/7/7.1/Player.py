@@ -51,9 +51,7 @@ class Player(PlayerInterface):
         self.board = Board()
         self.num_looks_ahead = num_looks_ahead
         self.color = None
-
-        # shadow state
-        self.registered = False
+        self.registered = False  # shadow state
 
     def register(self):
         """
@@ -113,7 +111,7 @@ class Player(PlayerInterface):
             raise ContractViolation("Function must be called after player.place()!")
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
-        if not self.check_board(board):
+        if not self._check_board(board):
             raise IllegalPlay("Player provided with a cheating board.")
         self.board.set_board(board)
         return Strategy.get_plays(self.board, self.color, self.num_looks_ahead)
@@ -132,11 +130,12 @@ class Player(PlayerInterface):
         """
         return "OK"
 
-    def check_board(self, board):
+    def _check_board(self, board):
         """
+        Ensures that a received board is within 2 plays of the board currently stored in the Player.
 
-        :param board:
-        :return:
+        :param list board:
+        :return: 'True' if board is valid given previous board, else 'False'.
         :type: bool
         """
         for color in RuleChecker.COLORS:

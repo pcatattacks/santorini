@@ -70,4 +70,3 @@ def test_get_legal_plays(legal_board, color):
     # pain by hand, so this will do for now
     for play in Strategy.get_legal_plays(legal_board, color):
         assert RuleChecker.is_legal_play(legal_board, *play)
-

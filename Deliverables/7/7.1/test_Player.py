@@ -165,4 +165,4 @@ def test_check_board(prev_board, curr_board, color, expected):
     player.register()
     player.place(initial_board(), color)
     player.board.set_board(prev_board)
-    assert expected == player.check_board(curr_board)
+    assert expected == player._check_board(curr_board)

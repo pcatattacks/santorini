@@ -10,7 +10,7 @@ def main():
 
     host, port = "127.0.0.1", 9999
     player = ProxyPlayer(host, port)
-    player.register()  # we don't have to print it for this assignment.
+    player.register()
     json_values = parse_json(take_input())
     acknowledgement = None
     for json_val in json_values:
@@ -37,18 +37,18 @@ def main():
         except InvalidCommand:
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
             break
-        except IllegalPlay:  # TODO: donno the behaviour yet
+        except IllegalPlay:
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
         except IllegalResponse as e:  # TODO: Defined for Proxy receiving incorrectly formatted responses. what behaviour?
             # could we possibly use ContractViolation instead, since giving an incorrect response is the same as
             # violating a function contract.
             raise e  # debug
-        except ContractViolation as e:  # TODO: unspecified behaviour for invalid input
+        except ContractViolation as e:
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
             break
         # except Exception as e:
         #     print(json.dumps(str(e)))
-        #     # print(json.dumps(traceback.format_exc()))
+        #     print(json.dumps(traceback.format_exc()))
 
     # ensures that player_driver server terminates if EOF is reached in std in, but Game Over isn't called.
     if not acknowledgement:

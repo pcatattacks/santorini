@@ -72,7 +72,7 @@ class Board:
             raise ContractViolation("Cannot get dimensions if Board.board member variable has not been set!")
         return len(self.board), len(self.board[0])
 
-    def set_board(self, board_obj):  # TODO - discuss whether should take board or list
+    def set_board(self, board_obj):
         """
         Assigns the passed in board to the `board` member variable.
 
@@ -80,7 +80,7 @@ class Board:
         :return: No value returned.
         :rtype: void.
         """
-        # TODO: add check for if the board object is valid
+        # TODO: use is_valid_board or leave it to board owner
         self.board = board_obj
         for r, row in enumerate(self.board):
             for c, cell in enumerate(row):
@@ -340,5 +340,6 @@ class Board:
         return json.dumps(self.board)
 
 
+# TODO: still want this defined here
 class IllegalMove(Exception):
     pass
