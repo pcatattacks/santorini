@@ -37,7 +37,7 @@ def main():
         except InvalidCommand:
             print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
         except IllegalPlay:  # TODO: donno the behaviour yet
-            pass
+            print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
         except IllegalResponse as e:  # TODO: Defined for Proxy receiving incorrectly formatted responses. what behaviour?
             # could we possibly use ContractViolation instead, since giving an incorrect response is the same as
             # violating a function contract.

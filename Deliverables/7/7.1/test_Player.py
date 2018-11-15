@@ -28,12 +28,32 @@ def initial_board(num_placements=0):
 
 
 @pytest.fixture()
+def test_board_0_prev():
+    board = [[[1, "blue2"], 2, 1, 2, 3],
+             [2, 2, 1, 0, 4],
+             [1, 0, 1, 1, 4],
+             [0, 0, [0, "white2"], 0, [2, "white1"]],
+             [1, [0, "blue1"], 0, 2, 3]]
+    return board
+
+
+@pytest.fixture()
 def test_board_0():
-    board = [[0, [2, "blue2"], 1, 2, 3],
+    board = [[1, [2, "blue2"], 1, 2, 3],
              [3, 2, 1, 0, 4],
              [1, 0, [1, "white2"], 2, 4],
              [0, 0, 0, 0, [2, "white1"]],
              [1, [0, "blue1"], 0, 2, 3]]
+    return board
+
+
+@pytest.fixture()
+def test_board_1_prev():
+    board = [[[3, "blue1"], 0, 0, [2, "white1"], 2],
+             [4, 0, 0, 4, 0],
+             [4, 4, 4, 4, 0],
+             [4, 4, 4, 4, 4],
+             [[0, "blue2"], 4, 4, 4, [0, "white2"]]]
     return board
 
 
@@ -114,15 +134,16 @@ def test_place(board, color, expected):
     assert expected[1] == player.color
 
 
-@pytest.mark.parametrize("board, expected", [
-    (test_board_0(), valid_plays(0)),
-    (test_board_1(), valid_plays(1))
+@pytest.mark.parametrize("prev_board, curr_board, expected", [
+    (test_board_0_prev(), test_board_0(), valid_plays(0)),
+    (test_board_1_prev(), test_board_1(), valid_plays(1))
 ])
-def test_play(board, expected):
+def test_play(prev_board, curr_board, expected):
     player = Player("P1", 5)
     player.register()
     player.place(initial_board(), RuleChecker.COLORS[0])
-    assert expected == player.play(board)
+    player.board.set_board(prev_board)
+    assert expected == player.play(curr_board)
 
 
 @pytest.mark.parametrize("", [])

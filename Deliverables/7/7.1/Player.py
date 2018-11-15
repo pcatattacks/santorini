@@ -1,7 +1,7 @@
 from Board import Board
 from RuleChecker import RuleChecker
 from Strategy import Strategy
-from CustomExceptions import ContractViolation
+from CustomExceptions import ContractViolation, IllegalPlay
 from PlayerInterface import PlayerInterface
 
 
@@ -113,6 +113,8 @@ class Player(PlayerInterface):
             raise ContractViolation("Function must be called after player.place()!")
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
+        if not self.check_board(board):
+            raise IllegalPlay("Player provided with a cheating board.")
         self.board.set_board(board)
         return Strategy.get_plays(self.board, self.color, self.num_looks_ahead)
 
@@ -183,12 +185,16 @@ class Player(PlayerInterface):
 
             for play in Strategy.get_legal_plays(self.board, self.color):
                 worker, directions = play
+                if len(directions) == 1:
+                    continue
                 move_dir, build_dir = directions
                 self.board.move(worker, move_dir)
                 self.board.build(worker, build_dir)
 
                 for opp_play in Strategy.get_legal_plays(self.board, opp_color):
                     opp_worker, opp_directions = opp_play
+                    if len(opp_directions) == 1:
+                        continue
                     opp_move_dir, opp_build_dir = opp_directions
                     self.board.move(opp_worker, opp_move_dir)
                     self.board.build(opp_worker, opp_build_dir)
