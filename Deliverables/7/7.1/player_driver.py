@@ -155,18 +155,22 @@ def main():
     server = socketserver.TCPServer((HOST, PORT), PlayerDriverRequestHandler)
 
     try:
-        print("Player Driver Server is starting...")
+        # print("Player Driver Server is starting...")
         server.serve_forever()  # TODO: doesn't exit when game is over, will keep listening. spawn another thread to call server_close()? Or sys.exit()
     except InvalidCommand:
-        print("Santorini game stopped because of receiving an invalid command from Referee.")
+        # print("Santorini game stopped because of receiving an invalid command from Referee.")
+        pass
     except IllegalPlay:
-        print("Santorini game stopped because of receiving an Illegal Play.")  # TODO: will this ever happen?
+        # print("Santorini game stopped because of receiving an Illegal Play.")  # TODO: will this ever happen?
+        pass
     except ContractViolation:  # TODO: unspecified behaviour for invalid input
-        print("Santorini game stopped because of internal Contract Error.")
+        # print("Santorini game stopped because of internal Contract Error.")
+        pass
     except Exception as e:
         thread = Thread(target=release_resources(server))
         thread.start()
-        raise e
+        # raise e
+        pass
 
     print(enumerate())  # debug
 

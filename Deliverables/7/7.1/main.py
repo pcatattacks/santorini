@@ -42,7 +42,7 @@ def main():
             # violating a function contract.
             raise e  # debug
         except ContractViolation as e:  # TODO: unspecified behaviour for invalid input
-            raise e  # debug
+            print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
         # except Exception as e:
         #     print(json.dumps(str(e)))
         #     # print(json.dumps(traceback.format_exc()))
