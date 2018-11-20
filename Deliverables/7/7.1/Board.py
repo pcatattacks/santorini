@@ -1,6 +1,10 @@
 import json
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation
+from copy import deepcopy
+
+
+# TODO: how do we feel about a helper function to return the len of worker_positions, for use in RuleChecker functions
 
 
 class Board:
@@ -332,7 +336,7 @@ class Board:
 
     def extract_json_board(self):
         """
-        returns a json representation of the current board state.
+        Returns a JSON representation of the current board state.
 
         :return: json array
         :rtype: string
@@ -340,6 +344,16 @@ class Board:
         return json.dumps(self.board)
 
 
-# TODO: still want this defined here
+    def extract_board(self):
+        """
+        Returns a deepcopy of the current board state.
+
+        :return: board list
+        :rtype: list
+        """
+        return deepcopy(self.board)
+
+
+# TODO: do we still want this defined here
 class IllegalMove(Exception):
     pass
