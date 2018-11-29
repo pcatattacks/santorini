@@ -8,12 +8,12 @@ from JsonParser import parse_json
 
 class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement interaction protocol contract
 
-    def __init__(self, host, port):
+    def __init__(self, host, port):  # TODO: refactor to accept connection
         # TODO: contract checks for host and port
         self.host = host
         self.port = port
 
-    def register(self):
+    def register(self) -> str:
         """
         Returns the name of the player.
 
@@ -33,7 +33,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
             raise IllegalResponse("ProxyPlayer didn't receive string for name. Received: {}".format(response))
         return response
 
-    def place(self, board, color):
+    def place(self, board, color) -> list:
         """
         Sets the `color` member variable to the parameter `color`. Returns the worker placements for the player.
 
@@ -59,7 +59,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
                                   .format(response))
         return response
 
-    def play(self, board):
+    def play(self, board) -> list:
         """
         Returns the play a player wants to execute on a given turn.
 
@@ -75,7 +75,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
                                   .format(response))
         return response
 
-    def notify(self, winner_name):
+    def notify(self, winner_name) -> str:
         """
         Notifies the player with the winner of the Santorini game.
 
@@ -115,7 +115,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         return response
 
     @staticmethod
-    def _examine_for_error(response):
+    def _examine_for_error(response) -> None:
         if response == "InvalidCommand":
             raise InvalidCommand()
         if response == "IllegalPlay":

@@ -77,7 +77,6 @@ class Referee:
 
         return winner
 
-
     def _register_player(self, name):
         """
         Registers a player's name and assigns them a color.
