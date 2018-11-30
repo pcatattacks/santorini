@@ -36,7 +36,7 @@ class SingleEliminationAdmin(BaseAdmin):
         self.stage = 1
 
     def _populate_players(self):
-        self.s.listen()
+        self.s.listen(self.num_remote_players)
         while len(self.players) < self.num_remote_players:
             conn, addr = self.s.accept()
             player = ProxyPlayer(conn)
@@ -88,11 +88,11 @@ class RoundRobinAdmin(BaseAdmin):
         self.players = {}
 
     def _populate_players(self):
-        self.s.listen()
+        self.s.listen(self.num_remote_players)
         while len(self.players) < self.num_remote_players:
             conn, addr = self.s.accept()
             player = ProxyPlayer(conn)
-            self.players[player] = (0, [])
+            self.players[player] = []
 
         if self._players_not_power_of_2():
             # add default players if needed
@@ -103,13 +103,29 @@ class RoundRobinAdmin(BaseAdmin):
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
                 local_player = Player("Computer" + str(i))
-                self.players[local_player] = (0, [])
+                self.players[local_player] = []
 
     def run_tournament(self):
-        pass
+        active_players = list(self.players.keys())
+        for i in range(len(active_players)):
+            for j in range(i+1, len(active_players)):
+                player1, player2 = active_players[i], active_players[j]
+                referee = Referee(player1, player2)
+                winner, loser_cheated = referee.play_game()
+                loser = player2 if winner is player1 else player1
+                loser_idx = j if winner is player1 else i
+                self.players[winner].append(loser)
+
+                if loser_cheated:
+                    for past_opponent in self.players[loser]:
+                        self.players[past_opponent].append(loser)
+                    self.players[loser] = []
+                    sub_player = Player("Substitute_for_{}".format(loser.get_name()))
+                    active_players[loser_idx] = sub_player
+                    self.players[sub_player] = []
 
     def print_rankings(self):
-        results = [(key, self.players[key]) for key in self.players]
-        results.sort(key=lambda x: x[1][0], reverse=True)
-        for player, data in results:
-            print("{name} : {points}".format(name=player.get_name(), points=data[0]))
+        results = [(key, len(self.players[key])) for key in self.players]
+        results.sort(key=lambda x: x[1], reverse=True)
+        for player, points in results:
+            print("{name} : {points}".format(name=player.get_name(), points=points))

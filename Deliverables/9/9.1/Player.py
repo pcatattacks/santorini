@@ -105,7 +105,6 @@ class Player(PlayerInterface):
         Returns the strategized play a player wants to execute on a given turn.
 
         :param list board:
-        :param int num_moves_ahead:
         :return: a play (as defined above)
         :rtype: list
         """
@@ -118,8 +117,7 @@ class Player(PlayerInterface):
         self.board.set_board(board)
         return self._select_play(Strategy.get_plays(self.board, self.color, self.num_looks_ahead))
 
-    # TODO: has to reset member variables for next game
-    def notify(self, winner_name):  # TODO: remove unnecessary parameter?
+    def notify(self, winner_name):
         """
         Notifies the player with the winner of the Santorini game.
 
@@ -131,6 +129,11 @@ class Player(PlayerInterface):
         :return: An acknowledgement string of "OK"
         :rtype: string
         """
+        # resetting interaction protocol contracts for future games
+        self.board = Board()
+        self.color = None
+        self.registered = False
+        print("{} has won the game!".format(winner_name))
         return "OK"
 
     def _check_board(self, curr_board):
