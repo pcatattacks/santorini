@@ -124,14 +124,17 @@ class RuleChecker:
         :return: 'True' if the play format is valid, else 'False'.
         :rtype: bool
         """
-        if isinstance(play, list) and len(play) == 2:
-            worker, directions = play
-            if ((isinstance(worker, str) and
-                 isinstance(directions, list) and
-                 0 < len(directions) < 3 and
-                 all(RuleChecker.is_valid_direction(direction) for direction in directions))):
+        if isinstance(play, list):
+            if not play:
                 return True
-        return False
+            if len(play) == 2:
+                worker, directions = play
+                if ((isinstance(worker, str) and
+                     isinstance(directions, list) and
+                     0 < len(directions) < 3 and
+                     all(RuleChecker.is_valid_direction(direction) for direction in directions))):
+                    return True
+            return False
 
     @staticmethod
     def is_legal_placement(board, placement):

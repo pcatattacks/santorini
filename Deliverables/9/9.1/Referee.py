@@ -62,21 +62,25 @@ class Referee:
             try:
                 play = player.play(self.board.extract_board())
                 print(play)  # debug
-                won = self._update_board_with_play(play)
-                if won:
-                    winner = self.player_names[self.turn]
+                if not play:
+                    winner = self.players[self.turn * -1 + 1]
                     for p in self.players:
-                        p.notify(self.player_names[self.turn])
-
+                        p.notify(self.player_names[self.turn * -1 + 1])
+                else:
+                    won = self._update_board_with_play(play)
+                    if won:
+                        winner = self.player_names[self.turn]
+                        for p in self.players:
+                            p.notify(self.player_names[self.turn])
             # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
             except (IllegalPlay, InvalidCommand, IllegalResponse):
                 winner = self.players[self.turn * -1 + 1]
                 cheating = True
                 for p in self.players:
                     p.notify(self.player_names[self.turn * -1 + 1])
-            except InvalidCommand:
-                # TODO - unspecified behaviour
-                pass
+            # except InvalidCommand:
+            #     # TODO - unspecified behaviour
+            #     pass
             except ContractViolation:
                 # TODO - unspecified behaviour
                 pass

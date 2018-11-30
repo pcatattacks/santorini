@@ -58,7 +58,8 @@ def is_valid_play_command(command):
     :rtype: bool
     """
     return (isinstance(command, list)
-            and len(command) == 2 and command[0] == "Play" and RuleChecker.is_valid_board(command[1]))
+            and ((not command) or
+                 (len(command) == 2 and command[0] == "Play" and RuleChecker.is_valid_board(command[1]))))
     # TODO: might have to do is_legal_board check here too, since InvalidCommand and IllegalPlay may both result in
     # "Santorini is Broken". Discuss
 

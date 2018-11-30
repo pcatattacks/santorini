@@ -239,9 +239,10 @@ class Player(PlayerInterface):
         :return:
         :rtype: list
         """
-        if not plays:
-            return [self.color + "1", ["N"]]
-        return random.choice(plays)
+        if plays:
+            return random.choice(plays)
+        return []
+
 
         # best_score = 0
         # best_play = [self.color + "1", ["N"]]
