@@ -25,6 +25,8 @@ class BaseAdmin(ABC):
         pass
 
     def _players_not_power_of_2(self):
+        if self.num_remote_players == 1:
+            return True
         return not (self.num_remote_players != 0 and not (self.num_remote_players & (self.num_remote_players - 1)))
 
 
@@ -34,6 +36,7 @@ class SingleEliminationAdmin(BaseAdmin):
         super().__init__(host, port, num_remote_players)
         self.players = {}
         self.stage = 1
+        self._populate_players()
 
     def _populate_players(self):
         self.s.listen(self.num_remote_players)
@@ -55,8 +58,10 @@ class SingleEliminationAdmin(BaseAdmin):
 
     def run_tournament(self):
         # initialize active players for first round (all players)
-        active_players = set(self.players.keys())
+        active_players = list(self.players.keys())
 
+        print(self.players) # debug
+        # print(active_players) # debug
         # while there is no tournament winner
         while len(active_players) > 1:
             # TODO: refactor to use threading
@@ -86,6 +91,7 @@ class RoundRobinAdmin(BaseAdmin):
     def __init__(self, host, port, num_remote_players):
         super().__init__(host, port, num_remote_players)
         self.players = {}
+        self._populate_players()
 
     def _populate_players(self):
         self.s.listen(self.num_remote_players)
