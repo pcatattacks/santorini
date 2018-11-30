@@ -85,14 +85,31 @@ class RoundRobinAdmin(BaseAdmin):
 
     def __init__(self, host, port, num_remote_players):
         super().__init__(host, port, num_remote_players)
-        pass
+        self.players = {}
 
     def _populate_players(self):
-        pass
+        self.s.listen()
+        while len(self.players) < self.num_remote_players:
+            conn, addr = self.s.accept()
+            player = ProxyPlayer(conn)
+            self.players[player] = (0, [])
+
+        if self._players_not_power_of_2():
+            # add default players if needed
+            num = self.num_remote_players
+            count = 0
+            while num != 0:
+                num = num >> 1
+                count = count + 1
+            for i in range((1 << count) - self.num_remote_players):
+                local_player = Player("Computer" + str(i))
+                self.players[local_player] = (0, [])
 
     def run_tournament(self):
         pass
 
     def print_rankings(self):
-        pass
-
+        results = [(key, self.players[key]) for key in self.players]
+        results.sort(key=lambda x: x[1][0], reverse=True)
+        for player, data in results:
+            print("{name} : {points}".format(name=player.get_name(), points=data[0]))
