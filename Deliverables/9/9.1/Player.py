@@ -64,7 +64,7 @@ class Player(PlayerInterface):
          - Cannot be called more than once.
 
         :return: the name of the player
-        :rtype: string
+        :rtype: str
         """
         if self.registered:
             raise ContractViolation("Cannot call Player.register() again until game ends!")
@@ -83,7 +83,7 @@ class Player(PlayerInterface):
          are present any cell.
 
         :param list board: an instance of Board (refer to documentation of Board class).
-        :param string color: A color (as defined in the documentation of Referee).
+        :param str color: A color (as defined in the documentation of Referee).
         :return: `list` of [position1, position2] denoting the position of the player's 1st and 2nd worker respectively.
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
@@ -126,15 +126,16 @@ class Player(PlayerInterface):
          - can only be called once per game
          - must be the last function to be called by an object that implements PlayerInterface.
 
-        :param string winner_name: Name of the winner of the Santorini game
+        :param str winner_name: Name of the winner of the Santorini game
         :return: An acknowledgement string of "OK"
-        :rtype: string
+        :rtype: str
         """
         # resetting interaction protocol contracts for future games
         self.board = Board()
         self.color = None
         self.registered = False
         print("{} has won the game!".format(winner_name))
+        print("------------------------------------------------")
         return "OK"
 
     def _check_board(self, curr_board):
@@ -208,7 +209,7 @@ class Player(PlayerInterface):
 
         :param Board prev_board: A Board object (see documentation for Board).
         :param list curr_board: A board (as defined in the documentation of Board).
-        :param string color: A color (as defined in the documentation of Referee).
+        :param str color: A color (as defined in the documentation of Referee).
         :return: 'True' if the current board can be achieved in one move from the previous board, else 'False'.
         :rtype: bool
         """
@@ -260,7 +261,6 @@ class Player(PlayerInterface):
         #     self.board.move(worker, Board.get_opposite_direction(move_dir))
         # return best_play
 
-
     def _score_board(self):
         """
 
@@ -280,8 +280,7 @@ class Player(PlayerInterface):
 
     def get_name(self):
         """
-
-        :return:
-        :rtype: string
+        :return: this player's name
+        :rtype: str
         """
         return self.name

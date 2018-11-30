@@ -10,7 +10,7 @@ HOST, PORT = "localhost", 9999
 
 with open("strategy.config", "r") as f:
     num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
-    player = Player("P1", num_looks_ahead=num_looks_ahead)
+    player = Player(input("Type your player's name: "), num_looks_ahead=num_looks_ahead)
 
 
 def is_valid_register_command(command):
@@ -88,8 +88,8 @@ class PlayerDriver:
     def start_driver(self):
         # TODO: way to exit from while loop when player has dropped out of tournament
         while True:
-            # self.s is the TCP socket connected to the admin
-            data = self.s.recv(4096).strip()
+            # self.s is the TCP socket connected to the referee
+            data = self.s.recv(1024).strip()
             data = data.decode('utf-8')
             # print("player driver received: ", data)  # debug
             # print("--------------------------------")  # debug
@@ -119,6 +119,7 @@ class PlayerDriver:
             except IllegalPlay as e:
                 self._send_response("IllegalPlay")
             except ContractViolation as e:
+                print(e)  # debug
                 self._send_response("ContractViolation")
 
     def _send_response(self, message):

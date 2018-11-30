@@ -1,6 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
-from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay
+from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay, IllegalResponse
 
 
 class Referee:
@@ -67,7 +67,9 @@ class Referee:
                     winner = self.player_names[self.turn]
                     for p in self.players:
                         p.notify(self.player_names[self.turn])
-            except IllegalPlay:
+
+            # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
+            except (IllegalPlay, InvalidCommand, IllegalResponse):
                 winner = self.players[self.turn * -1 + 1]
                 cheating = True
                 for p in self.players:

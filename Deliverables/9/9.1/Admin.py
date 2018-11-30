@@ -59,11 +59,11 @@ class SingleEliminationAdmin(BaseAdmin):
     def run_tournament(self):
         # initialize active players for first round (all players)
         active_players = list(self.players.keys())
-
         # print(self.players) # debug
         # print(active_players) # debug
         # while there is no tournament winner
         while len(active_players) > 1:
+            print("We're at stage {}!".format(self.stage))  # debug
             # TODO: refactor to use threading
             # assign opponents, instantiate referees, make play_game() calls, record results
             for i in range(len(active_players) // 2):
@@ -71,10 +71,16 @@ class SingleEliminationAdmin(BaseAdmin):
                 referee = Referee(player1, player2)
                 winner, loser_cheated = referee.play_game()
                 loser = player2 if winner is player1 else player1
+                loser_idx = len(active_players)-1-i if winner is player1 else i
 
                 self.players[loser] = 0 if loser_cheated else self.stage
-                active_players.remove(loser)
+                active_players[loser_idx] = None
 
+                print(winner.get_name() + " won!", loser.get_name() + " lost!")  # debug
+                print("{} rank: {}".format(winner.get_name(), self.players[winner]))  # debug
+                print("{} rank: {}".format(loser.get_name(), self.players[loser]))  # debug
+
+            active_players = [player for player in active_players if player is not None]
             self.stage += 1
 
         self.players[winner] = self.stage
@@ -83,7 +89,7 @@ class SingleEliminationAdmin(BaseAdmin):
         results = [(key, self.players[key]) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
         for player, rank in results:
-            print("{rank} : {name}".format(rank=(self.stage-rank+1), name=player.get_name()))
+            print("{rank} : {name}".format(rank=self.stage-rank+1, name=player.get_name()))
 
 
 class RoundRobinAdmin(BaseAdmin):

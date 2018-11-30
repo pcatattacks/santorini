@@ -1,4 +1,3 @@
-import socket
 import json
 from RuleChecker import RuleChecker
 from PlayerInterface import PlayerInterface
@@ -99,6 +98,8 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         :return:
         :rtype: string
         """
+        if not self.name:
+            raise ContractViolation("ProxyPlayer.register() must be called before get_name()!")
         return self.name
 
     def _send_message_and_recv_response(self, message):
@@ -117,7 +118,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         return response
 
     @staticmethod
-    def _examine_for_error(response):
+    def _examine_for_error(response):  # TODO: this method makes assumptions about how the Player operates. refactor
         if response == "InvalidCommand":
             raise InvalidCommand()
         if response == "IllegalPlay":

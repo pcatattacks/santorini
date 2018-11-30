@@ -357,7 +357,6 @@ class Board:
         """
         return json.dumps(self.board)
 
-
     def extract_board(self):
         """
         Returns a deepcopy of the current board state.
