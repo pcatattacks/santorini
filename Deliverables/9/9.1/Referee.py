@@ -22,7 +22,7 @@ class Referee:
         See `direction`,`worker`, `position` in documentation of `Board`.
 
     """
-    def __init__(self, player1, player2, admin, p1_num, p2_num):
+    def __init__(self, player1, player2):
         """
         :param Player player1: An instance of the `Player` class. See documentation for Player.
         :param Player player2: An instance of the `Player` class. See documentation for Player.
@@ -31,8 +31,6 @@ class Referee:
         self.player_names = []
         self.turn = 0
         self.board = Board()
-        self.admin = admin
-        self.player_nums = [p1_num, p2_num]
 
     def play_game(self):
         """
@@ -42,8 +40,8 @@ class Referee:
         CONTRACT:
          - Cannot be called more than once.
 
-        :return: the name of the winning player.
-        :rtype: string
+        :return: the winning player.
+        :rtype: Player
         """
         for player in self.players:
             name = player.register()
@@ -63,11 +61,11 @@ class Referee:
                 play = player.play(self.board)
                 won = self._update_board_with_play(play)
                 if won:
-                    winner = self.player_nums[self.turn]
+                    winner = self.player_names[self.turn]
                     for p in self.players:
                         p.notify(self.player_names[self.turn])
             except IllegalPlay:
-                winner = self.player_nums[self.turn * -1 + 1]
+                winner = self.players[self.turn * -1 + 1]
                 cheating = True
                 for p in self.players:
                     p.notify(self.player_names[self.turn * -1 + 1])
@@ -80,7 +78,7 @@ class Referee:
 
             self._swap_turn()
 
-        self._send_results(winner, cheating)
+        return winner, cheating
 
     def _register_player(self, name):
         """
@@ -151,8 +149,3 @@ class Referee:
     def _swap_turn(self):
         self.turn = 1 if self.turn == 0 else 0
 
-    def _send_results(self, winner, cheating):
-        if winner == self.player_nums[0]:
-            self.admin.update_results(winner, self.player_nums[1], cheating)
-        else:
-            self.admin.update_results(winner, self.player_nums[0], cheating)

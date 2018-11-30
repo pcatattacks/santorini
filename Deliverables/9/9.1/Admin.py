@@ -1,102 +1,98 @@
+from abc import ABC, abstractmethod
 from Player import Player
 from ProxyPlayer import ProxyPlayer
 from Referee import Referee
 import socket
-import time
 
-class Admin:
-    """
 
-    """
+class BaseAdmin(ABC):
 
-    # TODO: retrieve data from santorini.config and command line
-    IP = 'localhost'
-    PORT = 9999
-    STYLE = "cup"
-    NUM_REMOTE_PLAYERS = 1
-    NUM_LOOKS_AHEAD = 2
-
-    def __init__(self):
-        self.players = []
-        self.player_ranks = []
-        self.results = []
-        self.stage = 0
+    def __init__(self, host, port, num_remote_players):
+        self.num_remote_players = num_remote_players
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.bind((Admin.IP, Admin.PORT))
+        self.s.bind((host, port))
 
-    def administer_tournament(self):
-        self.populate_players()
-        if Admin.STYLE == "league":
-            self.round_robin()
-        elif Admin.STYLE == "cup":
-            self.single_elimination()
-        else:
-            pass # TODO: raise relevant exception
-        self.print_rankings()
+    @abstractmethod
+    def _populate_players(self):
+        pass
 
-    def populate_players(self):
-        # wait for connections from remote players
+    @abstractmethod
+    def run_tournament(self):
+        pass
+
+    @abstractmethod
+    def print_rankings(self):
+        pass
+
+    def _players_not_power_of_2(self):
+        return not (self.num_remote_players != 0 and not (self.num_remote_players & (self.num_remote_players - 1)))
+
+
+class SingleEliminationAdmin(BaseAdmin):
+
+    def __init__(self, host, port, num_remote_players):
+        super().__init__(host, port, num_remote_players)
+        self.players = {}
+        self.stage = 1
+
+    def _populate_players(self):
         self.s.listen()
-        while len(self.players) < Admin.NUM_REMOTE_PLAYERS:
+        while len(self.players) < self.num_remote_players:
             conn, addr = self.s.accept()
             player = ProxyPlayer(conn)
-            self.players.append(player)
-            self.player_ranks.append(None)
-        # TODO: refactor into helper function
-        # if # of players != 2^n, add default players
-        num_players = len(self.players)
-        if not (num_players != 0 and not (num_players & (num_players - 1))):
-            num = num_players
+            self.players[player] = None
+
+        if self._players_not_power_of_2():
+            # add default players if needed
+            num = self.num_remote_players
             count = 0
             while num != 0:
                 num = num >> 1
                 count = count + 1
-            for player in range((1 << count) - num_players):
-                self.players.append(Player.Player("Computer" + str(player), Admin.NUM_LOOKS_AHEAD))
-                self.player_ranks.append(None)
+            for i in range((1 << count) - self.num_remote_players):
+                local_player = Player("Computer" + str(i))
+                self.players[local_player] = None
 
-    def round_robin(self):
-        pass
-
-    def single_elimination(self):
+    def run_tournament(self):
         # initialize active players for first round (all players)
-        active_players = []
-        for count, player in enumerate(self.players):
-            active_players.append(count)
+        active_players = set(self.players.keys())
+
         # while there is no tournament winner
         while len(active_players) > 1:
-            # TODO: refactor so that local players do not play against each other
             # TODO: refactor to use threading
             # assign opponents, instantiate referees, make play_game() calls
-            it = iter(active_players)
-            for p1, p2 in zip(it, it):
-                referee = Referee.Referee(self.players[p1], self.players[p2], self, p1, p2)
-                referee.play_game()
-            # wait for results
-            while len(self.results) < len(active_players):
-                time.sleep(10)
-            # TODO: update player_ranks of losing players with current stage
+            for i in range(len(active_players) // 2):
+                player1, player2 = active_players[i], active_players[len(active_players)-1-i]
+                referee = Referee(player1, player2)
+                winner, loser_cheated = referee.play_game()
+                loser = player2 if winner is player1 else player1
 
-            # remove losing players from active_players
-            for player in active_players:
-                if self.player_ranks[player] is not None:
-                    active_players.remove(player)
+                self.players[loser] = 0 if loser_cheated else self.stage
+                active_players.remove(loser)
+
             self.stage += 1
-        self.player_ranks[active_players[0]] = self.stage
 
-    def update_results(self, winner, loser, cheating):
-        if cheating:
-            loser_rank = 0
-        else:
-            loser_rank = self.stage
-        self.results.append(loser, loser_rank)
+        self.players[winner] = self.stage
 
     def print_rankings(self):
-        rank = 1
-        while self.stage >= 0:
-            # every player who dropped out this stage has the same rank
-            for count, player in enumerate(self.players):
-                if self.player_ranks[count] == self.stage:
-                    print(str(rank) + ": " + player.get_name())
-            rank += 1
-            self.stage -= 1
+        results = [(key, self.players[key]) for key in self.players]
+        results.sort(key=lambda x: x[1], reverse=True)
+        for player, rank in results:
+            print("{rank} : {name}".format(rank=(self.stage-rank+1), name=player.get_name())
+
+
+class RoundRobinAdmin(BaseAdmin):
+
+    def __init__(self, host, port, num_remote_players):
+        super().__init__(host, port, num_remote_players)
+        pass
+
+    def _populate_players(self):
+        pass
+
+    def run_tournament(self):
+        pass
+
+    def print_rankings(self):
+        pass
+
