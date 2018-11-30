@@ -60,7 +60,7 @@ class SingleEliminationAdmin(BaseAdmin):
         # while there is no tournament winner
         while len(active_players) > 1:
             # TODO: refactor to use threading
-            # assign opponents, instantiate referees, make play_game() calls
+            # assign opponents, instantiate referees, make play_game() calls, record results
             for i in range(len(active_players) // 2):
                 player1, player2 = active_players[i], active_players[len(active_players)-1-i]
                 referee = Referee(player1, player2)
@@ -78,7 +78,7 @@ class SingleEliminationAdmin(BaseAdmin):
         results = [(key, self.players[key]) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
         for player, rank in results:
-            print("{rank} : {name}".format(rank=(self.stage-rank+1), name=player.get_name())
+            print("{rank} : {name}".format(rank=(self.stage-rank+1), name=player.get_name()))
 
 
 class RoundRobinAdmin(BaseAdmin):
