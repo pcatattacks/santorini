@@ -100,6 +100,7 @@ class Strategy:
             # avoid circular import
             # if RuleChecker.is_winning_play(board, *play):
             #     result_plays.append(play)
+            # print("checking", play)  # debug
             if len(play[1]) == 1:
                 result_plays.append(play)
             else:

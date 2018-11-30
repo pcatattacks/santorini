@@ -45,11 +45,13 @@ class Referee:
         """
         for player in self.players:
             name = player.register()
+            print(name)  # debug
             self._register_player(name)
             self._swap_turn()
 
         for player in self.players:
-            placements = player.place(self.board, RuleChecker.COLORS[self.turn])
+            placements = player.place(self.board.extract_board(), RuleChecker.COLORS[self.turn])
+            print(placements)  # debug
             self._update_board_with_placements(placements)
             self._swap_turn()
 
@@ -58,7 +60,8 @@ class Referee:
         while not winner:
             player = self.players[self.turn]
             try:
-                play = player.play(self.board)
+                play = player.play(self.board.extract_board())
+                print(play)  # debug
                 won = self._update_board_with_play(play)
                 if won:
                     winner = self.player_names[self.turn]
@@ -78,6 +81,7 @@ class Referee:
 
             self._swap_turn()
 
+        print(self.board.board)  # debug
         return winner, cheating
 
     def _register_player(self, name):

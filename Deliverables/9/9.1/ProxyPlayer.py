@@ -68,7 +68,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         message = ["Play", board]
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
-        if not isinstance(response, list) or not all(RuleChecker.is_valid_play(play) for play in response):
+        if not RuleChecker.is_valid_play(response):
             raise IllegalResponse("ProxyPlayer didn't receive correctly formatted play. Received {}"
                                   .format(response))
         return response

@@ -60,7 +60,7 @@ class SingleEliminationAdmin(BaseAdmin):
         # initialize active players for first round (all players)
         active_players = list(self.players.keys())
 
-        print(self.players) # debug
+        # print(self.players) # debug
         # print(active_players) # debug
         # while there is no tournament winner
         while len(active_players) > 1:

@@ -4,6 +4,7 @@ from Strategy import Strategy
 from CustomExceptions import ContractViolation, IllegalPlay
 from PlayerInterface import PlayerInterface
 import json
+import random
 
 
 class Player(PlayerInterface):
@@ -229,6 +230,7 @@ class Player(PlayerInterface):
             prev_board.move(worker, Board.get_opposite_direction(move_dir))
         return False
 
+    # TODO - put all strategic stuff in strategy component
     def _select_play(self, plays):
         """
 
@@ -236,22 +238,28 @@ class Player(PlayerInterface):
         :return:
         :rtype: list
         """
-        best_score = 0
-        best_play = [self.color + "1", ["N"]]
-        for play in plays:
-            worker, directions = play
-            if len(directions) == 1:
-                return play
-            move_dir, build_dir = directions
-            self.board.move(worker, move_dir)
-            self.board.build(worker, build_dir)
-            score = self._score_board()
-            if score > best_score:
-                best_score = score
-                best_play = play
-            self.board.undo_build(worker, build_dir)
-            self.board.move(worker, Board.get_opposite_direction(move_dir))
-        return best_play
+        if not plays:
+            return [self.color + "1", ["N"]]
+        return random.choice(plays)
+
+        # best_score = 0
+        # best_play = [self.color + "1", ["N"]]
+        # # print(plays) # debug
+        # for play in plays:
+        #     worker, directions = play
+        #     if len(directions) == 1:
+        #         return play
+        #     move_dir, build_dir = directions
+        #     self.board.move(worker, move_dir)
+        #     self.board.build(worker, build_dir)
+        #     score = self._score_board()
+        #     if score > best_score:
+        #         best_score = score
+        #         best_play = play
+        #     self.board.undo_build(worker, build_dir)
+        #     self.board.move(worker, Board.get_opposite_direction(move_dir))
+        # return best_play
+
 
     def _score_board(self):
         """
