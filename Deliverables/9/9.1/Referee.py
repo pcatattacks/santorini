@@ -62,11 +62,16 @@ class Referee:
             try:
                 play = player.play(self.board.extract_board())
                 print(play)  # debug
-                won = self._update_board_with_play(play)
-                if won:
-                    winner = self.player_names[self.turn]
+                if not play:
+                    winner = self.players[self.turn * -1 + 1]
                     for p in self.players:
-                        p.notify(self.player_names[self.turn])
+                        p.notify(self.player_names[self.turn * -1 + 1])
+                else:
+                    won = self._update_board_with_play(play)
+                    if won:
+                        winner = self.player_names[self.turn]
+                        for p in self.players:
+                            p.notify(self.player_names[self.turn])
             except IllegalPlay:
                 winner = self.players[self.turn * -1 + 1]
                 cheating = True
