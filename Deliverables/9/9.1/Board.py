@@ -1,6 +1,6 @@
 import json
 from RuleChecker import RuleChecker
-from CustomExceptions import ContractViolation
+from CustomExceptions import ContractViolation, IllegalPlay
 from copy import deepcopy
 
 
@@ -260,7 +260,7 @@ class Board:
             return self.board[row][col][1]
         return None
 
-    def has_worker(self, row, col):
+    def has_worker(self, row, col):  # TODO - merge with is_occupied using keyword argument?
         """
         Returns whether a cell has a worker present in it or not.
 
@@ -283,7 +283,7 @@ class Board:
         if not RuleChecker.is_valid_worker(worker):
             raise ContractViolation("Invalid worker provided: {}".format(worker))
         if self.has_worker(row, col):
-            raise IllegalMove("Cannot place worker in occupied cell!")
+            raise IllegalPlay("Cannot place worker in occupied cell!")
         height = self.board[row][col]
         self.board[row][col] = [height, worker]
         self.worker_positions[worker] = (row, col, height)
@@ -366,7 +366,9 @@ class Board:
         """
         return deepcopy(self.board)
 
+    def __str__(self):
+        result = ""
+        for row in self.board:
+            result += str(row) + '\n'
+        return result
 
-# TODO: do we still want this defined here
-class IllegalMove(Exception):
-    pass

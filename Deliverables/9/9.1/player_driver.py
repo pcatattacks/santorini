@@ -1,16 +1,11 @@
 import json
+import sys
+import Strategies
 from Player import Player
 from RuleChecker import RuleChecker
 from CustomExceptions import InvalidCommand, ContractViolation, IllegalPlay
 from JsonParser import parse_json
 import socket
-
-
-HOST, PORT = "localhost", 9999
-
-with open("strategy.config", "r") as f:
-    num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
-    player = Player(input("Type your player's name: "), num_looks_ahead=num_looks_ahead)
 
 
 def is_valid_register_command(command):
@@ -82,9 +77,17 @@ class PlayerDriver:
     """
 
     """
-    def __init__(self):
+    def __init__(self, player, host, port):
+        """
+
+        :param Player player:
+        :param str host:
+        :param int port:
+        """
+        # TODO - add contracts
+        self.player = player
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((HOST, PORT))
+        self.s.connect((host, port))
 
     def start_driver(self):
         # TODO: way to exit from while loop when player has dropped out of tournament
@@ -99,22 +102,23 @@ class PlayerDriver:
                 for json_val in json_values:
                     command = json_val["value"]
                     if is_valid_register_command(command):
-                        name = player.register()  # should raise error since player is already registered
+                        name = self.player.register()  # should raise error since player is already registered
                         self._send_response(name)
                     elif is_valid_place_command(command):
                         color, board_list = command[1:]
-                        placements = player.place(board_list, color)
+                        placements = self.player.place(board_list, color)
                         self._send_response(placements)
                     elif is_valid_play_command(command):
                         board_list = command[1]
-                        plays = player.play(board_list)
+                        plays = self.player.play(board_list)
                         self._send_response(plays)
                     elif is_valid_game_over_command(command):
                         name = command[1]
-                        acknowledgement = player.notify(name)
+                        acknowledgement = self.player.notify(name)
                         self._send_response(acknowledgement)
                     else:
                         raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
+            # TODO - refactor - making assumption about admin accepting these responses
             except InvalidCommand as e:
                 self._send_response("InvalidCommand")
             except IllegalPlay as e:
@@ -128,10 +132,43 @@ class PlayerDriver:
         self.s.sendall(data)
 
 
-def main():
-    player_driver = PlayerDriver()
+def main(strategy_type, admin_host, admin_port):
+    if not isinstance(admin_port, int):
+        raise ValueError()
+
+    if strategy_type == "random":
+        strategy = Strategies.RandomStrategy()
+    elif strategy_type == "look-ahead":
+        try:
+            with open("strategy.config", "r") as f:
+                num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
+            strategy = Strategies.NLooksAheadStrategy(num_looks_ahead)
+        except FileNotFoundError:
+            print("strategy.config for look-ahead strategy file not found in directory!")
+            sys.exit(1)
+    elif strategy_type == "greedy":
+        strategy = Strategies.GreedyStrategy()
+    elif strategy_type == "interactive":
+        strategy = Strategies.InteractiveStrategy()
+    else:
+        raise ValueError("Unsupported strategy type!")
+
+    player = Player(input("Type your player's name: "), strategy)
+
+    player_driver = PlayerDriver(player, admin_host, admin_port)
     player_driver.start_driver()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        strategy_option = sys.argv[1]
+
+        with open("santorini.config") as f:
+            data = parse_json(f.read())[0]["value"]
+            ip, port = data["IP"], data["port"]
+
+        main(strategy_option, ip, port)
+    except ValueError:
+        print("usage: ./player_driver.sh [strategy] ... [random | look-ahead | interactive | greedy]")
+        sys.exit(1)
+

@@ -43,23 +43,24 @@ class Referee:
         :return: the winning player.
         :rtype: Player
         """
-        for player in self.players:
-            name = player.register()
-            print(name)  # debug
-            self._register_player(name)
-            self._swap_turn()
-
-        for player in self.players:
-            placements = player.place(self.board.extract_board(), RuleChecker.COLORS[self.turn])
-            print(placements)  # debug
-            self._update_board_with_placements(placements)
-            self._swap_turn()
-
         winner = None
         cheating = False
-        while not winner:
-            player = self.players[self.turn]
-            try:
+
+        try:
+            for player in self.players:
+                name = player.register()
+                print(name)  # debug
+                self._register_player(name)
+                self._swap_turn()
+
+            for player in self.players:
+                placements = player.place(self.board.extract_board(), RuleChecker.COLORS[self.turn])
+                print(placements)  # debug
+                self._update_board_with_placements(placements)
+                self._swap_turn()
+
+            while not winner:
+                player = self.players[self.turn]
                 play = player.play(self.board.extract_board())
                 print(play)  # debug
                 if not play:
@@ -72,22 +73,23 @@ class Referee:
                         winner = self.player_names[self.turn]
                         for p in self.players:
                             p.notify(self.player_names[self.turn])
-            # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
-            except (IllegalPlay, InvalidCommand, IllegalResponse):
-                winner = self.players[self.turn * -1 + 1]
-                cheating = True
-                for p in self.players:
-                    p.notify(self.player_names[self.turn * -1 + 1])
-            # except InvalidCommand:
-            #     # TODO - unspecified behaviour
-            #     pass
-            except ContractViolation:
-                # TODO - unspecified behaviour
-                pass
 
-            self._swap_turn()
+                self._swap_turn()
 
-        print(self.board.board)  # debug
+        # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
+        except (IllegalPlay, InvalidCommand, IllegalResponse):
+            print("executed")
+            winner = self.players[self.turn * -1 + 1]
+            cheating = True
+            for p in self.players:
+                p.notify(self.player_names[self.turn * -1 + 1])
+        except ContractViolation:
+            # TODO - unspecified behaviour
+            pass
+
+        print("---------------------")
+        print(self.board)  # debug
+        assert winner is not None
         return winner, cheating
 
     def _register_player(self, name):

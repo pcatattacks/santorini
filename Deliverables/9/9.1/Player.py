@@ -1,10 +1,9 @@
 from Board import Board
 from RuleChecker import RuleChecker
-from Strategy import Strategy
+from Strategies import BaseStrategy, RandomStrategy
 from CustomExceptions import ContractViolation, IllegalPlay
 from PlayerInterface import PlayerInterface
 import json
-import random
 
 
 class Player(PlayerInterface):
@@ -31,10 +30,13 @@ class Player(PlayerInterface):
 
     """
 
-    def __init__(self, name, num_looks_ahead=1):
+    def __init__(self, name, strategy=RandomStrategy()):
         """
 
-        :param string name: the name of the Santorini player.
+        :param str name: the name of the Santorini player.
+        :param Strategy strategy: the strategy the player employs.
+        :return:
+        :rtype: None
         """
         # TODO: Discuss / Document for code walk.
         # Should we have the player store a board object and call the set_board() method within Player,
@@ -47,11 +49,11 @@ class Player(PlayerInterface):
         # called on it, which will be overly complicated.
         if not isinstance(name, str):
             raise ContractViolation("Name must be a string!")
-        if not isinstance(num_looks_ahead, int) or num_looks_ahead < 1:
-            raise ContractViolation("num_looks_ahead must be a positive integer! Given: {}".format(num_looks_ahead))
+        if not isinstance(strategy, BaseStrategy):
+            raise ContractViolation("Strategy must implement BaseStrategy interface!")
         self.name = name
         self.board = Board()
-        self.num_looks_ahead = num_looks_ahead
+        self.strategy = strategy
         self.color = None
         self.registered = False  # shadow state
 
@@ -99,7 +101,7 @@ class Player(PlayerInterface):
             raise ContractViolation("Invalid initial board provided: {}".format(board))
         self.board.set_board(board)
         # TODO: potential contract needed to ensure set_board is called at start of every turn for player
-        return Strategy.get_placements(self.board, self.color)
+        return self.strategy.get_placements(self.board, self.color)
 
     def play(self, board):
         """
@@ -116,7 +118,7 @@ class Player(PlayerInterface):
         if not self._check_board(board):
             raise IllegalPlay("Player provided with a cheating board.")
         self.board.set_board(board)
-        return self._select_play(Strategy.get_plays(self.board, self.color, self.num_looks_ahead))
+        return self.strategy.get_play(self.board, self.color)
 
     def notify(self, winner_name):
         """
@@ -134,8 +136,8 @@ class Player(PlayerInterface):
         self.board = Board()
         self.color = None
         self.registered = False
-        print("{} has won the game!".format(winner_name))
-        print("------------------------------------------------")
+        print("{} has won the game!".format(winner_name))  # debug
+        print("------------------------------------------------")  # debug
         return "OK"
 
     def _check_board(self, curr_board):
@@ -151,7 +153,7 @@ class Player(PlayerInterface):
         # TODO: can't use json.dumps data without json.loads first, so either we use that or a deepcopy function
         if RuleChecker.is_legal_initial_board(json.loads(self.board.extract_json_board()), self.color):
             # apply placements to currently stored board
-            placements = Strategy.get_placements(self.board, self.color)
+            placements = self.strategy.get_placements(self.board, self.color)
             for count, placement in enumerate(placements, 1):
                 row, col = placement
                 self.board.place_worker(row, col, self.color + str(count))
@@ -184,7 +186,7 @@ class Player(PlayerInterface):
         # else if player has already placed, checks possible sets of two turns
         else:
             # iterate through possible own plays, then for each check possible opponent plays for a board match
-            for own_play in Strategy.get_legal_plays(self.board, self.color):
+            for own_play in self.strategy.get_legal_plays(self.board, self.color):
                 own_worker, own_directions = own_play
                 # ignore wins as they did not occur
                 if len(own_directions) == 1:
@@ -214,7 +216,7 @@ class Player(PlayerInterface):
         :rtype: bool
         """
         # iterate through a player's plays to check for a matching resulting board
-        for play in Strategy.get_legal_plays(prev_board, color):
+        for play in self.strategy.get_legal_plays(prev_board, color):
             worker, directions = play
             # ignore wins as they did not occur
             if len(directions) == 1:
@@ -230,54 +232,6 @@ class Player(PlayerInterface):
             prev_board.undo_build(worker, build_dir)
             prev_board.move(worker, Board.get_opposite_direction(move_dir))
         return False
-
-    # TODO - put all strategic stuff in strategy component
-    def _select_play(self, plays):
-        """
-
-        :param list plays:
-        :return:
-        :rtype: list
-        """
-        if plays:
-            return random.choice(plays)
-        return []
-
-
-        # best_score = 0
-        # best_play = [self.color + "1", ["N"]]
-        # # print(plays) # debug
-        # for play in plays:
-        #     worker, directions = play
-        #     if len(directions) == 1:
-        #         return play
-        #     move_dir, build_dir = directions
-        #     self.board.move(worker, move_dir)
-        #     self.board.build(worker, build_dir)
-        #     score = self._score_board()
-        #     if score > best_score:
-        #         best_score = score
-        #         best_play = play
-        #     self.board.undo_build(worker, build_dir)
-        #     self.board.move(worker, Board.get_opposite_direction(move_dir))
-        # return best_play
-
-    def _score_board(self):
-        """
-
-        :return:
-        :rtype: list
-        """
-        score = 0
-        workers = [self.color + "1", self.color + "2"]
-        for worker in workers:
-            row, col, height = self.board.get_worker_position(worker)
-            score += height * 2
-            for direction in RuleChecker.DIRECTIONS:
-                adj_height = self.board.get_height(worker, direction)
-                if adj_height:
-                    score += adj_height
-        return score
 
     def get_name(self):
         """
