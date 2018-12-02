@@ -2,6 +2,7 @@ import json
 import sys
 import Strategies
 from Player import Player
+from SmartPlayer import SmartPlayer
 from RuleChecker import RuleChecker
 from CustomExceptions import InvalidCommand, ContractViolation, IllegalPlay
 from JsonParser import parse_json
@@ -157,7 +158,7 @@ def main(strategy_type, admin_host, admin_port):
     else:
         raise ValueError("Unsupported strategy type!")
 
-    player = Player(input("Type your player's name: "), strategy)
+    player = SmartPlayer(input("Type your player's name: "), strategy)
 
     player_driver = PlayerDriver(player, admin_host, admin_port)
     player_driver.start_driver()

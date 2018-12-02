@@ -380,11 +380,12 @@ class GreedyStrategy(BaseStrategy):
 
     def get_play(self, board, color):
         """
-        # TODO - Jos - add docstring, not sure how the scoring works atm
+        Returns the best play given a list of plays, using a heuristic function. Winning plays are returned immediately.
 
-        :param Board board:
-        :param str color:
-        :return:
+        :param Board board: an instance of Board (refer to documentation of Board class).
+        :param str color: color (as defined above)
+        :return: a legal play (as defined above)
+        :rtype: list
         """
         plays = self.get_legal_plays(board, color)
         if not plays:
@@ -410,12 +411,15 @@ class GreedyStrategy(BaseStrategy):
     @staticmethod
     def _score_board(board, color):
         """
-        # TODO - Jos - add docstring, not sure how the scoring works atm
+        A heuristic function used to score a given board for a player of a given color. It assigns points for the height
+        of cells under and adjacent to the player's workers.
 
-        :return:
-        :rtype: list
+        :param Board board: an instance of Board (refer to documentation of Board class).
+        :param str color: color (as defined above)
+        :return: a numeric score for the given board
+        :rtype: float
         """
-        score = 0
+        score = 0.0
         workers = [color + "1", color + "2"]
         for worker in workers:
             row, col, height = board.get_worker_position(worker)
@@ -423,7 +427,7 @@ class GreedyStrategy(BaseStrategy):
             for direction in RuleChecker.DIRECTIONS:
                 adj_height = board.get_height(worker, direction)
                 if adj_height:
-                    score += adj_height
+                    score += adj_height * 0.5
         return score
 
 
