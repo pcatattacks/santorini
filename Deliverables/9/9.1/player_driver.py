@@ -90,7 +90,6 @@ class PlayerDriver:
         self.s.connect((host, port))
 
     def start_driver(self):
-        # TODO: way to exit from while loop when player has dropped out of tournament
         while True:
             # self.s is the TCP socket connected to the referee
             data = self.s.recv(1024)

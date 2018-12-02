@@ -28,7 +28,6 @@ class Referee:
         :param Player player2: An instance of the `Player` class. See documentation for Player.
         """
         self.players = [player1, player2]
-        self.player_names = []
         self.turn = 0
         self.board = Board()
 
@@ -50,7 +49,6 @@ class Referee:
             for player in self.players:
                 name = player.register()
                 print(name)  # debug
-                self._register_player(name)
                 self._swap_turn()
 
             for player in self.players:
@@ -92,23 +90,6 @@ class Referee:
         print("---------------------")
         print(self.board)  # debug
         return winner, cheating
-
-    def _register_player(self, name):
-        """
-        Registers a player's name and assigns them a color.
-
-        CONTRACT:
-         - Can only be called once per distinct player per game (two players).
-
-        :param string name: The name of the player to be registered.
-        :return:
-        :rtype: void
-        """
-        if not name or not isinstance(name, str):
-            raise ContractViolation("Expected a non-empty string. Received {}".format(name))
-        if len(self.player_names) > 2:
-            raise InvalidCommand("Can only register two players.")
-        self.player_names.append(name)
 
     def _update_board_with_placements(self, placements):
         """
