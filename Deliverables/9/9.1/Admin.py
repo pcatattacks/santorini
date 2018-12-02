@@ -85,6 +85,8 @@ class SingleEliminationAdmin(BaseAdmin):
 
         self.players[winner] = self.stage
 
+        self.s.close()  # cleanup
+
     def print_rankings(self):
         results = [(key, self.players[key]) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
@@ -136,15 +138,11 @@ class RoundRobinAdmin(BaseAdmin):
                     active_players[loser_idx] = sub_player
                     self.players[sub_player] = []
 
+        self.s.close()  # cleanup
+
     def print_rankings(self):
         results = [(key, len(self.players[key])) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
         for player, points in results:
             print("{name} : {points}".format(name=player.get_name(), points=points))
 
-    # yo so i woke up and fiddled a bit with the code, added support for empty lists for now although we might want to
-    # put the referee portion of that logic in update_board_with_play and update the function's return value accordingly
-    # probably have it return the winner as opposed to just a boolean
-    # the rankings now properly reflect concedes and doesn't think they are cheaters, i ran a tournament locally with 5
-    # remote players and let the rest fill in, and it ran to completion and the results looked good
-    # i'm still tired af and i gotta some more sleep so i cant work today sorry man

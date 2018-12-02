@@ -93,8 +93,11 @@ class PlayerDriver:
         # TODO: way to exit from while loop when player has dropped out of tournament
         while True:
             # self.s is the TCP socket connected to the referee
-            data = self.s.recv(1024).strip()
-            data = data.decode('utf-8')
+            data = self.s.recv(1024)
+            if not data:
+                print("Admin terminated connection.")
+                break
+            data = data.strip().decode('utf-8')
             # print("player driver received: ", data)  # debug
             # print("--------------------------------")  # debug
             json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
