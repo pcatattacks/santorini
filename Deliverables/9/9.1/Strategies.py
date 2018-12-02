@@ -101,10 +101,10 @@ class RandomStrategy(BaseStrategy):
         num_rows, num_cols = board.get_dimensions()
         placements = []
         while len(placements) != 2:
-            row, col = random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)
-            while board.has_worker(row, col):
-                row, col = random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)
-            placements.append((row, col))
+            placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            while board.has_worker(*placement) or placement in placements:
+                placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            placements.append(placement)
         assert len(placements) == 2  # shouldn't needed since we're checking that the board is valid at the start, but
         # may as well
         return placements
@@ -159,14 +159,27 @@ class NLooksAheadStrategy(BaseStrategy):
         worker respectively. See `worker` and `position` in Board.py documentation.
         :rtype: list
         """
+        # num_rows, num_cols = board.get_dimensions()
+        # corners = ([0, 0], [0, num_cols-1], [num_rows-1, num_cols-1], [num_rows-1, 0])
+        # placements = []
+        # for corner in corners:
+        #     if not board.has_worker(*corner):
+        #         placements.append(corner)
+        #     if len(placements) == 2:
+        #         break
+        # assert len(placements) == 2  # shouldn't needed since we're checking that the board is valid at the start, but
+        # # may as well
+        # return placements
+
+        # making this return random placements now, not corners - so we can play against local players.
+        # TODO - make the placements somewhat strategic?
         num_rows, num_cols = board.get_dimensions()
-        corners = ([0, 0], [0, num_cols-1], [num_rows-1, num_cols-1], [num_rows-1, 0])
         placements = []
-        for corner in corners:
-            if not board.has_worker(*corner):
-                placements.append(corner)
-            if len(placements) == 2:
-                break
+        while len(placements) != 2:
+            placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            while board.has_worker(*placement) or placement in placements:
+                placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            placements.append(placement)
         assert len(placements) == 2  # shouldn't needed since we're checking that the board is valid at the start, but
         # may as well
         return placements
@@ -357,10 +370,10 @@ class GreedyStrategy(BaseStrategy):
         num_rows, num_cols = board.get_dimensions()
         placements = []
         while len(placements) != 2:
-            row, col = random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)
-            while board.has_worker(row, col):
-                row, col = random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)
-            placements.append((row, col))
+            placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            while board.has_worker(*placement) or placement in placements:
+                placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
+            placements.append(placement)
         assert len(placements) == 2  # shouldn't needed since we're checking that the board is valid at the start, but
         # may as well
         return placements

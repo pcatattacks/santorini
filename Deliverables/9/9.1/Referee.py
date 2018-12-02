@@ -45,8 +45,8 @@ class Referee:
         """
         winner = None
         cheating = False
-
         try:
+
             for player in self.players:
                 name = player.register()
                 print(name)  # debug
@@ -64,32 +64,33 @@ class Referee:
                 play = player.play(self.board.extract_board())
                 print(play)  # debug
                 if not play:
+                    print("winning cause other player cant move")  # debug
                     winner = self.players[self.turn * -1 + 1]
                     for p in self.players:
-                        p.notify(self.player_names[self.turn * -1 + 1])
+                        p.notify(winner.get_name())
                 else:
                     won = self._update_board_with_play(play)
                     if won:
-                        winner = self.player_names[self.turn]
+                        print("winning via move")  # debug
+                        winner = self.players[self.turn]
                         for p in self.players:
-                            p.notify(self.player_names[self.turn])
+                            p.notify(winner.get_name())
 
                 self._swap_turn()
 
         # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
-        except (IllegalPlay, InvalidCommand, IllegalResponse):
-            print("executed")
+        except (IllegalPlay, InvalidCommand, IllegalResponse) as e:
+            print(e)  # debug
             winner = self.players[self.turn * -1 + 1]
             cheating = True
             for p in self.players:
-                p.notify(self.player_names[self.turn * -1 + 1])
-        except ContractViolation:
-            # TODO - unspecified behaviour
-            pass
+                p.notify(winner.get_name())
+        except ContractViolation as e:
+            # TODO - unspecified behaviour - reveals bugs in our code
+            print(e)
 
         print("---------------------")
         print(self.board)  # debug
-        assert winner is not None
         return winner, cheating
 
     def _register_player(self, name):

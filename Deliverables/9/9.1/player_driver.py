@@ -120,8 +120,10 @@ class PlayerDriver:
                         raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
             # TODO - refactor - making assumption about admin accepting these responses
             except InvalidCommand as e:
+                print(e)  # debug
                 self._send_response("InvalidCommand")
             except IllegalPlay as e:
+                print(e)  # debug
                 self._send_response("IllegalPlay")
             except ContractViolation as e:
                 print(e)  # debug
