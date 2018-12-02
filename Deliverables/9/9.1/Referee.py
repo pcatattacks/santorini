@@ -1,6 +1,7 @@
 from Board import Board
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay, IllegalResponse
+import random
 
 
 class Referee:
@@ -60,9 +61,22 @@ class Referee:
             while not winner:
                 player = self.players[self.turn]
                 play = player.play(self.board.extract_board())
+
+                # cheater checking testing: comment line above and uncomment if/else below to sometimes send bad boards
+                # if random.randrange(10) < 1:
+                #     print("sending incorrect board")
+                #     incorrect_board = Board()
+                #     incorrect_board.place_worker(0, 0, RuleChecker.COLORS[0] + "1")
+                #     incorrect_board.place_worker(0, 4, RuleChecker.COLORS[0] + "2")
+                #     incorrect_board.place_worker(4, 4, RuleChecker.COLORS[1] + "1")
+                #     incorrect_board.place_worker(4, 0, RuleChecker.COLORS[1] + "2")
+                #     play = player.play(incorrect_board.extract_board())
+                # else:
+                #     play = player.play(self.board.extract_board())
+
                 print(play)  # debug
                 if not play:
-                    print("winning cause other player cant move")  # debug
+                    print("losing because can't move or stop other player's win")  # debug
                     winner = self.players[self.turn * -1 + 1]
                     for p in self.players:
                         p.notify(winner.get_name())

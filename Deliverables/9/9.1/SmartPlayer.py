@@ -25,12 +25,7 @@ class SmartPlayer(Player):
         if not self._check_board(board):
             raise IllegalPlay("Player provided with a cheating board.")
         print("cheater checking...")  # debug
-        # TODO: use the code below or call the super().play function? the latter would have repetitive checks but not
-        # have the redundant code below
-        self.board.set_board(board)
-        play = self.strategy.get_play(self.board, self.color)
-        print("sending play", play)  # debug
-        return play
+        return super().play(board)
 
     def _check_board(self, curr_board):  # TODO - there's a bug here, need to test. commenting out usage for now
         """
