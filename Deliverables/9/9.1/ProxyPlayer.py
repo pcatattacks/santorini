@@ -20,7 +20,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
          - Cannot be called more than once.
 
         :return: the name of the player
-        :rtype: string
+        :rtype: str
         """
         # TODO: contract checks
         message = ["Register"]
@@ -43,7 +43,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
          are present any cell.
 
         :param list board: an instance of Board (refer to documentation of Board class).
-        :param string color: a color (as defined above)
+        :param str color: a color (as defined above)
         :return: `list` of [position1, position2] denoting the position of the player's 1st and 2nd worker respectively.
         See `position`, `worker` in documentation of Board.py.
         :rtype: list
@@ -80,9 +80,9 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
          - can only be called once per game
          - must be the last function to be called by an object that implements PlayerInterface.
 
-        :param string winner_name: Name of the winner of the Santorini game
+        :param str winner_name: Name of the winner of the Santorini game
         :return: An acknowledgement string of "OK"
-        :rtype: string
+        :rtype: str
         """
         message = ["Game Over", winner_name]
         response = self._send_message_and_recv_response(message)
@@ -96,7 +96,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         """
 
         :return:
-        :rtype: string
+        :rtype: str
         """
         if not self.name:
             raise ContractViolation("ProxyPlayer.register() must be called before get_name()!")

@@ -76,16 +76,16 @@ class Referee:
 
                 self._swap_turn()
 
-        # TODO - this needs to be bundled just into IllegalResponse while refactoring ProxyPlayer._examine_for_error
-        except (IllegalPlay, InvalidCommand, IllegalResponse) as e:
+        except (IllegalPlay, InvalidCommand, ContractViolation) as e:
             print(e)  # debug
             winner = self.players[self.turn * -1 + 1]
             cheating = True
             for p in self.players:
                 p.notify(winner.get_name())
-        except ContractViolation as e:
-            # TODO - unspecified behaviour - reveals bugs in our code
+        except IllegalResponse as e:  # Only happens when socket abruptly closes on Player side
             print(e)
+            print("We got caught cheating...")
+            raise e
 
         print("---------------------")
         print(self.board)  # debug
@@ -129,7 +129,8 @@ class Referee:
         worker, directions = play
         if (worker[:-1] != RuleChecker.COLORS[self.turn]
                 or not RuleChecker.is_legal_play(self.board, worker, directions)):
-            raise IllegalPlay("Illegal play made by {player}: {play}".format(player=self.players[self.turn], play=play))
+            raise IllegalPlay("Illegal play made by {player}: {play}".format(player=self.players[self.turn].get_name(),
+                                                                             play=play))
 
         if len(directions) == 1:
             return True

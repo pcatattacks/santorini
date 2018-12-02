@@ -121,13 +121,13 @@ class PlayerDriver:
                     else:
                         raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
             # TODO - refactor - making assumption about admin accepting these responses
-            except InvalidCommand as e:
+            except (InvalidCommand, IllegalPlay) as e:
                 print(e)  # debug
-                self._send_response("InvalidCommand")
-            except IllegalPlay as e:
-                print(e)  # debug
-                self._send_response("IllegalPlay")
-            except ContractViolation as e:
+                print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
+                # self._send_response("InvalidCommand")
+                self.s.close()
+                break
+            except ContractViolation as e:  # this helps us detect bugs in our implementation
                 print(e)  # debug
                 self._send_response("ContractViolation")
 

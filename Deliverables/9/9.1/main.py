@@ -14,8 +14,11 @@ def main(tournament, num_remote_players, host, port):
     else:
         raise ValueError()
 
-    admin.run_tournament()
-    admin.print_rankings()
+    try:  # wrapped in try-except to gracefully close the socket.
+        admin.run_tournament()
+        admin.print_rankings()
+    except Exception:
+        admin.s.close()
 
 
 if __name__ == "__main__":
