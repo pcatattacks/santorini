@@ -98,7 +98,7 @@ class Referee:
                 p.notify(winner.get_name())
         except IllegalResponse as e:  # Only happens when socket abruptly closes on Player side
             print(e)
-            print("We got caught cheating...")
+            print("We got caught cheating... Or a remote player abruptly closed their socket!")
             raise e
 
         print("---------------------")

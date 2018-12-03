@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Player import Player
+from SmartPlayer import SmartPlayer
 from ProxyPlayer import ProxyPlayer
 from Referee import Referee
 import socket
@@ -7,10 +7,12 @@ import socket
 
 class BaseAdmin(ABC):
 
-    def __init__(self, host, port, num_remote_players):
+    def __init__(self, host, port, num_remote_players, fallback_player=SmartPlayer):
         self.num_remote_players = num_remote_players
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind((host, port))
+        self.fallback_player = fallback_player
+        assert fallback_player is not SmartPlayer
 
     @abstractmethod
     def _populate_players(self):
@@ -32,8 +34,8 @@ class BaseAdmin(ABC):
 
 class SingleEliminationAdmin(BaseAdmin):
 
-    def __init__(self, host, port, num_remote_players):
-        super().__init__(host, port, num_remote_players)
+    def __init__(self, host, port, num_remote_players, fallback_player=SmartPlayer):
+        super().__init__(host, port, num_remote_players, fallback_player)
         self.players = {}
         self.stage = 1
         self._populate_players()
@@ -53,7 +55,8 @@ class SingleEliminationAdmin(BaseAdmin):
                 num = num >> 1
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
-                local_player = Player("Computer" + str(i))
+                # local_player = Player("Computer" + str(i))
+                local_player = self.fallback_player()
                 self.players[local_player] = None
 
     def run_tournament(self):
@@ -64,7 +67,7 @@ class SingleEliminationAdmin(BaseAdmin):
         # while there is no tournament winner
         while len(active_players) > 1:
             print("We're at stage {}!".format(self.stage))  # debug
-            # TODO: refactor to use threading
+            # TODO: refactor to be concurrent
             # assign opponents, instantiate referees, make play_game() calls, record results
             for i in range(len(active_players) // 2):
                 player1, player2 = active_players[i], active_players[len(active_players)-1-i]
@@ -77,8 +80,8 @@ class SingleEliminationAdmin(BaseAdmin):
                 active_players[loser_idx] = None
 
                 print(winner.get_name() + " won!", loser.get_name() + " lost!")  # debug
-                print("{} rank: {}".format(winner.get_name(), self.players[winner]))  # debug
-                print("{} rank: {}".format(loser.get_name(), self.players[loser]))  # debug
+                print("{} current rank: {}".format(winner.get_name(), self.players[winner]))  # debug
+                print("{} current rank: {}".format(loser.get_name(), self.players[loser]))  # debug
 
             active_players = [player for player in active_players if player is not None]
             self.stage += 1
@@ -96,8 +99,8 @@ class SingleEliminationAdmin(BaseAdmin):
 
 class RoundRobinAdmin(BaseAdmin):
 
-    def __init__(self, host, port, num_remote_players):
-        super().__init__(host, port, num_remote_players)
+    def __init__(self, host, port, num_remote_players, fallback_player=SmartPlayer):
+        super().__init__(host, port, num_remote_players, fallback_player)
         self.players = {}
         self._populate_players()
 
@@ -116,7 +119,8 @@ class RoundRobinAdmin(BaseAdmin):
                 num = num >> 1
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
-                local_player = Player("Computer" + str(i))
+                # local_player = Player("Computer" + str(i))
+                local_player = self.fallback_player()
                 self.players[local_player] = []
 
     def run_tournament(self):
@@ -134,7 +138,7 @@ class RoundRobinAdmin(BaseAdmin):
                     for past_opponent in self.players[loser]:
                         self.players[past_opponent].append(loser)
                     self.players[loser] = []
-                    sub_player = Player("Substitute_for_{}".format(loser.get_name()))
+                    sub_player = self.fallback_player()
                     active_players[loser_idx] = sub_player
                     self.players[sub_player] = []
 

@@ -8,7 +8,7 @@ import json
 
 class SmartPlayer(Player):
 
-    def __init__(self, name, strategy=RandomStrategy()):
+    def __init__(self, name=None, strategy=RandomStrategy()):
         super().__init__(name, strategy)
         self.placements = None
 

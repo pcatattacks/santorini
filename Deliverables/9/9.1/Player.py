@@ -29,7 +29,9 @@ class Player(PlayerInterface):
 
     """
 
-    def __init__(self, name, strategy=RandomStrategy()):
+    COUNT = 0  # number of instances of local players. For naming purposes only.
+
+    def __init__(self, name=None, strategy=RandomStrategy()):
         """
 
         :param str name: the name of the Santorini player.
@@ -46,15 +48,19 @@ class Player(PlayerInterface):
         # functionality that's exposed to users. May as well abstract that using a Player function. If we do option 2,
         # we'll also have to write an extra contract to make sure a board that's been passed in has had set_board()
         # called on it, which will be overly complicated.
-        if not isinstance(name, str):
+        if not name:
+            self.name = "LocalPlayer{}".format(Player.COUNT)
+        elif not isinstance(name, str):
             raise ContractViolation("Name must be a string!")
+        else:
+            self.name = name
         if not isinstance(strategy, BaseStrategy):
             raise ContractViolation("Strategy must implement BaseStrategy interface!")
-        self.name = name
         self.board = Board()
         self.strategy = strategy
         self.color = None
         self.registered = False  # shadow state
+        Player.COUNT += 1
 
     def register(self):
         """
@@ -114,8 +120,6 @@ class Player(PlayerInterface):
             raise ContractViolation("Function must be called after player.place()!")
         if not RuleChecker.is_legal_board(board):
             raise ContractViolation("Invalid board provided: {}".format(board))
-        # if not self._check_board(board):
-        #     raise IllegalPlay("Player provided with a cheating board.")
         self.board.set_board(board)
         play = self.strategy.get_play(self.board, self.color)
         print("sending play", play)  # debug
