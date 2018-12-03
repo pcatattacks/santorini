@@ -18,7 +18,8 @@ def main(tournament, num_remote_players, host, port, default_player):
     try:  # wrapped in try-except to gracefully close the socket if anything unexpected happens.
         admin.run_tournament()
         admin.print_rankings()
-    except Exception:
+    except Exception as e:
+        print(e)
         admin.s.close()
 
 

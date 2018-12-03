@@ -91,6 +91,7 @@ class SingleEliminationAdmin(BaseAdmin):
         self.s.close()  # cleanup
 
     def print_rankings(self):
+        print("\nFinal Standings:\n----------------------")
         results = [(key, self.players[key]) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
         for player, rank in results:
@@ -145,6 +146,7 @@ class RoundRobinAdmin(BaseAdmin):
         self.s.close()  # cleanup
 
     def print_rankings(self):
+        print("\nFinal Standings:\n----------------------")
         results = [(key, len(self.players[key])) for key in self.players]
         results.sort(key=lambda x: x[1], reverse=True)
         for player, points in results:

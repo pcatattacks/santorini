@@ -27,7 +27,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not isinstance(response, str):  # checking if is_valid_name. Potentially create well named micro-function?
-            raise IllegalResponse("ProxyPlayer didn't receive string for name. Received: {}".format(response))
+            raise InvalidCommand("ProxyPlayer didn't receive string for name. Received: {}".format(response))
         self.name = response
         return response
 
@@ -52,7 +52,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not RuleChecker.is_valid_placement(response):
-            raise IllegalResponse("ProxyPlayer didn't receive correctly formatted placement. Received {}"
+            raise InvalidCommand("ProxyPlayer didn't receive correctly formatted placement. Received {}"
                                   .format(response))
         return response
 
@@ -68,7 +68,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not RuleChecker.is_valid_play(response):
-            raise IllegalResponse("ProxyPlayer didn't receive correctly formatted play. Received {}"
+            raise InvalidCommand("ProxyPlayer didn't receive correctly formatted play. Received {}"
                                   .format(response))
         return response
 
@@ -88,7 +88,7 @@ class ProxyPlayer(PlayerInterface):  # TODO: change docstrings and implement int
         response = self._send_message_and_recv_response(message)
         self._examine_for_error(response)
         if not response == "OK":
-            raise IllegalResponse('ProxyPlayer didn\'t receive correctly formatted "OK". Received {}'
+            raise InvalidCommand('ProxyPlayer didn\'t receive correctly formatted "OK". Received {}'
                                   .format(response))
         return response
 

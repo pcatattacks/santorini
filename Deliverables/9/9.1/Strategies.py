@@ -439,12 +439,16 @@ class InteractiveStrategy(BaseStrategy):
     """
 
     def get_placements(self, board, color):
+        print("You were assigned color {}.".format(color))
         InteractiveStrategy._display_board_state(board)
 
         placements = []
         while len(placements) != 2:
-            placement = [int(x) for x in input("Please make a placement in the form of row, col: ").strip().split(",")]
-            placements.append(placement)
+            try:
+                placement = [int(x) for x in input("Please make a placement in the form of row, col: ").strip().split(",")]
+                placements.append(placement)
+            except ValueError:
+                print("row, col must be comma separated integers.")
 
         return placements
 

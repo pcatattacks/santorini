@@ -98,10 +98,16 @@ class Referee:
                 p.notify(winner.get_name())
         except IllegalResponse as e:  # Only happens when socket abruptly closes on Player side
             print(e)
-            print("We got caught cheating... Or a remote player abruptly closed their socket!")
-            raise e
+            winner = self.players[self.turn * -1 + 1]
+            loser = self.players[self.turn]
+            cheating = True
+            winner.notify(winner.get_name())
+            print("We got caught cheating... Or a remote player abruptly closed their socket!\n "
+                  "Screw player {}. I declare him dumb. The Overlord Founder always wins. "
+                  "Onwards!".format(loser.get_name()))
+            # raise e
 
-        print("---------------------")
+        print("\nFinal Board State:\n---------------------")
         print(self.board)  # debug
         return winner, cheating
 
