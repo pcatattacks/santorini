@@ -12,7 +12,6 @@ class BaseAdmin(ABC):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind((host, port))
         self.fallback_player = fallback_player
-        assert fallback_player is not SmartPlayer
 
     @abstractmethod
     def _populate_players(self):
@@ -49,13 +48,12 @@ class SingleEliminationAdmin(BaseAdmin):
 
         if self._players_not_power_of_2():
             # add default players if needed
-            num = self.num_remote_players
+            num = self.num_remote_players if self.num_remote_players != 0 else 1
             count = 0
             while num != 0:
                 num = num >> 1
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
-                # local_player = Player("Computer" + str(i))
                 local_player = self.fallback_player()
                 self.players[local_player] = None
 
@@ -114,7 +112,7 @@ class RoundRobinAdmin(BaseAdmin):
 
         if self._players_not_power_of_2():
             # add default players if needed
-            num = self.num_remote_players
+            num = self.num_remote_players if self.num_remote_players != 0 else 1
             count = 0
             while num != 0:
                 num = num >> 1

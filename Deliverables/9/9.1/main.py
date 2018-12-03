@@ -5,7 +5,7 @@ from Admin import RoundRobinAdmin, SingleEliminationAdmin
 
 
 def main(tournament, num_remote_players, host, port, default_player):
-    if num_remote_players < 1 or not isinstance(port, int):
+    if num_remote_players < 0 or not isinstance(port, int):
         raise ValueError()
 
     if tournament == "cup":
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         main(tournament_type[1:], int(n), ip, port, DefaultPlayer)
     except ValueError:
         print("usage: ./santorini.sh [option] ... [-cup n | -league n]")
-        print("n must be a positive integer.")
+        print("n must be integer >= 0.")
         sys.exit(1)
     except AttributeError:
         print("Module at path given in santorini.config does not have attribute named 'Player'!")
