@@ -74,7 +74,7 @@ class Player(PlayerInterface):
         :rtype: str
         """
         if self.registered:
-            raise ContractViolation("Cannot call Player.register() again until game ends!")
+            raise ContractViolation("Cannot call Player.register() more than once!")
         self.registered = True
         return self.name
 
@@ -140,7 +140,6 @@ class Player(PlayerInterface):
         # resetting interaction protocol contracts for future games
         self.board = Board()
         self.color = None
-        self.registered = False
         print("{} has won the game!".format(winner_name))  # debug
         print("------------------------------------------------")  # debug
         return "OK"

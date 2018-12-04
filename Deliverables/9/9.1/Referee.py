@@ -1,7 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay, IllegalResponse
-import random
 
 
 class Referee:
@@ -25,9 +24,14 @@ class Referee:
     """
     def __init__(self, player1, player2):
         """
+        Takes in two player objects that have called their register() functions.
+
         :param Player player1: An instance of the `Player` class. See documentation for Player.
         :param Player player2: An instance of the `Player` class. See documentation for Player.
         """
+        # logging
+        print(player1.get_name())
+        print(player2.get_name())
         self.players = [player1, player2]
         self.turn = 0
         self.board = Board()
@@ -46,11 +50,6 @@ class Referee:
         winner = None
         cheating = False
         try:
-
-            for player in self.players:
-                name = player.register()
-                print(name)  # debug
-                self._swap_turn()
 
             for player in self.players:
                 placements = player.place(self.board.extract_board(), RuleChecker.COLORS[self.turn])

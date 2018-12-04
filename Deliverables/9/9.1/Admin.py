@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from SmartPlayer import SmartPlayer
 from ProxyPlayer import ProxyPlayer
 from Referee import Referee
+from CustomExceptions import InvalidCommand
 import socket
 
 
@@ -44,6 +45,13 @@ class SingleEliminationAdmin(BaseAdmin):
         while len(self.players) < self.num_remote_players:
             conn, addr = self.s.accept()
             player = ProxyPlayer(conn)
+
+            try:
+                player.register()
+            except InvalidCommand:
+                conn.close()
+                player = self.fallback_player()
+                player.register()
             self.players[player] = None
 
         if self._players_not_power_of_2():
@@ -55,6 +63,7 @@ class SingleEliminationAdmin(BaseAdmin):
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
                 local_player = self.fallback_player()
+                local_player.register()
                 self.players[local_player] = None
 
     def run_tournament(self):
@@ -108,6 +117,13 @@ class RoundRobinAdmin(BaseAdmin):
         while len(self.players) < self.num_remote_players:
             conn, addr = self.s.accept()
             player = ProxyPlayer(conn)
+
+            try:
+                player.register()
+            except InvalidCommand:
+                conn.close()
+                player = self.fallback_player()
+                player.register()
             self.players[player] = []
 
         if self._players_not_power_of_2():
@@ -118,8 +134,8 @@ class RoundRobinAdmin(BaseAdmin):
                 num = num >> 1
                 count = count + 1
             for i in range((1 << count) - self.num_remote_players):
-                # local_player = Player("Computer" + str(i))
                 local_player = self.fallback_player()
+                local_player.register()
                 self.players[local_player] = []
 
     def run_tournament(self):
