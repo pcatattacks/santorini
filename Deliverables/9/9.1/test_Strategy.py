@@ -1,7 +1,7 @@
 import pytest
 from Board import Board
 from RuleChecker import RuleChecker
-from Strategy import Strategy
+import Strategies
 from CustomExceptions import ContractViolation
 
 # TODO: modify tests to reflect that the strategy component no longer does a check for a valid (initial) board
