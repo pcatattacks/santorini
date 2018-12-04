@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from SmartPlayer import SmartPlayer
 from ProxyPlayer import ProxyPlayer
 from Referee import Referee
-from CustomExceptions import InvalidCommand
+from CustomExceptions import InvalidCommand, IllegalResponse
 import socket
 
 
@@ -48,7 +48,7 @@ class SingleEliminationAdmin(BaseAdmin):
 
             try:
                 player.register()
-            except InvalidCommand:
+            except (InvalidCommand, IllegalResponse):
                 conn.close()
                 player = self.fallback_player()
                 player.register()
@@ -120,7 +120,7 @@ class RoundRobinAdmin(BaseAdmin):
 
             try:
                 player.register()
-            except InvalidCommand:
+            except (InvalidCommand, IllegalResponse):
                 conn.close()
                 player = self.fallback_player()
                 player.register()
