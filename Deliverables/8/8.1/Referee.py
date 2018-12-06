@@ -1,6 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
-from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay
+from CustomExceptions import ContractViolation, InvalidCommand, IllegalPlay, IllegalResponse
 
 
 class Referee:
@@ -24,11 +24,15 @@ class Referee:
     """
     def __init__(self, player1, player2):
         """
+        Takes in two player objects that have called their register() functions.
+
         :param Player player1: An instance of the `Player` class. See documentation for Player.
         :param Player player2: An instance of the `Player` class. See documentation for Player.
         """
+        # logging
+        print(player1.get_name())
+        print(player2.get_name())
         self.players = [player1, player2]
-        self.player_names = []
         self.turn = 0
         self.board = Board()
 
@@ -40,59 +44,71 @@ class Referee:
         CONTRACT:
          - Cannot be called more than once.
 
-        :return: the name of the winning player.
-        :rtype: string
+        :return: the winning player.
+        :rtype: Player
         """
-        for player in self.players:
-            name = player.register()
-            self._register_player(name)
-            self._swap_turn()
-
-        for player in self.players:
-            placements = player.place(self.board, RuleChecker.COLORS[self.turn])
-            self._update_board_with_placements(placements)
-            self._swap_turn()
-
         winner = None
-        while not winner:
-            player = self.players[self.turn]
-            try:
-                play = player.play(self.board)
-                won = self._update_board_with_play(play)
-                if won:
-                    winner = self.player_names[self.turn]
+        cheating = False
+        try:
+
+            for player in self.players:
+                placements = player.place(self.board.extract_board(), RuleChecker.COLORS[self.turn])
+                print(placements)  # debug
+                self._update_board_with_placements(placements)
+                self._swap_turn()
+
+            while not winner:
+                player = self.players[self.turn]
+                play = player.play(self.board.extract_board())
+
+                # cheater checking testing: comment line above and uncomment if/else below to sometimes send bad boards
+                # if random.randrange(10) < 1:
+                #     print("sending incorrect board")
+                #     incorrect_board = Board()
+                #     incorrect_board.place_worker(0, 0, RuleChecker.COLORS[0] + "1")
+                #     incorrect_board.place_worker(0, 4, RuleChecker.COLORS[0] + "2")
+                #     incorrect_board.place_worker(4, 4, RuleChecker.COLORS[1] + "1")
+                #     incorrect_board.place_worker(4, 0, RuleChecker.COLORS[1] + "2")
+                #     play = player.play(incorrect_board.extract_board())
+                # else:
+                #     play = player.play(self.board.extract_board())
+
+                print(play)  # debug
+                if not play:
+                    print("losing because can't move or stop other player's win")  # debug
+                    winner = self.players[self.turn * -1 + 1]
                     for p in self.players:
-                        p.notify(self.player_names[self.turn])
-            except IllegalPlay:
-                for p in self.players:
-                    p.notify(self.player_names[self.turn * -1 + 1])
-            except InvalidCommand:
-                # TODO - unspecified behaviour
-                pass
-            except ContractViolation:
-                # TODO - unspecified behaviour
-                pass
+                        p.notify(winner.get_name())
+                else:
+                    won = self._update_board_with_play(play)
+                    if won:
+                        print("winning via move")  # debug
+                        winner = self.players[self.turn]
+                        for p in self.players:
+                            p.notify(winner.get_name())
 
-            self._swap_turn()
+                self._swap_turn()
 
-        return winner
+        except (IllegalPlay, InvalidCommand, ContractViolation) as e:
+            print(e)  # debug
+            winner = self.players[self.turn * -1 + 1]
+            cheating = True
+            for p in self.players:
+                p.notify(winner.get_name())
+        except IllegalResponse as e:  # Only happens when socket abruptly closes on Player side
+            print(e)
+            winner = self.players[self.turn * -1 + 1]
+            loser = self.players[self.turn]
+            cheating = True
+            winner.notify(winner.get_name())
+            print("We got caught cheating... Or a remote player abruptly closed their socket!\n "
+                  "Screw player {}. I declare him dumb. The Overlord Founder always wins. "
+                  "Onwards!".format(loser.get_name()))
+            # raise e
 
-    def _register_player(self, name):
-        """
-        Registers a player's name and assigns them a color.
-
-        CONTRACT:
-         - Can only be called once per distinct player per game (two players).
-
-        :param string name: The name of the player to be registered.
-        :return:
-        :rtype: void
-        """
-        if not name or not isinstance(name, str):
-            raise ContractViolation("Expected a non-empty string. Received {}".format(name))
-        if len(self.player_names) > 2:
-            raise InvalidCommand("Can only register two players.")
-        self.player_names.append(name)
+        print("\nFinal Board State:\n---------------------")
+        print(self.board)  # debug
+        return winner, cheating
 
     def _update_board_with_placements(self, placements):
         """
@@ -132,7 +148,8 @@ class Referee:
         worker, directions = play
         if (worker[:-1] != RuleChecker.COLORS[self.turn]
                 or not RuleChecker.is_legal_play(self.board, worker, directions)):
-            raise IllegalPlay("Illegal play made by {player}: {play}".format(player=self.players[self.turn], play=play))
+            raise IllegalPlay("Illegal play made by {player}: {play}".format(player=self.players[self.turn].get_name(),
+                                                                             play=play))
 
         if len(directions) == 1:
             return True
@@ -145,3 +162,4 @@ class Referee:
 
     def _swap_turn(self):
         self.turn = 1 if self.turn == 0 else 0
+

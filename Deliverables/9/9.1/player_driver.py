@@ -151,6 +151,8 @@ def main(strategy_type, admin_host, admin_port):
         except FileNotFoundError:
             print("strategy.config for look-ahead strategy file not found in directory!")
             sys.exit(1)
+    elif strategy_type == "smart":
+        strategy = Strategies.SmartStrategy()
     elif strategy_type == "greedy":
         strategy = Strategies.GreedyStrategy()
     elif strategy_type == "interactive":

@@ -1,11 +1,12 @@
 import json
-import socketserver
-from threading import Thread, enumerate
+import sys
+import Strategies
 from Player import Player
+from SmartPlayer import SmartPlayer
 from RuleChecker import RuleChecker
 from CustomExceptions import InvalidCommand, ContractViolation, IllegalPlay
 from JsonParser import parse_json
-import time
+import socket
 
 
 def is_valid_register_command(command):
@@ -53,7 +54,8 @@ def is_valid_play_command(command):
     :rtype: bool
     """
     return (isinstance(command, list)
-            and len(command) == 2 and command[0] == "Play" and RuleChecker.is_valid_board(command[1]))
+            and ((not command) or
+                 (len(command) == 2 and command[0] == "Play" and RuleChecker.is_valid_board(command[1]))))
     # TODO: might have to do is_legal_board check here too, since InvalidCommand and IllegalPlay may both result in
     # "Santorini is Broken". Discuss
 
@@ -72,91 +74,108 @@ def is_valid_game_over_command(command):
     return isinstance(command, list) and len(command) == 2 and command[0] == "Game Over" and isinstance(command[1], str)
 
 
-class PlayerDriverRequestHandler(socketserver.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
+class PlayerDriver:
     """
 
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        data = self.request.recv(4096).strip()
-        data = data.decode('utf-8')
-        # print("player driver received: ", data)  # debug
-        # print("--------------------------------")  # debug
-        json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
-        try:
-            for json_val in json_values:
-                command = json_val["value"]
-                if is_valid_register_command(command):
-                    name = player.register()  # should raise error since player is already registered
-                    self._send_response(name)
-                elif is_valid_place_command(command):
-                    color, board_list = command[1:]
-                    placements = player.place(board_list, color)
-                    self._send_response(placements)
-                elif is_valid_play_command(command):
-                    board_list = command[1]
-                    plays = player.play(board_list)
-                    self._send_response(plays)
-                elif is_valid_game_over_command(command):
-                    name = command[1]
-                    acknowledgement = player.notify(name)
-                    self._send_response(acknowledgement)
-                    self._cleanup()
+    """
+    def __init__(self, player, host, port):
+        """
 
-                else:
-                    raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
+        :param Player player:
+        :param str host:
+        :param int port:
+        """
+        # TODO - add contracts
+        self.player = player
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect((host, port))
 
-        except InvalidCommand as e:
-            self._send_response("InvalidCommand")
-        except IllegalPlay as e:
-            self._send_response("IllegalPlay")
-        except ContractViolation as e:
-            self._send_response("ContractViolation")
+    def start_driver(self):
+        while True:
+            # self.s is the TCP socket connected to the referee
+            data = self.s.recv(1024)
+            if not data:
+                print("Admin terminated connection.")
+                break
+            data = data.strip().decode('utf-8')
+            # print("player driver received: ", data)  # debug
+            # print("--------------------------------")  # debug
+            json_values = parse_json(data)  # TODO: should only be one element array - what behaviour when not?
+            try:
+                for json_val in json_values:
+                    command = json_val["value"]
+                    if is_valid_register_command(command):
+                        name = self.player.register()  # should raise error since player is already registered
+                        self._send_response(name)
+                    elif is_valid_place_command(command):
+                        color, board_list = command[1:]
+                        placements = self.player.place(board_list, color)
+                        self._send_response(placements)
+                    elif is_valid_play_command(command):
+                        board_list = command[1]
+                        plays = self.player.play(board_list)
+                        self._send_response(plays)
+                    elif is_valid_game_over_command(command):
+                        name = command[1]
+                        acknowledgement = self.player.notify(name)
+                        self._send_response(acknowledgement)
+                    else:
+                        raise InvalidCommand("Invalid command passed to Player! Given:".format(command))
+            # TODO - refactor - making assumption about admin accepting these responses
+            except (InvalidCommand, IllegalPlay) as e:
+                print(e)  # debug
+                print(json.dumps("Santorini is broken! Too many tourists in such a small place..."))
+                # self._send_response("InvalidCommand")
+                self.s.close()
+                break
+            except ContractViolation as e:  # this helps us detect bugs in our implementation
+                print(e)  # debug
+                self._send_response("ContractViolation")
 
     def _send_response(self, message):
         data = bytes(json.dumps(message) + "\n", "utf-8")
-        self.request.sendall(data)
-
-    def _cleanup(self):
-        # stopping the loop. must be called from different thread or will deadlock.
-        thread = Thread(target=release_resources, args=(self.server, ))
-        thread.start()
+        self.s.sendall(data)
 
 
-def release_resources(server):
-    """
-    :param socketserver.BaseServer server:
-    :return:
-    """
-    server.shutdown()
-    server.server_close()
+def main(strategy_type, admin_host, admin_port):
+    if not isinstance(admin_port, int):
+        raise ValueError()
 
+    if strategy_type == "random":
+        strategy = Strategies.RandomStrategy()
+    elif strategy_type == "look-ahead":
+        try:
+            with open("strategy.config", "r") as f:
+                num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
+            strategy = Strategies.NLooksAheadStrategy(num_looks_ahead)
+        except FileNotFoundError:
+            print("strategy.config for look-ahead strategy file not found in directory!")
+            sys.exit(1)
+    elif strategy_type == "smart":
+        strategy = Strategies.SmartStrategy()
+    elif strategy_type == "greedy":
+        strategy = Strategies.GreedyStrategy()
+    elif strategy_type == "interactive":
+        strategy = Strategies.InteractiveStrategy()
+    else:
+        raise ValueError("Unsupported strategy type!")
 
-with open("strategy.config", "r") as f:
-    num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
-    player = Player("P1", num_looks_ahead=num_looks_ahead)
+    player = SmartPlayer(input("Type your player's name: "), strategy)
 
-HOST, PORT = "localhost", 9999
-
-
-def main():
-
-    # Create the server, binding to HOST on port PORT
-    server = socketserver.TCPServer((HOST, PORT), PlayerDriverRequestHandler)
-
-    # print("Player Driver Server is starting...")
-    try:
-        server.serve_forever()
-        # TODO: Implement a timeout for the real game
-    except Exception:
-        thread = Thread(target=release_resources, args=(server,))
-        thread.start()
+    player_driver = PlayerDriver(player, admin_host, admin_port)
+    player_driver.start_driver()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        strategy_option = sys.argv[1]
+
+        with open("santorini.config") as f:
+            data = parse_json(f.read())[0]["value"]
+            ip, port = data["IP"], data["port"]
+
+        main(strategy_option, ip, port)
+    except ValueError:
+        print("usage: ./player_driver.sh [strategy] ... [random | look-ahead | interactive | greedy]")
+        sys.exit(1)
+
