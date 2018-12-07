@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
         main(int(n), ip, port, SmartPlayer)
     except ValueError:
-        print("usage: ./santorini.sh [option] ... [-cup n | -league n]")
+        print("usage: ./santorini.sh [option] ... [n]")
         print("n must be integer >= 0.")
         sys.exit(1)
     except AttributeError:
