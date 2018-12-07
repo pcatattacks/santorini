@@ -218,6 +218,11 @@ class Board:
         self.worker_positions[worker] = (adj_cell_row, adj_cell_col, adj_cell_height)
         return self.board
 
+    def worker_exists(self, worker):
+        if worker in self.worker_positions:
+            return True
+        return False
+
     def get_worker_position(self, worker):
         """
         Returns the position of the given worker and the height at that position as one tuple of

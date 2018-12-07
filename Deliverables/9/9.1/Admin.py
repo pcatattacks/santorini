@@ -4,6 +4,7 @@ from ProxyPlayer import ProxyPlayer
 from Referee import Referee
 from CustomExceptions import InvalidCommand, IllegalResponse
 import socket
+import random
 
 
 class BaseAdmin(ABC):
@@ -78,7 +79,10 @@ class SingleEliminationAdmin(BaseAdmin):
             # assign opponents, instantiate referees, make play_game() calls, record results
             for i in range(len(active_players) // 2):
                 player1, player2 = active_players[i], active_players[len(active_players)-1-i]
-                referee = Referee(player1, player2)
+                if random.random() < 0.5:
+                    referee = Referee(player1, player2)
+                else:
+                    referee = Referee(player2, player1)
                 winner, loser_cheated = referee.play_game()
                 loser = player2 if winner is player1 else player1
                 loser_idx = len(active_players)-1-i if winner is player1 else i
@@ -143,7 +147,7 @@ class RoundRobinAdmin(BaseAdmin):
         for i in range(len(active_players)):
             for j in range(i+1, len(active_players)):
                 player1, player2 = active_players[i], active_players[j]
-                referee = Referee(player1, player2)
+                referee = Referee(player2, player1)
                 winner, loser_cheated = referee.play_game()
                 loser = player2 if winner is player1 else player1
                 loser_idx = j if winner is player1 else i

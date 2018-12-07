@@ -1,41 +1,32 @@
 import sys
-from importlib.machinery import SourceFileLoader
 from JsonParser import parse_json
-from Admin import RoundRobinAdmin, SingleEliminationAdmin
+from Admin import SingleEliminationAdmin
+from SmartPlayer import SmartPlayer
 
 
-def main(tournament, num_remote_players, host, port, default_player):
-    if num_remote_players < 0 or not isinstance(port, int):
+def main(num_games, host, port, default_player):
+    if num_games < 0 or not isinstance(port, int):
         raise ValueError()
 
-    if tournament == "cup":
-        admin = SingleEliminationAdmin(host, port, num_remote_players, fallback_player=default_player)
-    elif tournament == "league":
-        admin = RoundRobinAdmin(host, port, num_remote_players, fallback_player=default_player)
-    else:
-        raise ValueError()
-
-    try:  # wrapped in try-except to gracefully close the socket if anything unexpected happens.
-        admin.run_tournament()
-        admin.print_rankings()
-    except Exception as e:
-        print(e)
-        admin.s.close()
+    for game in range(num_games):
+        admin = SingleEliminationAdmin(host, port, 1, fallback_player=default_player)
+        try:
+            admin.run_tournament()
+            admin.print_rankings()
+        except Exception as e:
+            print(e)
+            admin.s.close()
 
 
 if __name__ == "__main__":
     try:
-        tournament_type, n = sys.argv[1:]
+        n = sys.argv[1]
 
         with open("santorini.config") as f:
             data = parse_json(f.read())[0]["value"]
             ip, port = data["IP"], data["port"]
-            default_player_path = data["default-player"]
 
-        DefaultPlayerModule = SourceFileLoader("DefaultPlayerModule", default_player_path).load_module()
-        DefaultPlayer = DefaultPlayerModule.Player
-
-        main(tournament_type[1:], int(n), ip, port, DefaultPlayer)
+        main(int(n), ip, port, SmartPlayer)
     except ValueError:
         print("usage: ./santorini.sh [option] ... [-cup n | -league n]")
         print("n must be integer >= 0.")
@@ -43,4 +34,3 @@ if __name__ == "__main__":
     except AttributeError:
         print("Module at path given in santorini.config does not have attribute named 'Player'!")
         sys.exit(1)
-

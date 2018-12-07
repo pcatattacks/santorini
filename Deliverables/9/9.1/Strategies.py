@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import random
 from RuleChecker import RuleChecker
 from CustomExceptions import ContractViolation
+import math
 
 
 class BaseStrategy(ABC):
@@ -356,15 +357,40 @@ class SmartStrategy(BaseStrategy):
         self.num_looks_ahead = num_looks_ahead
 
     def get_placements(self, board, color):
-        # TODO: using random placements, figure out a heuristic for good placements
-        num_rows, num_cols = board.get_dimensions()
+        opp_color = RuleChecker.COLORS[0] if color == RuleChecker.COLORS[1] else RuleChecker.COLORS[1]
+        opp_workers = [opp_color + "1", opp_color + "2"]
+
+        if not board.worker_exists(opp_workers[0]):
+            rows, cols = board.get_dimensions()
+            half_row = rows / 2
+
+            return [[math.floor(half_row), 0], [math.floor(half_row) + 1, 0]]
+        else:
+            return self._get_placements_helper(board, opp_workers)
+
+    def _get_placements_helper(self, board, opp_workers):
+        distances = {}
+
+        rows, cols = board.get_dimensions()
+        for row in range(rows):
+            for col in range(cols):
+                distances[str(row) + str(col)] = SmartStrategy._get_worker_distance(board, row, col, opp_workers[0]) + \
+                                                 SmartStrategy._get_worker_distance(board, row, col, opp_workers[1])
+
+        distances_list = [(coor, distances[coor]) for coor in distances]
+        distances_list.sort(key=lambda x: x[1], reverse=True)
+
         placements = []
-        while len(placements) != 2:
-            placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
-            while board.has_worker(*placement) or placement in placements:
-                placement = [random.randint(0, num_rows - 1), random.randint(0, num_cols - 1)]
-            placements.append(placement)
-        assert len(placements) == 2
+
+        for i in range(2):
+            coor_str = distances_list[i][0]
+            coor_len = len(coor_str)
+
+            placement_row = int(coor_str[0:coor_len//2])
+            placement_col = int(coor_str[coor_len//2:coor_len])
+
+            placements.append([placement_row, placement_col])
+
         return placements
 
     def get_play(self, board, color):
@@ -462,8 +488,16 @@ class SmartStrategy(BaseStrategy):
             for direction in RuleChecker.DIRECTIONS:
                 adj_height = board.get_height(worker, direction)
                 if adj_height and adj_height < 4:
-                    score += (adj_height * 2) - abs(adj_height - height)
+                    score += adj_height * 2 + adj_height - height
+                if board.is_occupied(worker, direction):
+                    score -= 1
         return score
+
+    @staticmethod
+    def _get_worker_distance(board, row, col, worker):
+        worker_row, worker_col, worker_height = board.get_worker_position(worker)
+        distance = math.sqrt(pow(row - worker_row, 2) + pow(col - worker_col, 2))
+        return distance
 
 
 class GreedyStrategy(BaseStrategy):
