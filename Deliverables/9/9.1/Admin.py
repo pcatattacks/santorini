@@ -67,7 +67,7 @@ class SingleEliminationAdmin(BaseAdmin):
                 local_player.register()
                 self.players[local_player] = None
 
-    def run_tournament(self):
+    def run_tournament(self, n=1):
         # initialize active players for first round (all players)
         active_players = list(self.players.keys())
         # print(self.players) # debug
@@ -99,7 +99,11 @@ class SingleEliminationAdmin(BaseAdmin):
 
         self.players[winner] = self.stage
 
-        self.s.close()  # cleanup
+        if n > 1:
+            self.stage = 1
+            self.run_tournament()
+        else:
+            self.s.close()  # cleanup
 
     def print_rankings(self):
         print("\nFinal Standings:\n----------------------")
@@ -142,7 +146,7 @@ class RoundRobinAdmin(BaseAdmin):
                 local_player.register()
                 self.players[local_player] = []
 
-    def run_tournament(self):
+    def run_tournament(self, n=1):
         active_players = list(self.players.keys())
         for i in range(len(active_players)):
             for j in range(i+1, len(active_players)):
@@ -161,7 +165,11 @@ class RoundRobinAdmin(BaseAdmin):
                     active_players[loser_idx] = sub_player
                     self.players[sub_player] = []
 
-        self.s.close()  # cleanup
+        if n > 1:
+            self.stage = 1
+            self.run_tournament()
+        else:
+            self.s.close()  # cleanup
 
     def print_rankings(self):
         print("\nFinal Standings:\n----------------------")
