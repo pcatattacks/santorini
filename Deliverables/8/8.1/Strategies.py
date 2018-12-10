@@ -484,7 +484,7 @@ class SmartStrategy(BaseStrategy):
         workers = [color + "1", color + "2"]
         for worker in workers:
             row, col, height = board.get_worker_position(worker)
-            score += height * 6
+            score += height * 10
             for direction in RuleChecker.DIRECTIONS:
                 adj_height = board.get_height(worker, direction)
                 if adj_height and adj_height < 4:
