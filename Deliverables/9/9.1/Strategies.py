@@ -382,14 +382,27 @@ class SmartStrategy(BaseStrategy):
 
         placements = []
 
-        for i in range(2):
-            coor_str = distances_list[i][0]
-            coor_len = len(coor_str)
+        # for i in range(2):
+        #     coor_str = distances_list[i][0]
+        #     coor_len = len(coor_str)
+        #
+        #     placement_row = int(coor_str[0:coor_len//2])
+        #     placement_col = int(coor_str[coor_len//2:coor_len])
+        #
+        #     placements.append([placement_row, placement_col])
 
-            placement_row = int(coor_str[0:coor_len//2])
-            placement_col = int(coor_str[coor_len//2:coor_len])
+        far_coor_str = distances_list[0][0]
+        far_coor_len = len(far_coor_str)
+        clo_coor_str = distances_list[len(distances_list) - 3][0]
+        clo_coor_len = len(clo_coor_str)
 
-            placements.append([placement_row, placement_col])
+        far_placement_row = int(far_coor_str[0:far_coor_len // 2])
+        far_placement_col = int(far_coor_str[far_coor_len // 2:far_coor_len])
+        clo_placement_row = int(clo_coor_str[0:clo_coor_len // 2])
+        clo_placement_col = int(clo_coor_str[clo_coor_len // 2:clo_coor_len])
+
+        placements.append([far_placement_row, far_placement_col])
+        placements.append([clo_placement_row, clo_placement_col])
 
         return placements
 
@@ -424,8 +437,8 @@ class SmartStrategy(BaseStrategy):
 
             self._score_look_ahead(board, play_str, play_scores, play_win_pcts, play_loss_pcts, color, False, 1, self.num_looks_ahead)
 
-            win_score = play_win_pcts[play_str] * 27
-            loss_score = play_loss_pcts[play_str] * -27
+            win_score = play_win_pcts[play_str] * 161
+            loss_score = play_loss_pcts[play_str] * -161
             play_scores[play_str] += win_score + loss_score
 
             board.undo_build(worker, build_dir)
@@ -484,7 +497,7 @@ class SmartStrategy(BaseStrategy):
         workers = [color + "1", color + "2"]
         for worker in workers:
             row, col, height = board.get_worker_position(worker)
-            score += height * 10
+            score += height * 16
             for direction in RuleChecker.DIRECTIONS:
                 adj_height = board.get_height(worker, direction)
                 if adj_height and adj_height < 4:
@@ -496,7 +509,11 @@ class SmartStrategy(BaseStrategy):
     @staticmethod
     def _get_worker_distance(board, row, col, worker):
         worker_row, worker_col, worker_height = board.get_worker_position(worker)
-        distance = math.sqrt(pow(row - worker_row, 2) + pow(col - worker_col, 2))
+        if worker_row == row and worker_col == col:
+            rows, cols = board.get_dimensions()
+            distance = -1 * (rows + cols)
+        else:
+            distance = math.sqrt(pow(row - worker_row, 2) + pow(col - worker_col, 2))
         return distance
 
 
@@ -574,7 +591,7 @@ class GreedyStrategy(BaseStrategy):
         workers = [color + "1", color + "2"]
         for worker in workers:
             row, col, height = board.get_worker_position(worker)
-            score += height * 3
+            score += height * 5
             for direction in RuleChecker.DIRECTIONS:
                 adj_height = board.get_height(worker, direction)
                 if adj_height:
