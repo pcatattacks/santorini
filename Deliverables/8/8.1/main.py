@@ -1,7 +1,7 @@
 import sys
+from importlib.machinery import SourceFileLoader
 from JsonParser import parse_json
 from Admin import RoundRobinAdmin
-from SmartPlayer import SmartPlayer
 
 
 def main(num_games, host, port, default_player):
@@ -24,8 +24,12 @@ if __name__ == "__main__":
         with open("santorini.config") as f:
             data = parse_json(f.read())[0]["value"]
             ip, port = data["IP"], data["port"]
+            default_player_path = data["default-player"]
 
-        main(int(n), ip, port, SmartPlayer)
+        DefaultPlayerModule = SourceFileLoader("DefaultPlayerModule", default_player_path).load_module()
+        DefaultPlayer = DefaultPlayerModule.Player
+
+        main(int(n), ip, port, DefaultPlayer)
     except ValueError:
         print("usage: ./santorini.sh [option] ... [n]")
         print("n must be integer >= 1.")
