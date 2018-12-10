@@ -437,8 +437,8 @@ class SmartStrategy(BaseStrategy):
 
             self._score_look_ahead(board, play_str, play_scores, play_win_pcts, play_loss_pcts, color, False, 1, self.num_looks_ahead)
 
-            win_score = play_win_pcts[play_str] * 160
-            loss_score = play_loss_pcts[play_str] * -160
+            win_score = play_win_pcts[play_str] * 161
+            loss_score = play_loss_pcts[play_str] * -161
             play_scores[play_str] += win_score + loss_score
 
             board.undo_build(worker, build_dir)
