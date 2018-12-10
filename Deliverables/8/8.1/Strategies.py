@@ -351,7 +351,7 @@ class NLooksAheadStrategy(BaseStrategy):
 
 
 class SmartStrategy(BaseStrategy):
-    def __init__(self, num_looks_ahead=2):
+    def __init__(self, num_looks_ahead=1):
         if not isinstance(num_looks_ahead, int) or num_looks_ahead < 1:
             raise ContractViolation("num_looks_ahead must be a positive integer! Given: {}".format(num_looks_ahead))
         self.num_looks_ahead = num_looks_ahead

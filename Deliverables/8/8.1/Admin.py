@@ -101,7 +101,7 @@ class SingleEliminationAdmin(BaseAdmin):
 
         if n > 1:
             self.stage = 1
-            self.run_tournament()
+            self.run_tournament(n-1)
         else:
             self.s.close()  # cleanup
 
@@ -151,7 +151,10 @@ class RoundRobinAdmin(BaseAdmin):
         for i in range(len(active_players)):
             for j in range(i+1, len(active_players)):
                 player1, player2 = active_players[i], active_players[j]
-                referee = Referee(player2, player1)
+                if random.random() < 0.5:
+                    referee = Referee(player1, player2)
+                else:
+                    referee = Referee(player2, player1)
                 winner, loser_cheated = referee.play_game()
                 loser = player2 if winner is player1 else player1
                 loser_idx = j if winner is player1 else i
@@ -167,7 +170,7 @@ class RoundRobinAdmin(BaseAdmin):
 
         if n > 1:
             self.stage = 1
-            self.run_tournament()
+            self.run_tournament(n-1)
         else:
             self.s.close()  # cleanup
 
