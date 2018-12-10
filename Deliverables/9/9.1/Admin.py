@@ -162,6 +162,7 @@ class RoundRobinAdmin(BaseAdmin):
                         self.players[past_opponent].append(loser)
                     self.players[loser] = []
                     sub_player = self.fallback_player()
+                    sub_player.register()
                     active_players[loser_idx] = sub_player
                     self.players[sub_player] = []
 

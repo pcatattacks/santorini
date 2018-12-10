@@ -49,7 +49,7 @@ def legal_board():
     (legal_initial_board_with_workers("blue"), "white", [[0, 4], [4, 0]]),
 ])
 def test_get_placements(board, color, expected):
-    assert expected == Strategy.get_placements(board, color)
+    assert expected == Strategies.NLooksAheadStrategy.get_placements(board, color)
 
 
 def test_get_play():
@@ -68,5 +68,5 @@ def test_loses_in_n_moves():
 def test_get_legal_plays(legal_board, color):
     # Not a complete test, only tests for legality of plays output. Getting all possible move/build combos would be a
     # pain by hand, so this will do for now
-    for play in Strategy.get_legal_plays(legal_board, color):
+    for play in Strategies.BaseStrategy.get_legal_plays(legal_board, color):
         assert RuleChecker.is_legal_play(legal_board, *play)

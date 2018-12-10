@@ -72,6 +72,22 @@ def parse_json(input_string):
     return results
 
 
+def parse_json(input_string):
+    result = []
+    json_val = ""
+    count = 0
+    for line in input_string:
+        json_val += line
+        try:
+            result.append({"index": count, "value": json.loads(json_val)})
+            count += 1
+        except ValueError:
+            pass
+    if not result:
+        raise ValueError("Invalid json passed! Passed {}.".format(input_string))
+    return result
+
+
 def main():
     results = parse_json(take_input())
     for val in reversed(results):
