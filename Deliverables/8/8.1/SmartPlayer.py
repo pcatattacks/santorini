@@ -1,6 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
-from Strategies import RandomStrategy
+from Strategies import GreedyStrategy
 from CustomExceptions import ContractViolation, IllegalPlay
 from Player import Player
 import json
@@ -8,7 +8,7 @@ import json
 
 class SmartPlayer(Player):
 
-    def __init__(self, name=None, strategy=RandomStrategy()):
+    def __init__(self, name=None, strategy=GreedyStrategy()):
         super().__init__(name, strategy)
         self.placements = None
 

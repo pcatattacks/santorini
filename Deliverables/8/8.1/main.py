@@ -1,6 +1,6 @@
 import sys
 from JsonParser import parse_json
-from Admin import SingleEliminationAdmin
+from Admin import RoundRobinAdmin
 from SmartPlayer import SmartPlayer
 
 
@@ -8,9 +8,10 @@ def main(num_games, host, port, default_player):
     if num_games < 1 or not isinstance(port, int):
         raise ValueError()
 
-    admin = SingleEliminationAdmin(host, port, 1, fallback_player=default_player)
+    admin = RoundRobinAdmin(host, port, 1, fallback_player=default_player)
     try:
         admin.run_tournament(num_games)
+        admin.print_rankings()
     except Exception as e:
         print(e)
         admin.s.close()

@@ -169,7 +169,6 @@ class RoundRobinAdmin(BaseAdmin):
                     self.players[sub_player] = []
 
         if n > 1:
-            self.stage = 1
             self.run_tournament(n-1)
         else:
             self.s.close()  # cleanup
