@@ -163,10 +163,10 @@ def test_notify():
 
 
 @pytest.mark.parametrize("prev_board, curr_board, color, expected", [
-    (initial_board(), initial_board(4), RuleChecker.COLORS[0], True),
+    (initial_board(), initial_board(4), RuleChecker.COLORS[0], False),
     (initial_board(), test_board_0(), RuleChecker.COLORS[0], False),
     (initial_board(), test_board_1(), RuleChecker.COLORS[1], False),
-    (initial_board(2), test_board_2(), RuleChecker.COLORS[1], True),
+    (initial_board(2), test_board_2(), RuleChecker.COLORS[1], False),
     (initial_board(2), test_board_3(), RuleChecker.COLORS[1], False),
     (initial_board(4), test_board_4(), RuleChecker.COLORS[0], True),
     (test_board_3(), test_board_5(), RuleChecker.COLORS[0], False)
