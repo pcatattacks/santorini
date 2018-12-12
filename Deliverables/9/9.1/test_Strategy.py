@@ -2,7 +2,6 @@ import pytest
 from Board import Board
 from RuleChecker import RuleChecker
 import Strategies
-from CustomExceptions import ContractViolation
 
 # TODO: modify tests to reflect that the strategy component no longer does a check for a valid (initial) board
 
@@ -42,14 +41,15 @@ def legal_board():
     return board
 
 
-@pytest.mark.parametrize("board, color, expected", [
-    (legal_initial_board(), "blue", [[0, 0], [0, 4]]),
-    (legal_initial_board(), "white", [[0, 0], [0, 4]]),
-    (legal_initial_board_with_workers("white"), "blue", [[0, 4], [4, 0]]),
-    (legal_initial_board_with_workers("blue"), "white", [[0, 4], [4, 0]]),
-])
-def test_get_placements(board, color, expected):
-    assert expected == Strategies.NLooksAheadStrategy.get_placements(board, color)
+# # Used to test for corner placements but no longer needed since placements are now random.
+# @pytest.mark.parametrize("board, color, expected", [
+#     (legal_initial_board(), "blue", [[0, 0], [0, 4]]),
+#     (legal_initial_board(), "white", [[0, 0], [0, 4]]),
+#     (legal_initial_board_with_workers("white"), "blue", [[0, 4], [4, 0]]),
+#     (legal_initial_board_with_workers("blue"), "white", [[0, 4], [4, 0]]),
+# ])
+# def test_get_placements(board, color, expected):
+#     assert expected == Strategies.NLooksAheadStrategy.get_placements(board, color)
 
 
 def test_get_play():

@@ -137,6 +137,8 @@ class Player(PlayerInterface):
         :return: An acknowledgement string of "OK"
         :rtype: str
         """
+        if not self.registered:
+            raise ContractViolation("Player.notify() cannot be called before register!")
         # resetting interaction protocol contracts for future games
         self.board = Board()
         self.color = None

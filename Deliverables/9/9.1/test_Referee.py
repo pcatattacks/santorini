@@ -51,17 +51,17 @@ def play_board(num_turns=0):
     return board.board
 
 
-@pytest.mark.parametrize("names", [
-    (["P1"]),
-    (["P1", "P2"])
-])
-def test_register_player(names):
-    player1 = Player("P1")
-    player2 = Player("P2")
-    referee = Referee(player1, player2)
-    for count, name in enumerate(names):
-        referee._register_player(name)
-        assert referee.player_names[count] == name
+# @pytest.mark.parametrize("names", [
+#     (["P1"]),
+#     (["P1", "P2"])
+# ])
+# def test_register_player(names):
+#     player1 = Player("P1")
+#     player2 = Player("P2")
+#     referee = Referee(player1, player2)
+#     for count, name in enumerate(names):
+#         referee._register_player(name)
+#         assert referee.player_names[count] == name
 
 
 @pytest.mark.parametrize("placements, expected", [
@@ -71,9 +71,9 @@ def test_register_player(names):
 def test_update_board_with_placements(placements, expected):
     player1 = Player("P1")
     player2 = Player("P2")
+    player1.register()
+    player2.register()
     referee = Referee(player1, player2)
-    referee._register_player(player1.register())
-    referee._register_player(player2.register())
     for count, placement in enumerate(placements):
         referee._update_board_with_placements(placement)
         referee._swap_turn()
@@ -89,9 +89,9 @@ def test_update_board_with_placements(placements, expected):
 def test_update_board_with_play(plays, expected):
     player1 = Player("P1")
     player2 = Player("P2")
+    player1.register()
+    player2.register()
     referee = Referee(player1, player2)
-    referee._register_player(player1.register())
-    referee._register_player(player2.register())
     referee.board.set_board(initial_board(4))
     for count, play in enumerate(plays):
         referee._update_board_with_play(play)

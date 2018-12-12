@@ -1,7 +1,9 @@
 import pytest
 from Board import Board
 from Player import Player
+from SmartPlayer import SmartPlayer
 from RuleChecker import RuleChecker
+from CustomExceptions import ContractViolation
 
 
 @pytest.fixture()
@@ -114,41 +116,50 @@ def valid_plays(play):
     return plays[play]
 
 
-@pytest.mark.parametrize("name", [
-    ("P1"),
-    ("P2")
-])
+@pytest.mark.parametrize("name", ["P1", "P2"])
 def test_register(name):
-    player = Player(name, 5)
+    player = Player(name)
     assert name == player.register()
+    with pytest.raises(ContractViolation): # testing if player can register twice
+        player.register()
 
 
 @pytest.mark.parametrize("board, color, expected", [
-    (initial_board(), RuleChecker.COLORS[0], [placement_positions(1), RuleChecker.COLORS[0]]),
-    (initial_board(2), RuleChecker.COLORS[1], [placement_positions(2), RuleChecker.COLORS[1]])
+    (initial_board(), RuleChecker.COLORS[0], RuleChecker.COLORS[0]),
+    (initial_board(2), RuleChecker.COLORS[1], RuleChecker.COLORS[1])
 ])
 def test_place(board, color, expected):
-    player = Player("P1", 5)
+    player = Player("P1")
     player.register()
-    assert expected[0] == player.place(board, color)
-    assert expected[1] == player.color
+    random_placements = player.place(board, color)
+    assert RuleChecker.is_valid_placement(random_placements)
+    assert expected == player.color
+    with pytest.raises(ContractViolation):  # checking if place can be called again (shouldn't)
+        player.place(board, color)
 
 
-@pytest.mark.parametrize("prev_board, curr_board, expected", [
-    (test_board_0_prev(), test_board_0(), valid_plays(0)),
-    (test_board_1_prev(), test_board_1(), valid_plays(1))
-])
-def test_play(prev_board, curr_board, expected):
-    player = Player("P1", 5)
-    player.register()
-    player.place(initial_board(), RuleChecker.COLORS[0])
-    player.board.set_board(prev_board)
-    assert expected == player.play(curr_board)
+# # no longer needed since it is randomized now.
+# @pytest.mark.parametrize("prev_board, curr_board, expected", [
+#     (test_board_0_prev(), test_board_0(), valid_plays(0)),
+#     (test_board_1_prev(), test_board_1(), valid_plays(1))
+# ])
+# def test_play(prev_board, curr_board, expected):
+#     player = Player("P1")
+#     player.register()
+#     player.place(initial_board(), RuleChecker.COLORS[0])
+#     player.board.set_board(prev_board)
+#     assert expected == player.play(curr_board)
 
 
 def test_notify():
-    player = Player("P1", 5)
+    player = Player("P1")
+    with pytest.raises(ContractViolation):
+        player.notify("P2")
+    player.register()
     assert "OK" == player.notify("P2")
+    assert player.color is None
+    assert Board().board == player.board.board
+    player.place(initial_board(), RuleChecker.COLORS[0])  # player should be able to place again now
 
 
 @pytest.mark.parametrize("prev_board, curr_board, color, expected", [
@@ -161,7 +172,7 @@ def test_notify():
     (test_board_3(), test_board_5(), RuleChecker.COLORS[0], False)
 ])
 def test_check_board(prev_board, curr_board, color, expected):
-    player = Player("P1", 5)
+    player = SmartPlayer("P1")
     player.register()
     player.place(initial_board(), color)
     player.board.set_board(prev_board)
