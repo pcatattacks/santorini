@@ -462,30 +462,43 @@ class SmartStrategy(BaseStrategy):
                 play_win_pcts[play] += prop
             return
 
-        prop *= 1 / len(turn_plays)
-
         for turn_play in turn_plays:
             turn_worker, turn_directions = turn_play
-
             if len(turn_directions) == 1:
                 if is_turn:
                     play_win_pcts[play] += prop
                 else:
                     play_loss_pcts[play] += prop
-                continue
+                return
 
+        # prop /= len(turn_plays)
+
+        best_score = None
+
+        for turn_play in turn_plays:
+            turn_worker, turn_directions = turn_play
             turn_move_dir, turn_build_dir = turn_directions
 
             board.move(turn_worker, turn_move_dir)
             board.build(turn_worker, turn_build_dir)
 
             if num_looks_ahead > 1:
-                self._score_look_ahead(board, play, play_scores, play_win_pcts, play_loss_pcts, color, (not is_turn), prop, num_looks_ahead-1)
+                # self._score_look_ahead(board, play, play_scores, play_win_pcts, play_loss_pcts, color, (not is_turn), prop, num_looks_ahead-1)
+                self._score_look_ahead(board, play, play_scores, play_win_pcts, play_loss_pcts, color, (not is_turn),
+                                       (prop / len(turn_plays)), num_looks_ahead - 1)
             else:
-                play_scores[play] += self._score_board(board, color) * prop
+                # play_scores[play] += self._score_board(board, color) * prop
+                turn_score = self._score_board(board, color)
+                if best_score is None:
+                    best_score = turn_score
+                elif (is_turn and turn_score > best_score) or (not is_turn and turn_score < best_score):
+                    best_score = turn_score
 
             board.undo_build(turn_worker, turn_build_dir)
             board.move(turn_worker, board.get_opposite_direction(turn_move_dir))
+
+        if best_score is not None:
+            play_scores[play] += best_score * prop
 
     def _score_board(self, board, color):
         opp_color = RuleChecker.COLORS[0] if color == RuleChecker.COLORS[1] else RuleChecker.COLORS[1]
@@ -633,3 +646,24 @@ class InteractiveStrategy(BaseStrategy):
         print("\nBoard State:")
         print("---------------------------")
         print(board)
+
+
+class CheatingStrategy(BaseStrategy):
+    def get_placements(self, board, color):
+        placements = []
+        rows, cols = board.get_dimensions()
+        for i in range(2):
+            row = random.randint(0, rows-1)
+            col = random.randint(0, cols-1)
+            placements.append([row, col])
+        return placements
+
+    def get_play(self, board, color):
+        workers = [color + "1", color + "2"]
+        worker = random.choice(workers)
+        directions = [random.choice(RuleChecker.DIRECTIONS)]
+        if random.random() < 0.9:
+            directions.append(random.choice(RuleChecker.DIRECTIONS))
+        play = [worker, directions]
+        return play
+

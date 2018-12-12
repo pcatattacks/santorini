@@ -1,6 +1,6 @@
 from Board import Board
 from RuleChecker import RuleChecker
-from Strategies import RandomStrategy, GreedyStrategy
+from Strategies import RandomStrategy, GreedyStrategy, SmartStrategy, CheatingStrategy
 from CustomExceptions import ContractViolation, IllegalPlay
 from Player import Player
 import json

@@ -137,26 +137,22 @@ class PlayerDriver:
         self.s.sendall(data)
 
 
-def main(strategy_type, admin_host, admin_port):
+def main(strategy_type, num_looks_ahead, admin_host, admin_port):
     if not isinstance(admin_port, int):
         raise ValueError()
 
     if strategy_type == "random":
         strategy = Strategies.RandomStrategy()
     elif strategy_type == "look-ahead":
-        try:
-            with open("strategy.config", "r") as f:
-                num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
-            strategy = Strategies.NLooksAheadStrategy(num_looks_ahead)
-        except FileNotFoundError:
-            print("strategy.config for look-ahead strategy file not found in directory!")
-            sys.exit(1)
+        strategy = Strategies.NLooksAheadStrategy(num_looks_ahead)
     elif strategy_type == "smart":
-        strategy = Strategies.SmartStrategy()
+        strategy = Strategies.SmartStrategy(num_looks_ahead)
     elif strategy_type == "greedy":
         strategy = Strategies.GreedyStrategy()
     elif strategy_type == "interactive":
         strategy = Strategies.InteractiveStrategy()
+    elif strategy_type == "cheating":
+        strategy = Strategies.CheatingStrategy()
     else:
         raise ValueError("Unsupported strategy type!")
 
@@ -169,12 +165,21 @@ def main(strategy_type, admin_host, admin_port):
 if __name__ == "__main__":
     try:
         strategy_option = sys.argv[1]
+        if len(sys.argv) > 2:
+            num_looks_ahead = int(sys.argv[2])
+        else:
+            try:
+                with open("strategy.config", "r") as f:
+                    num_looks_ahead = parse_json(f.read())[0]["value"]["look-ahead"]
+            except FileNotFoundError:
+                print("strategy.config for look-ahead strategy file not found in directory!")
+                sys.exit(1)
 
         with open("santorini.config") as f:
             data = parse_json(f.read())[0]["value"]
             ip, port = data["IP"], data["port"]
 
-        main(strategy_option, ip, port)
+        main(strategy_option, num_looks_ahead, ip, port)
     except ValueError:
         print("usage: ./player_driver.sh [strategy] ... [random | look-ahead | interactive | greedy]")
         sys.exit(1)

@@ -157,6 +157,8 @@ def main(strategy_type, admin_host, admin_port):
         strategy = Strategies.GreedyStrategy()
     elif strategy_type == "interactive":
         strategy = Strategies.InteractiveStrategy()
+    elif strategy_type == "cheating":
+        strategy = Strategies.CheatingStrategy()
     else:
         raise ValueError("Unsupported strategy type!")
 
@@ -176,6 +178,6 @@ if __name__ == "__main__":
 
         main(strategy_option, ip, port)
     except ValueError:
-        print("usage: ./player_driver.sh [strategy] ... [random | look-ahead | interactive | greedy]")
+        print("usage: ./player_driver.sh [strategy] ... [random | look-ahead | interactive | greedy | cheating]")
         sys.exit(1)
 
