@@ -144,6 +144,7 @@ class RoundRobinAdmin(BaseAdmin):
 
     def run_tournament(self):
         active_players = list(self.players.keys())
+        cheaters = set()
         for i in range(len(active_players)):
             for j in range(i+1, len(active_players)):
                 player1, player2 = active_players[i], active_players[j]
@@ -157,8 +158,10 @@ class RoundRobinAdmin(BaseAdmin):
                 self.players[winner].append(loser)
 
                 if loser_cheated:
+                    cheaters.add(loser)
                     for past_opponent in self.players[loser]:
-                        self.players[past_opponent].append(loser)
+                        if past_opponent not in cheaters:
+                            self.players[past_opponent].append(loser)
                     self.players[loser] = []
                     sub_player = self.fallback_player()
                     sub_player.register()

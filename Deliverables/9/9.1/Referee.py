@@ -93,8 +93,12 @@ class Referee:
             print(e)  # debug
             winner = self.players[self.turn * -1 + 1]
             cheating = True
-            for p in self.players:
-                p.notify(winner.get_name())
+            try:
+                for p in self.players:
+                    p.notify(winner.get_name())
+            except InvalidCommand as e:
+                print(e)
+                print("cheater already identified!")
         except IllegalResponse as e:  # Only happens when socket abruptly closes on Player side
             print(e)
             winner = self.players[self.turn * -1 + 1]
