@@ -1,5 +1,5 @@
 # Santorini
-A distributed version of the 2-player version of the Santorini board game (without God cards).
+A distributed implementation of the 2-player version of the Santorini board game (without God cards).
 
 Instructions can be found [here](https://roxley.com/wp-content/uploads/2016/08/Santorini-Rulebook-Web-2016.08.14.pdf).
 
@@ -55,3 +55,14 @@ In `Strategies.py`, various strategy components can be found, each with a differ
 `InteractiveStrategy` is the one that allows remote players to make their own (`interactive`) moves. All others make automated moves.
 
 For more information, dig into the `Strategies.py` file.
+
+## THIS IS NOT MY GAME
+
+The trademark and copyright for Santorini belong to:
+
+© 2017 Roxley Games. All rights reserved worldwide. Manufactured and distributed under license 
+by Spin Master Ltd.  
+SANTORINI™ is a trademark of Gordon Hamilton, used under license.  
+Spin Master logo & © Spin Master Ltd. All rights reserved. 
+
+This implementation belongs to the contributors and should only be used for private use. Thanks!
