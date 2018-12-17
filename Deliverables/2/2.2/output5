@@ -1,2 +1,0 @@
-ValueError: Administrator.set_player_option() value argument
-            must be between 1 and 10 inclusive, or -1.

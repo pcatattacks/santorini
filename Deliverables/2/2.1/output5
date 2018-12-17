@@ -1,1 +1,0 @@
-Player.ContractError: Can't call player.end_game() until player.keep_number() is called.
